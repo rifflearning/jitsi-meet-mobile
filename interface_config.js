@@ -2,7 +2,7 @@
 /* eslint sort-keys: ["error", "asc", {"caseSensitive": false}] */
 
 var interfaceConfig = {
-    APP_NAME: 'Jitsi Meet',
+    APP_NAME: 'Riff Analytics',
     AUDIO_LEVEL_PRIMARY_COLOR: 'rgba(255,255,255,0.4)',
     AUDIO_LEVEL_SECONDARY_COLOR: 'rgba(255,255,255,0.2)',
 
@@ -15,7 +15,7 @@ var interfaceConfig = {
      * Note: this mode is experimental and subject to breakage.
      */
     AUTO_PIN_LATEST_SCREEN_SHARE: 'remote-only',
-    BRAND_WATERMARK_LINK: '',
+    BRAND_WATERMARK_LINK: 'https://www.riffanalytics.ai',
 
     CLOSE_PAGE_GUEST_HINT: false, // A html text to be shown to guests on the close page, false disables it
     /**
@@ -47,7 +47,7 @@ var interfaceConfig = {
     DEFAULT_BACKGROUND: '#474747',
     DEFAULT_LOCAL_DISPLAY_NAME: 'me',
     DEFAULT_LOGO_URL: 'images/watermark.png',
-    DEFAULT_REMOTE_DISPLAY_NAME: 'Fellow Jitster',
+    DEFAULT_REMOTE_DISPLAY_NAME: 'Fellow Riffer',
 
     DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
 
@@ -107,10 +107,10 @@ var interfaceConfig = {
     HIDE_INVITE_MORE_HEADER: false,
 
     INITIAL_TOOLBAR_TIMEOUT: 20000,
-    JITSI_WATERMARK_LINK: 'https://jitsi.org',
+    JITSI_WATERMARK_LINK: 'https://www.riffanalytics.ai',
 
     LANG_DETECTION: true, // Allow i18n to detect the system language
-    LIVE_STREAMING_HELP_LINK: 'https://jitsi.org/live', // Documentation reference for the live streaming feature.
+    LIVE_STREAMING_HELP_LINK: 'https://support.google.com/youtube/answer/2474026', // Documentation reference for the live streaming feature.
     LOCAL_THUMBNAIL_RATIO: 16 / 9, // 16:9
 
     /**
@@ -169,7 +169,7 @@ var interfaceConfig = {
      * If indicated some of the error dialogs may point to the support URL for
      * help.
      */
-    SUPPORT_URL: 'https://community.jitsi.org/',
+    SUPPORT_URL: 'https://www.riffanalytics.ai/contact-us/',
 
     TOOLBAR_ALWAYS_VISIBLE: false,
 
