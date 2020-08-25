@@ -270,9 +270,11 @@ class Conference extends AbstractConference<Props, *> {
         interfaceConfig.filmStripOnly
             && dispatch(setToolboxAlwaysVisible(true));
 
-        dispatch(setTileViewByDefault());
-        dispatch(attachSibilant());
-        dispatch(subscribeToEmotionsData());
+        if (!this.props._showPrejoin) {
+            dispatch(setTileViewByDefault());
+            dispatch(attachSibilant());
+            dispatch(subscribeToEmotionsData());
+        }
     }
 }
 

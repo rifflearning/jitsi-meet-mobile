@@ -14,9 +14,8 @@ import {
 import { openURLInBrowser } from '../base/util';
 import { executeDialOutRequest, executeDialOutStatusRequest, getDialInfoPageURL } from '../invite/functions';
 import { showErrorNotification } from '../notifications';
-
-// import { subscribeToEmotionsData } from '../riff-emotions/actions';
-// import { setTileViewByDefault, attachSibilant } from '../riff-metrics/actions';
+import { subscribeToEmotionsData } from '../riff-emotions/actions';
+import { setTileViewByDefault, attachSibilant } from '../riff-metrics/actions';
 
 import {
     PREJOIN_START_CONFERENCE,
@@ -208,9 +207,9 @@ export function initPrejoin(tracks: Object[], errors: Object) {
  */
 export function joinConference() {
     return (dispatch: Function) => {
-        // dispatch(setTileViewByDefault());
-        // dispatch(attachSibilant());
-        // dispatch(subscribeToEmotionsData());
+        dispatch(setTileViewByDefault());
+        dispatch(attachSibilant());
+        dispatch(subscribeToEmotionsData());
 
         dispatch({
             type: PREJOIN_START_CONFERENCE
