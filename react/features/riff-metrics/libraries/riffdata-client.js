@@ -21,13 +21,13 @@ import io from 'socket.io-client';
 
 // access to api
 
-let dataserverPath = window.client_config?.dataServer?.path || '';
+let dataserverPath = '/api/videodata';
 
 dataserverPath += '/socket.io';
 
-const socketUrl = `https://riff-poc.riffplatform.com`;
+const socketUrl = 'https://dev.riffplatform.com';
 
-const socket = io(window.client_config?.dataServer?.url || socketUrl, {
+const socket = io(socketUrl, {
     timeout: 20000,
     path: dataserverPath,
     transports: [
