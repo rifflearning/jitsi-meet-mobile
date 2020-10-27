@@ -9,6 +9,8 @@ import * as actionTypes from './actionTypes';
 import { app, socket } from 'libs/riffdata-client';
 import { subscribeToEmotionsData } from '../riff-emotions/actions';
 import { sendStatsOnConnect } from './nodejs-browser-stats';
+import RiffPlatform from '../riff-platform/components';
+import api from '../riff-platform/api';
 
 export function setRiffServerRoomId(roomId) {
     return {
@@ -138,15 +140,13 @@ function sendUtteranceToServer(data, {uid: participant}, room, token ) {
 export function maybeRedirectToLoginPage() {
     return new Promise(res => {
         if (!config.iAmRecorder) {
-            // if (!localStorage.getItem('jwt-token') && (window.location.pathname !== '/app/login')) {
-            if (window.location.pathname !== '/app/login') {
-                localStorage.setItem('prevPathname', window.location.pathname);
-                window.location.pathname = '/app/login'
-            }
-            firebaseApp.auth().onAuthStateChanged(user => {
+            api.isAuth().then(user => {
                 if (user === null) {
                     localStorage.setItem('prevPathname', window.location.pathname);
-                    window.location.href = '/static/login.html';
+                    APP.store.getState()['features/base/app'].app._navigate({
+                        component: RiffPlatform,
+                        href: null
+                    });
                 } else {
                     const { uid, email, displayName } = user;
 
