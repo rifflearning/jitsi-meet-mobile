@@ -11,6 +11,7 @@ import { ActionButton, InputField, PreMeetingScreen, ToggleButton } from '../../
 import { connect } from '../../base/redux';
 import { getDisplayName, updateSettings } from '../../base/settings';
 import { getLocalJitsiVideoTrack } from '../../base/tracks';
+import { maybeExtractIdFromDisplayName } from '../../riff-dashboard-page/functions';
 import {
     joinConference as joinConferenceAction,
     joinConferenceWithoutAudio as joinConferenceWithoutAudioAction,
@@ -259,6 +260,8 @@ class Prejoin extends Component<Props, State> {
         const { _closeDialog, _onDropdownClose, _onOptionsClick, _setName, _showDialog } = this;
         const { showJoinByPhoneButtons } = this.state;
 
+        const { firebaseIdWithSeparator, displayName } = maybeExtractIdFromDisplayName(name);
+
         return (
             <PreMeetingScreen
                 footer = { this._renderFooter() }
@@ -273,10 +276,16 @@ class Prejoin extends Component<Props, State> {
                     <div className = 'prejoin-input-area-container'>
                         <div className = 'prejoin-input-area'>
                             <InputField
-                                onChange = { _setName }
+                                placeHolder = 'Room Name (* Required)'
+                                value = { window.location.pathname.slice(1) } />
+                            <InputField
+                                placeHolder = 'Meeting Type' />
+                            <InputField
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onChange = { value => _setName(`${firebaseIdWithSeparator}${value}`) }
                                 onSubmit = { joinConference }
                                 placeHolder = { t('dialog.enterDisplayName') }
-                                value = { name } />
+                                value = { displayName } />
 
                             <div className = 'prejoin-preview-dropdown-container'>
                                 <InlineDialog

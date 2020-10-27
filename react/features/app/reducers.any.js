@@ -49,3 +49,4 @@ import '../videosipgw/reducer';
 import '../welcome/reducer';
 import '../riff-dashboard-page/reducer';
 import '../riff-emotions/reducer';
+import '../riff-platform/reducer';

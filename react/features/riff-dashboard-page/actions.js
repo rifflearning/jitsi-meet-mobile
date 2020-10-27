@@ -138,6 +138,11 @@ function sendUtteranceToServer(data, {uid: participant}, room, token ) {
 export function maybeRedirectToLoginPage() {
     return new Promise(res => {
         if (!config.iAmRecorder) {
+            // if (!localStorage.getItem('jwt-token') && (window.location.pathname !== '/app/login')) {
+            if (window.location.pathname !== '/app/login') {
+                localStorage.setItem('prevPathname', window.location.pathname);
+                window.location.pathname = '/app/login'
+            }
             firebaseApp.auth().onAuthStateChanged(user => {
                 if (user === null) {
                     localStorage.setItem('prevPathname', window.location.pathname);

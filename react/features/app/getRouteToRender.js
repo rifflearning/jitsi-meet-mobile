@@ -1,5 +1,4 @@
 // @flow
-
 import { generateRoomWithoutSeparator } from '@jitsi/js-utils/random';
 import type { Component } from 'react';
 
@@ -9,6 +8,7 @@ import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
 import { maybeRedirectToLoginPage } from '../riff-dashboard-page/actions';
+import RiffApp from '../riff-platform/components';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
 import {
     BlankPage,
@@ -38,16 +38,46 @@ export type Route = {
  * {@code getState} function.
  * @returns {Promise<Route>}
  */
-export function _getRouteToRender(stateful: Function | Object): Promise<Route> {
+export async function _getRouteToRender(stateful: Function | Object): Promise<Route> {
     const state = toState(stateful);
 
-    return maybeRedirectToLoginPage().then(() => {
-        if (navigator.product === 'ReactNative') {
-            return _getMobileRoute(state);
-        }
+    await maybeRedirectToLoginPage();
 
-        return _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
-    });
+    if (navigator.product === 'ReactNative') {
+        return _getMobileRoute(state);
+    }
+
+    return _getRiffAppRoute(state) || _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
+}
+
+/**
+ * Returns the {@code Route} to display when trying to access a conference if
+ * a valid conference is being joined.
+ *
+ * @param {Object} state - The redux state.
+ * @returns {Promise<Route>|undefined}
+ */
+function _getRiffAppRoute(state): ?Promise<Route> {
+    if (window.location.pathname.split('/')[1] !== 'app') {
+        return;
+    }
+
+    const route = {
+        component: RiffApp,
+        href: undefined
+    };
+
+    // Update the location if it doesn't match. This happens when a room is
+    // joined from the welcome page. The reason for doing this instead of using
+    // the history API is that we want to load the config.js which takes the
+    // room into account.
+    const { locationURL } = state['features/base/connection'];
+
+    if (window.location.href !== locationURL.href) {
+        route.href = locationURL.href;
+    }
+
+    return Promise.resolve(route);
 }
 
 /**
