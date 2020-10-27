@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as actionTypes from '../actionTypes';
 import api from '../api';
+import { setJwt, removeJwt } from '../functions';
 
 function signInRequest(){
   return {
@@ -9,7 +10,7 @@ function signInRequest(){
 }
 
 export function signInSuccess(token) {
-  localStorage.setItem('jwt-token', token);
+  setJwt(token)
 
   // const pathName = localStorage.getItem('prevPathname');
   // if ( pathName && (pathName !== window.location.pathname)) {
@@ -32,7 +33,7 @@ function signInFailure(error){
 }
 
 export function logout() {
-  localStorage.removeItem('jwt-token');
+  removeJwt()
 
   return {
     type: actionTypes.LOGOUT

@@ -1,11 +1,13 @@
 /* eslint-disable */
+import { getJwt } from './functions';
+
 const API_URL = "https://localhost:4445/api";
 
 class AuthService {
     getHeaders = () => ({
         headers: {
             'Content-type': 'application/json',
-            'Authorization': 'Bearer ' + (localStorage.getItem('jwt-token'))
+            'Authorization': 'Bearer ' + (getJwt())
         }
     })
 
@@ -48,6 +50,20 @@ class AuthService {
         } catch (e) {
             throw new Error('Error in fetchProfile');
         }
+    }
+
+    isAuth = async () => {
+        if (!getJwt()) return null;
+
+        let user;
+        try {
+            const { email: uid, email, name: displayName } = await this.fetchProfile() // name: "r", email: "r"
+
+            user = { uid, email, displayName };
+        } catch (error) {
+            user = null;
+        }
+        return user;
     }
 }
 

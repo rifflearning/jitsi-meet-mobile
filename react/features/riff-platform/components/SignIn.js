@@ -24,6 +24,7 @@ const Login = ({ login, loginError, loggingIn }) => {
             <form onSubmit = { handleSubmit }>
                 <input
                     required
+                    autoFocus
                     // type = 'email'
                     onChange = { e => setemail(e.target.value) } />
                 <input
@@ -31,7 +32,7 @@ const Login = ({ login, loginError, loggingIn }) => {
                     // type = 'password'
                     onChange = { e => setpassword(e.target.value) } />
                 <input
-                    disabled = { Boolean(loggingIn && email && password) }
+                    disabled = { loggingIn }
                     type = 'submit'
                     value = 'submit' />
             </form>

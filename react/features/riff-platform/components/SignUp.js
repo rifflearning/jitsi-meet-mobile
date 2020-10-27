@@ -26,6 +26,7 @@ const SignUp = ({ register, signUpError, signingUp }) => {
             <form onSubmit = { handleSubmit }>
                 <input
                     required
+                    autoFocus
                     // type = 'email'
                     onChange = { e => setname(e.target.value) } />
                 <input

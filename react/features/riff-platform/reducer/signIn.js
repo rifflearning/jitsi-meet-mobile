@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 import * as actionTypes from '../actionTypes';
+import { getJwt } from '../functions';
 
-const token = localStorage.getItem('jwt-token');
+const token = getJwt();
 const initialState = token ? { loggedIn: true,
     token } : {};
 
