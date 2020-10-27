@@ -104,22 +104,21 @@ $flagsImagePath: "../images/";
 /* Modules END */
 @import 'riff-overrides';
 
-.drag-container {
-    position: absolute;
-    height: calc(100vh + 240px);
-    width: calc(100vw + 200px);
-    pointer-events: none;
+/*
+#riff-dashboard-page-full {
+  all: unset;
+  
+  @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+}
+*/
+#meeting-mediator-wrapper {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  cursor: move;
 
-  #meeting-mediator-wrapper {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    cursor: move;
-    pointer-events: all;
-
-    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
-  }
+  @import '../react/features/riff-dashboard-page/src/sass/main.scss';
 }
 
 /* tooltip for meeting-mediator */
