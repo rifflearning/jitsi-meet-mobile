@@ -7,11 +7,14 @@ import {
 } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
+import { createBrowserHistory } from "history";
 // import { FullDashboardPage } from '../../riff-dashboard-page/src/dashboard-page';
 
 import App from './App';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+
+export const customHistory = createBrowserHistory();
 
 const Reset = () => <div>Reset</div>;
 
@@ -48,7 +51,7 @@ const RiffPlatform = ({ token }) => {
     );
 
     return (
-        <Router basename = '/app'>
+        <Router basename = '/app' history={customHistory}>
             <Switch>
                 {token ? loggedInRoutes : authRoutes}
             </Switch>

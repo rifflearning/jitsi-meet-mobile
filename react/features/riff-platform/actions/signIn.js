@@ -1,7 +1,10 @@
 /* eslint-disable */
 import * as actionTypes from '../actionTypes';
 import api from '../api';
-import { setJwt, removeJwt } from '../functions';
+import { setJwt, removeJwt, getPrevPath } from '../functions';
+import { _getRouteToRender } from '../../app/getRouteToRender';
+import { customHistory } from '../components';
+import { _navigate } from '../../app/middleware';
 
 function signInRequest(){
   return {
@@ -10,18 +13,22 @@ function signInRequest(){
 }
 
 export function signInSuccess(token) {
-  setJwt(token)
+  return (dispatch, getState) => {
+    setJwt(token)
 
-  // const pathName = localStorage.getItem('prevPathname');
-  // if ( pathName && (pathName !== window.location.pathname)) {
-  //   window.location.pathname = pathName;
-  // } else {
-  //   window.location.pathname = '/';
-  // }
-
-  return {
-    type: actionTypes.LOGIN_SUCCESS,
-    token
+    const prevPathname = getPrevPath();
+    const isPrevPathRoomName = () => prevPathname && prevPathname?.split('/')[1] !== 'app';
+    if (isPrevPathRoomName()) {
+      // navigate to room name
+      customHistory.push(getPrevPath());
+      _navigate({getState})
+    } else {
+      // set token, what will redirect main app to /app root
+      dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        token
+      })
+    }
   }
 }
 
@@ -40,12 +47,13 @@ export function logout() {
   }
 }
 
-export function signIn({email, password}) {
+export function signIn({ email, password }) {
   return async (dispatch) => {
     dispatch(signInRequest());
 
     try {
       const res = await api.signIn({email, password})
+
 
       dispatch(signInSuccess(res.token));
     } catch (e) {

@@ -11,6 +11,7 @@ import { subscribeToEmotionsData } from '../riff-emotions/actions';
 import { sendStatsOnConnect } from './nodejs-browser-stats';
 import RiffPlatform from '../riff-platform/components';
 import api from '../riff-platform/api';
+import { setPrevPath } from '../riff-platform/functions';
 
 export function setRiffServerRoomId(roomId) {
     return {
@@ -142,7 +143,7 @@ export function maybeRedirectToLoginPage() {
         if (!config.iAmRecorder) {
             api.isAuth().then(user => {
                 if (user === null) {
-                    localStorage.setItem('prevPathname', window.location.pathname);
+                    setPrevPath(window.location.pathname)
                     APP.store.getState()['features/base/app'].app._navigate({
                         component: RiffPlatform,
                         href: null

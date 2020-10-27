@@ -1,15 +1,4 @@
-export const getJwt = () => {
-    let jwt;
-
-    try {
-        jwt = localStorage.getItem('jwt-token');
-    } catch (e) {
-        console.error(e);
-        jwt = null;
-    }
-
-    return jwt;
-};
+export const getJwt = () => localStorage.getItem('jwt-token');
 
 export const setJwt = token => {
     localStorage.setItem('jwt-token', token);
@@ -17,5 +6,11 @@ export const setJwt = token => {
 
 export const removeJwt = () => {
     localStorage.removeItem('jwt-token');
+};
+
+export const getPrevPath = () => sessionStorage.getItem('prevPathname');
+
+export const setPrevPath = pathName => {
+    sessionStorage.setItem('prevPathname', pathName);
 };
 
