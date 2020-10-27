@@ -1,0 +1,22 @@
+html body {
+  background-color: $defaultBackground;
+
+    #react #riff-dashboard-page-full {  
+      @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+    }
+}
+
+#meeting-mediator-wrapper {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    cursor: move;
+
+    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+}
+
+/* tooltip for meeting-mediator */
+body > .tooltip {
+    z-index: 100;
+}

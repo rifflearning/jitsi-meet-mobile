@@ -8,7 +8,7 @@ import {
 
 import { connect } from '../../base/redux';
 import { createBrowserHistory } from "history";
-// import { FullDashboardPage } from '../../riff-dashboard-page/src/dashboard-page';
+import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 
 import App from './App';
 import SignIn from './SignIn';
@@ -26,9 +26,9 @@ const RiffPlatform = ({ token }) => {
                 path = '/' >
                 <App />
             </Route>
-            {/* <Route
-                component={FullDashboardPage}
-                path = '/dashboard' /> */}
+            <Route
+                component={DashboardPage}
+                path = '/dashboard' />
             <Redirect to = '/' />
         </Switch>
     );

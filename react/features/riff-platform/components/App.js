@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
-// import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
 import { getProfile } from '../actions/profile';
@@ -14,14 +14,14 @@ const App = ({ doLogout, getProfileInfo, profileInfo, profileLoading }) => {
     return (
         <div>
             <p>
-                App
+                Lobby
             </p>
             {profileLoading ? 'loading...' : JSON.stringify(profileInfo)}
             <button
                 onClick = { doLogout }>
                 logout
             </button>
-            {/* <Link to = '/dashboard'>Dashboard</Link> */}
+            <Link to = '/dashboard'>Dashboard</Link>
         </div>
     );
 };

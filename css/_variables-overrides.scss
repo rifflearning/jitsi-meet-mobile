@@ -8,6 +8,7 @@ $welcomePageTabContainerItem: rgba(255,255,255,0.50);
 $welcomePageTabContainerItemHover: rgba(255,255,255,0.25);
 
 // override _light.scss theme
+$defaultBackground: #282725;
 $primaryButtonBackground: $riffVioletDark;
 $primaryButtonHoverBackground: $riffViolet;
 $overlayButtonBg: $riffViolet;
@@ -15,8 +16,8 @@ $reloadProgressBarBg: $riffViolet;
 $popupSliderColor: #9603da;
 
 // override _variables.scss
-$welcomePageBackground: linear-gradient(-90deg, #282725 0%, #7a7974 50%, #474747 100%);
-$welcomePageBackground: linear-gradient(-90deg, #282725 0%, #282725 50%, #282725 100%);
+$welcomePageBackground: linear-gradient(-90deg, $defaultBackground 0%, #7a7974 50%, #474747 100%);
+$welcomePageBackground: $defaultBackground;
 $videoThumbnailSelected: $riffViolet;
 $dominantSpeakerBg: $riffViolet;
 $connectionIndicatorBg: $riffViolet;
