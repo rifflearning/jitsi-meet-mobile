@@ -16,8 +16,7 @@ $reloadProgressBarBg: $riffViolet;
 $popupSliderColor: #9603da;
 
 // override _variables.scss
-$welcomePageBackground: linear-gradient(-90deg, $defaultBackground 0%, #7a7974 50%, #474747 100%);
-$welcomePageBackground: $defaultBackground;
+$welcomePageBackground: linear-gradient(-90deg, $defaultBackground 0%, $defaultBackground 50%, $defaultBackground 100%);
 $videoThumbnailSelected: $riffViolet;
 $dominantSpeakerBg: $riffViolet;
 $connectionIndicatorBg: $riffViolet;
