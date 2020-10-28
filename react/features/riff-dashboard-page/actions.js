@@ -1,7 +1,6 @@
 /* global APP, config */
 
 import Sibilant from 'sibilant-webaudio';
-import { firebaseApp } from 'libs/utils/firebase_utils';
 
 import { setTileView } from '../video-layout';
 
@@ -12,6 +11,7 @@ import { sendStatsOnConnect } from './nodejs-browser-stats';
 import RiffPlatform from '../riff-platform/components';
 import api from '../riff-platform/api';
 import { setPrevPath } from '../riff-platform/functions';
+import { navigateWithoutReload } from './functions';
 
 export function setRiffServerRoomId(roomId) {
     return {
@@ -26,9 +26,7 @@ export function redirectToRiffMetrics() {
 
         await participantLeaveRoom(roomId, uid);
 
-        getState()['features/base/app'].app._navigate({
-            href: '/static/dashboard.html'
-        });
+        navigateWithoutReload(RiffPlatform, '/app/dashboard');
     };
 }
 
@@ -144,10 +142,7 @@ export function maybeRedirectToLoginPage() {
             api.isAuth().then(user => {
                 if (user === null) {
                     setPrevPath(window.location.pathname)
-                    APP.store.getState()['features/base/app'].app._navigate({
-                        component: RiffPlatform,
-                        href: null
-                    });
+                    navigateWithoutReload(RiffPlatform);
                 } else {
                     const { uid, email, displayName } = user;
 

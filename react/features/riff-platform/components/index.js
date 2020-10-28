@@ -13,6 +13,7 @@ import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import App from './App';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import { getJwt } from '../functions';
 
 export const customHistory = createBrowserHistory();
 
@@ -53,7 +54,7 @@ const RiffPlatform = ({ token }) => {
     return (
         <Router basename = '/app' history={customHistory}>
             <Switch>
-                {token ? loggedInRoutes : authRoutes}
+                {getJwt() ? loggedInRoutes : authRoutes}
             </Switch>
         </Router>
     );
