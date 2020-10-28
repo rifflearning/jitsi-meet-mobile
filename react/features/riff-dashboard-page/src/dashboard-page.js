@@ -71,9 +71,9 @@ const DashboardPage = () => {
 export default () => (
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <ConnectedRouter history={browserHistory}>
+            {/* <ConnectedRouter history={browserHistory}> */}
               <DashboardPage />
-            </ConnectedRouter>
+            {/* </ConnectedRouter> */}
         </PersistGate>
     </Provider>
 )

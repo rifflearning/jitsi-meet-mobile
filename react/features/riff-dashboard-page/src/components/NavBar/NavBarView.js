@@ -295,8 +295,7 @@ class NavBarView extends React.Component {
             if (this.props.authType === AuthTypes.Firebase) {
                 userLinks.push(
                     <Link
-                        // to={Routes.UserProfile}
-                        to={''}
+                        to={'/'}
                         key={Routes.UserProfile}>
                         {'Profile'}
                     </Link>

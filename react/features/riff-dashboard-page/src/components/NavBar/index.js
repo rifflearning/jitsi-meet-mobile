@@ -17,6 +17,7 @@ import { connect } from 'react-redux';
 import { replace } from 'connected-react-router';
 
 import { toggleNavbarMenu } from 'Redux/actions/menu';
+import {logout} from '../../../../riff-platform/actions/signIn'
 import { userLogout } from 'Redux/actions/user';
 import { getIsRiffConnected } from 'Redux/selectors/riff';
 import { getInviteId, getWasInvited } from 'Redux/selectors/chat';
@@ -46,7 +47,8 @@ const navBarMapProps = {
 
     mapDispatchToProps: dispatch => ({
         handleLogOut: (/* event */) => {
-            dispatch(userLogout());
+            APP.store.dispatch(logout());
+            // dispatch(userLogout());
             // dispatch(replace(Routes.Home));
         },
 
