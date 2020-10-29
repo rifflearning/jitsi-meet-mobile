@@ -128,7 +128,9 @@ function _conferenceWillLeave({ dispatch, getState }, next, action) {
 function _setRoom({ dispatch, getState }, next, action) {
     const { doNotStoreRoom } = getState()['features/base/config'];
 
-    if (!doNotStoreRoom && action.room) {
+    const isRiffPlatformPath = () => window.location.pathname.split('/')[1] === 'app';
+
+    if (!doNotStoreRoom && action.room && !isRiffPlatformPath()) {
         const { locationURL } = getState()['features/base/connection'];
 
         if (locationURL) {
