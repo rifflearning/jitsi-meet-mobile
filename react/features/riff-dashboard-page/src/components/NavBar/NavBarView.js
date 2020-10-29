@@ -128,7 +128,7 @@ class NavBarView extends React.Component {
                 <div className='riff-logo'>
                     <Link
                         // to={Routes.Home}
-                        to={''}
+                        to={'dashboard'}
                         onClick={() => {
                             window.location.pathname = '/';
                         }}
@@ -248,7 +248,7 @@ class NavBarView extends React.Component {
             chatRoute = (
                 <Link
                     // to={Routes.Chat}
-                    to={''}
+                    to={'/dashboard'}
                     className={`nav-link ${activeRoute === Routes.Chat ? 'is-active' : ''}`}
                     onClick={() => {
                         window.location.pathname = `/${this.props.roomName}`;
@@ -295,6 +295,7 @@ class NavBarView extends React.Component {
             if (this.props.authType === AuthTypes.Firebase) {
                 userLinks.push(
                     <Link
+                        // to={Routes.UserProfile}
                         to={'/'}
                         key={Routes.UserProfile}>
                         {'Profile'}
@@ -307,7 +308,7 @@ class NavBarView extends React.Component {
                 userLinks.push(
                     <Link
                         // to={Routes.Home}
-                        to={''}
+                        to={'/dashboard'}
                         key='logout'
                         onClick={this.props.handleLogOut}
                     >
