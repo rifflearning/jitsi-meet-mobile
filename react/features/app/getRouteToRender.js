@@ -8,7 +8,7 @@ import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
 import { maybeRedirectToLoginPage } from '../riff-dashboard-page/actions';
-import RiffApp from '../riff-platform/components';
+import RiffPlatform from '../riff-platform/components';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
 import {
     BlankPage,
@@ -47,7 +47,7 @@ export async function _getRouteToRender(stateful: Function | Object): Promise<Ro
         return _getMobileRoute(state);
     }
 
-    return _getRiffAppRoute(state) || _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
+    return _getRiffPlatformRoute(state) || _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
 }
 
 /**
@@ -57,13 +57,13 @@ export async function _getRouteToRender(stateful: Function | Object): Promise<Ro
  * @param {Object} state - The redux state.
  * @returns {Promise<Route>|undefined}
  */
-function _getRiffAppRoute(state): ?Promise<Route> {
+function _getRiffPlatformRoute(state): ?Promise<Route> {
     if (window.location.pathname.split('/')[1] !== 'app') {
         return;
     }
 
     const route = {
-        component: RiffApp,
+        component: RiffPlatform,
         href: undefined
     };
 
@@ -149,7 +149,11 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
 function _getWebWelcomePageRoute(state): Promise<Route> {
     const route = _getEmptyRoute();
 
-    if (isWelcomePageUserEnabled(state)) {
+    const redirectToRiffPlatformLobby = true; // maybe externalize this flag
+
+    if (redirectToRiffPlatformLobby) {
+        route.component = RiffPlatform;
+    } else if (isWelcomePageUserEnabled(state)) {
         if (isSupportedBrowser()) {
             route.component = WelcomePage;
         } else {
