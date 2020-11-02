@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
@@ -7,9 +7,16 @@ import { getProfile } from '../actions/profile';
 import { logout } from '../actions/signIn';
 
 const App = ({ doLogout, getProfileInfo, profileInfo, profileLoading }) => {
+    const [ room, setRoom ] = useState('');
+
     useEffect(() => {
         getProfileInfo();
     }, []);
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        window.location.href = room;
+    };
 
     return (
         <div>
@@ -22,6 +29,15 @@ const App = ({ doLogout, getProfileInfo, profileInfo, profileLoading }) => {
                 logout
             </button>
             <Link to = '/dashboard'>Dashboard</Link>
+            <form onSubmit = { handleSubmit }>
+                <input
+                    placeholder = 'enter room name'
+                    onChange = { e => setRoom(e.target.value) } />
+                <button
+                    type = 'submit'>
+                    go to room
+                </button>
+            </form>
         </div>
     );
 };
