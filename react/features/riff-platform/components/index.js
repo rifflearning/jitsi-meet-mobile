@@ -16,6 +16,7 @@ import SignUp from './SignUp';
 import { getJwt } from '../functions';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import purple from '@material-ui/core/colors/purple';
+import Reset from './Dashboard/Dashboard'
 
 export const customHistory = createBrowserHistory();
 
@@ -30,8 +31,6 @@ const darkTheme = createMuiTheme({
         }
     },
   });
-
-const Reset = () => <div>Reset</div>;
 
 const RiffPlatform = ({ token }) => {
     const loggedInRoutes = (
@@ -69,14 +68,14 @@ const RiffPlatform = ({ token }) => {
         <ThemeProvider theme={darkTheme}>
             <Router basename='/app' history={customHistory}>
                 <div style={{display:'flex', flexDirection:'column', height:'100vh', backgroundColor:'#282725'}}>
-                    <div>header</div>
+                    {/* <div>header</div> */}
                     <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
                         <div style={{flex:1}}>
                             <Switch>
                                 {getJwt() ? loggedInRoutes : authRoutes}
                             </Switch>
                         </div>
-                        <div>footer</div>
+                        {/* <div>footer</div> */}
                     </div>
                 </div>
             </Router>

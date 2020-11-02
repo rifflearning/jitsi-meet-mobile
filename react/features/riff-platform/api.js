@@ -60,6 +60,7 @@ class ApiService {
             const { email: uid, email, name: displayName } = await this.fetchProfile() // name: "r", email: "r"
 
             user = { uid, email, displayName };
+            user = { uid:'XYU5l9PRibST29m7oYQ9GWGoCwN2', email:'denys@riffanalytics.ai', displayName:'Denys Savisko' };
         } catch (error) {
             user = null;
         }

@@ -15,7 +15,7 @@ export function signInSuccess(token) {
     setJwt(token)
 
     const prevPathname = getPrevPath();
-    const isPrevPathRoomName = () => prevPathname && (prevPathname?.split('/')[1] !== 'app');
+    const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
     if (isPrevPathRoomName()) {
       // navigate to room name
       navigateToConference(getPrevPath())
