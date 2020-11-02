@@ -51,6 +51,12 @@ cp css/all.css temp-deploy-aws/css/
 mkdir temp-deploy-aws/libs
 cp libs/* temp-deploy-aws/libs/
 
+# add versioning to all.css and app.bundle.min.js imports in index.html 
+SHA_SUM_ALL_CSS=$(shasum temp-deploy-aws/css/all.css | awk '{print substr($1,0,8)}')
+SHA_SUM_APP_BUNDLE=$(shasum temp-deploy-aws/libs/app.bundle.min.js | awk '{print substr($1,0,8)}')
+awk "{gsub(/css\/all.css/,\"css\/all.css?v=${SHA_SUM_ALL_CSS}\")}1" temp-deploy-aws/index.html > temp-deploy-aws/temp.html && mv temp-deploy-aws/temp.html temp-deploy-aws/index.html
+awk "{gsub(/app.bundle.min.js\?v=139/,\"app.bundle.min.js?v=${SHA_SUM_APP_BUNDLE}\")}1" temp-deploy-aws/index.html > temp-deploy-aws/temp.html && mv temp-deploy-aws/temp.html temp-deploy-aws/index.html
+
 # copy all images
 mkdir temp-deploy-aws/images
 cp images/* temp-deploy-aws/images/

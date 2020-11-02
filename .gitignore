@@ -86,3 +86,4 @@ ios/app/GoogleService-Info.plist
 
 # .env variables for firebase
 .env
+temp-deploy-aws
