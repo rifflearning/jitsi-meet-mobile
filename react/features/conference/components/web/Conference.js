@@ -217,14 +217,17 @@ class Conference extends AbstractConference<Props, *> {
                 onMouseMove = { this._onShowToolbar }>
 
                 {!_showPrejoin
-                    && <Draggable bounds = { 'parent' }>
-                        <div id = 'meeting-mediator-wrapper'>
-                            <MeetingMediator
-                                displayName = { displayName }
-                                isEnabled = { true }
-                                webRtcPeers = { webRtcPeers } />
-                        </div>
-                    </Draggable>
+                    && <div className = 'drag-container'>
+                        <Draggable bounds = 'parent'>
+                            <div
+                                id = 'meeting-mediator-wrapper'>
+                                <MeetingMediator
+                                    displayName = { displayName }
+                                    isEnabled = { true }
+                                    webRtcPeers = { webRtcPeers } />
+                            </div>
+                        </Draggable>
+                    </div>
                 }
 
                 <Notice />
