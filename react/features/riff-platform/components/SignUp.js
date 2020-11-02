@@ -101,7 +101,7 @@ function SignUp({ doRegister, signUpError, signingUp }) {
     e.preventDefault();
 
     if (!isFormValid()) return;
-    alert({
+    doRegister({
         email,
         password
     });
