@@ -1,3 +1,9 @@
+/* global APP */
+
+import { _navigate } from '../app/middleware';
+
+import { customHistory } from './components';
+
 export const getJwt = () => localStorage.getItem('jwt-token');
 
 export const setJwt = token => {
@@ -14,3 +20,7 @@ export const setPrevPath = pathName => {
     sessionStorage.setItem('prevPathname', pathName);
 };
 
+export const navigateToConference = conferencePath => {
+    customHistory.push(conferencePath);
+    _navigate({ getState: APP.store.getState });
+};

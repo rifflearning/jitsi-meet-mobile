@@ -1,10 +1,8 @@
 /* eslint-disable */
 import * as actionTypes from '../actionTypes';
 import api from '../api';
-import { setJwt, removeJwt, getPrevPath } from '../functions';
+import { setJwt, removeJwt, getPrevPath, navigateToConference } from '../functions';
 import { _getRouteToRender } from '../../app/getRouteToRender';
-import { customHistory } from '../components';
-import { _navigate } from '../../app/middleware';
 
 function signInRequest(){
   return {
@@ -17,11 +15,10 @@ export function signInSuccess(token) {
     setJwt(token)
 
     const prevPathname = getPrevPath();
-    const isPrevPathRoomName = () => prevPathname && prevPathname?.split('/')[1] !== 'app';
+    const isPrevPathRoomName = () => prevPathname && (prevPathname?.split('/')[1] !== 'app');
     if (isPrevPathRoomName()) {
       // navigate to room name
-      customHistory.push(getPrevPath());
-      _navigate({getState})
+      navigateToConference(getPrevPath())
     } else {
       // set token, what will redirect main app to /app root
       dispatch({

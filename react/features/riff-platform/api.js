@@ -3,7 +3,7 @@ import { getJwt } from './functions';
 
 const API_URL = "https://localhost:4445/api";
 
-class AuthService {
+class ApiService {
     getHeaders = () => ({
         headers: {
             'Content-type': 'application/json',
@@ -67,4 +67,4 @@ class AuthService {
     }
 }
 
-export default new AuthService();
+export default new ApiService();
