@@ -1,53 +1,50 @@
-import { FRAME } from './constants';
+import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(stream) {
-        this._video = document.createElement('video');
-        this._canvas = document.createElement('canvas');
+    constructor(participantId, serverUrl, stream) {
+        this._participantId = participantId;
+        this._socket = io(serverUrl);
+        this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
 
-        // Indicates whether or not streaming is on and 
-        // we can capture frames from it
-        this._streaming = false;
+        // temporary
+        this._capturer.getPhotoCapabilities().then(capabilities => {
+            console.log("Photo capabilities: ");
+            console.log(capabilities);
+        });
 
-        // Width of frame, will be set to the default value
-        this._frameWidth = null;
-
-        // Height of frame, will be calculated based on the aspect ratio
-        // of the input stream
-        this._frameHeight = null;
-
-        this._video.srcObject = stream;
-        this._video.addEventListener('canplay', (e) => {
-            this._streaming = true;
-            this._frameWidth = FRAME.WIDTH;
-            this._frameHeight = this._video.videoHeight / (this._video.videoWidth / FRAME.WIDTH);
-        }, false);
-        
-        this._video.play();
-    }
-
-    /**
-     * Captures a frame of the video stream by drawing it into an offscreen canvas
-     * 
-     * @returns {Promise}
-     */
-    captureFrame = () => {
-        return new Promise((resolve, reject) => {
-            if (this._streaming) {
-                const context = this._canvas.getContext('2d');
-                this._canvas.width = this._frameWidth;
-                this._canvas.height = this._frameHeight;
-            
-                context.drawImage(this._video, 0, 0, this._frameWidth, this._frameHeight);
-
-                this._canvas.toBlob(resolve, 'image/png', 1);
-            } else {
-                reject('video stream is not ready for capturing yet');
-            }
+        this._socket.on('connect', () => {
+            socket.emit('participantId', this._participantId);
         });
     }
 
+    /**
+     * Sends message to the socket with frame 
+     * if socket is open, otherwise just drops it
+     * 
+     * @returns {void}
+     */
+    send = async () => {
+        if (socket.connected) {
+            try {
+                const blob = await this._capturer.takePhoto();
+                // temporary
+                console.log(`Generated frame for ${this._participantId}, url: ${URL.createObjectURL(blob)}`);
+                this._socket.emit("frame", blob);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    /**
+     * Closes socket connection
+     * 
+     * @returns {void}
+     */
+    stop = () => {
+        this._socket.close();
+    }
 }
 
 export default Capturer;
