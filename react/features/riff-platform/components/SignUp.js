@@ -102,6 +102,7 @@ function SignUp({ doRegister, signUpError, signingUp }) {
 
     if (!isFormValid()) return;
     doRegister({
+        name,
         email,
         password
     });
