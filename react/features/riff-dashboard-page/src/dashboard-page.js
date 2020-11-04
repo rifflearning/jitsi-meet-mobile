@@ -56,14 +56,8 @@ const DashboardPage = () => {
     }, [])
 
     return <div id="riff-dashboard-page-full">
-        <Helmet defaultTitle='Riff' titleTemplate='%s - Riff' />
-        <div>
-            <NavBar
-                activeRoute={'/riffs'}
-            />
-            <div id='main-content-container'>
-                <Dashboard />
-            </div>
+        <div id='main-content-container'>
+            <Dashboard />
         </div>
     </div>
 }
