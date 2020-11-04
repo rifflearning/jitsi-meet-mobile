@@ -2,9 +2,10 @@ import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(participantId, serverUrl, stream) {
+    constructor(participantId, dispatcherUrl, stream) {
+        this._socket = null;
+        this._connectionEstablished = false;
         this._participantId = participantId;
-        this._socket = io(serverUrl);
         this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
 
         // temporary
@@ -13,9 +14,18 @@ class Capturer {
             console.log(capabilities);
         });
 
-        this._socket.on('connect', () => {
-            socket.emit('participantId', this._participantId);
-        });
+        let response = await fetch(`${dispatcherUrl}/job/${participantId}`);
+        if (response.ok) { 
+            let json = await response.json();
+            this._socket = io(`${json.data.ip}:${json.data.port}`);
+            
+            this._socket.on('connect', () => {
+                this._connectionEstablished = true;
+            });
+        } 
+        else {
+            console.error(`Cannot establish connection with server: ${dispatcherUrl}`);
+        }
     }
 
     /**
@@ -25,12 +35,12 @@ class Capturer {
      * @returns {void}
      */
     send = async () => {
-        if (socket.connected) {
+        if (this._connectionEstablished) {
             try {
                 const blob = await this._capturer.takePhoto();
                 // temporary
                 console.log(`Generated frame for ${this._participantId}, url: ${URL.createObjectURL(blob)}`);
-                this._socket.emit("frame", blob);
+                this._socket.send(blob);
             } catch (err) {
                 console.error(err);
             }

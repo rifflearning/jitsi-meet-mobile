@@ -19,25 +19,25 @@ export default {
      */
     _delay: 50,
 
-    _init(serverUrl) {
+    _init(dispatcherUrl) {
         getAllActiveVideoTracks().forEach(track => {
             const participantId = track.participantId;
             const stream = track.jitsiTrack.stream;
 
-            this._capturers.push(new Capturer(participantId, serverUrl, stream));
+            this._capturers.push(new Capturer(participantId, dispatcherUrl, stream));
         });
     },
 
-    start(serverUrl) {
+    start(dispatcherUrl) {
         const tracks = getAllActiveVideoTracks() || [];
         
         if (!tracks.length) {
             console.error('Error while start capturer. Will try again in 2 seconds...');
-            setTimeout(() => this.start(serverUrl), 2000);
+            setTimeout(() => this.start(dispatcherUrl), 2000);
             return;
         }
 
-        this._init(serverUrl);
+        this._init(dispatcherUrl);
 
         this._interval = setInterval(() => {
             this._capturers.forEach(capturer => capturer.send());
