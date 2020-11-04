@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import React from 'react';
-import Draggable from 'react-draggable';
 
 import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
 import { getConferenceNameForTitle } from '../../../base/conference';
@@ -16,7 +15,7 @@ import { LargeVideo } from '../../../large-video';
 import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
 import { Prejoin, isPrejoinPageVisible } from '../../../prejoin';
 // eslint-disable-next-line max-len
-import { MeetingMediator } from '../../../riff-dashboard-page/src/components/Chat/Meeting/MeetingSidebar/MeetingMediator';
+import DraggableMeetingMediator from '../../../riff-platform/components/DraggableMeetingMediator';
 import {
     Toolbox,
     fullScreenChanged,
@@ -217,17 +216,9 @@ class Conference extends AbstractConference<Props, *> {
                 onMouseMove = { this._onShowToolbar }>
 
                 {!_showPrejoin
-                    && <div className = 'drag-container'>
-                        <Draggable bounds = 'parent'>
-                            <div
-                                id = 'meeting-mediator-wrapper'>
-                                <MeetingMediator
-                                    displayName = { displayName }
-                                    isEnabled = { true }
-                                    webRtcPeers = { webRtcPeers } />
-                            </div>
-                        </Draggable>
-                    </div>
+                    && <DraggableMeetingMediator
+                        displayName = { displayName }
+                        webRtcPeers = { webRtcPeers } />
                 }
 
                 <Notice />

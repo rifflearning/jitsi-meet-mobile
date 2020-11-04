@@ -15,10 +15,11 @@ html body {
 
 #meeting-mediator-wrapper {
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
     left: 0;
     top: 0;
     cursor: move;
+    pointer-events: all;
 
     @import '../react/features/riff-dashboard-page/src/sass/main.scss';
 }
