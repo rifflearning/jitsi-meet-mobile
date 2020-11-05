@@ -2,25 +2,33 @@ import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(participantId, dispatcherUrl, stream) {
+    constructor(participantId, stream) {
         this._socket = null;
-        this._connectionEstablished = false;
+        this._isLive = false;
         this._participantId = participantId;
         this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
 
-        // temporary
+        // log participant's frame data to be visible inside jibri
         this._capturer.getPhotoCapabilities().then(capabilities => {
-            console.log("Photo capabilities: ");
+            console.log(`Photo capabilities for ${participantId}: `);
             console.log(capabilities);
         });
+    }
 
+    /**
+     * Connects to socket and initializes capturing process
+     * 
+     * @returns {void}
+     */
+    connect = async (dispatcherUrl) => {
         let response = await fetch(`${dispatcherUrl}/job/${participantId}`);
         if (response.ok) { 
             let json = await response.json();
             this._socket = io(`${json.data.ip}:${json.data.port}`);
-            
+
             this._socket.on('connect', () => {
-                this._connectionEstablished = true;
+                this._isLive = true;
+                this._pushNextFrame();
             });
         } 
         else {
@@ -29,18 +37,16 @@ class Capturer {
     }
 
     /**
-     * Sends message to the socket with frame 
-     * if socket is open, otherwise just drops it
+     * Infinite loop of capturing next available frame in stream
      * 
      * @returns {void}
      */
-    send = async () => {
-        if (this._connectionEstablished) {
+    _pushNextFrame = async () => {
+        if (this._isLive) {
             try {
                 const blob = await this._capturer.takePhoto();
-                // temporary
-                console.log(`Generated frame for ${this._participantId}, url: ${URL.createObjectURL(blob)}`);
                 this._socket.send(blob);
+                this._pushNextFrame(); // schedule next one
             } catch (err) {
                 console.error(err);
             }
@@ -48,11 +54,12 @@ class Capturer {
     }
 
     /**
-     * Closes socket connection
+     * Stops frames pushing and closes socket connection
      * 
      * @returns {void}
      */
-    stop = () => {
+    disconnect = () => {
+        this._isLive = false;
         this._socket.close();
     }
 }
