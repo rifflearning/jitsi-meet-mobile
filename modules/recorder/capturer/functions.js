@@ -1,6 +1,6 @@
 /* global APP */
 
-import { MEDIA_TYPE } from './constants';
+import { MEDIA_TYPE, FEATURES } from './constants';
 
 
 /**
@@ -9,7 +9,19 @@ import { MEDIA_TYPE } from './constants';
  * @returns {Array}
  */
 export function getAllActiveVideoTracks() {
-    return APP.store.getState()['features/base/tracks']
+    return APP.store.getState()[FEATURES.TRACKS]
             .filter(track => track.mediaType === MEDIA_TYPE.VIDEO)
             .filter(track => !track.muted);
 };
+
+/**
+ * Returns userId associated with given participantId
+ *
+ * @returns {String}
+ */
+export function getUserIdByParticipantId(participantId) {
+    const participant = APP.store.getState()[FEATURES.PARTICIPANTS]
+        .filter(participant => participant.id === participantId); 
+    
+    return participant.name.split(`|`)[0];
+}

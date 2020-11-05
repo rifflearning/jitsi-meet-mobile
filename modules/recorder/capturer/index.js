@@ -1,54 +1,39 @@
 import Capturer from './Capturer';
-import { getAllActiveVideoTracks } from './functions';
+import { getAllActiveVideoTracks, getUserIdByParticipantId } from './functions';
 
 
 export default {
 
     /**
-     * Holds a list of participant's video stream capturers
+     * Holds a map between participant and video stream capturer
      */
-    _capturers: [],
-
-    /**
-     * Holds an interval for scheduling frame pulling 
-     */
-    _interval: null,
-
-    /**
-     * Holds delay value in ms beetwen frame pulling
-     */
-    _delay: 50,
-
-    _init(dispatcherUrl) {
-        getAllActiveVideoTracks().forEach(track => {
-            const participantId = track.participantId;
-            const stream = track.jitsiTrack.stream;
-
-            this._capturers.push(new Capturer(participantId, dispatcherUrl, stream));
-        });
-    },
+    _capturers: new Map(),
 
     start(dispatcherUrl) {
         const tracks = getAllActiveVideoTracks() || [];
         
         if (!tracks.length) {
-            console.error('Error while start capturer. Will try again in 2 seconds...');
-            setTimeout(() => this.start(dispatcherUrl), 2000);
+            console.error('Error while start capturer. Will try again in 1 second...');
+            setTimeout(() => this.start(dispatcherUrl), 1000);
             return;
         }
+        
+        tracks.forEach(track => {
+            const participantId = track.participantId;
+            const userId = getUserIdByParticipantId(participantId);
+            const stream = track.jitsiTrack.stream;
 
-        this._init(dispatcherUrl);
+            this._capturers.set(participantId, new Capturer(userId, stream));
+        });
 
-        this._interval = setInterval(() => {
-            this._capturers.forEach(capturer => capturer.send());
-        }, this._delay);
+        for (let capturer of this._capturers.values()) {
+            capturer.connect(dispatcherUrl);
+        }
     },
 
     stop() {
-        clearInterval(this._interval);
-        
-        for (let capturer of this._capturers) {
-            capturer.stop();
+        for (let capturer of this._capturers.values()) {
+            capturer.disconnect();
         }
     }
 

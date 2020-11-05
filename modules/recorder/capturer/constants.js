@@ -4,3 +4,11 @@
 export const MEDIA_TYPE = {
     VIDEO: "video"
 };
+
+/**
+ * The set of features in global store
+ */
+export const FEATURES = {
+    TRACKS: 'features/base/tracks',
+    PARTICIPANTS: 'features/base/participants'
+}
