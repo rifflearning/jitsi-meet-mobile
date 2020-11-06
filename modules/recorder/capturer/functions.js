@@ -21,7 +21,7 @@ export function getAllActiveVideoTracks() {
  */
 export function getUserIdByParticipantId(participantId) {
     const participant = APP.store.getState()[FEATURES.PARTICIPANTS]
-        .filter(participant => participant.id === participantId); 
+        .find(participant => participant.id === participantId); 
     
     return participant.name.split(`|`)[0];
 }
