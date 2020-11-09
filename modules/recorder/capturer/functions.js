@@ -58,7 +58,7 @@ export function selectUpdatedParticipants(last) {
     const current = getParticipantsWithActiveStreams();
 
     return {
-        left: new Set([...last].filter(x => !current.has(x))),
-        joined: new Set([...current].filter(x => !last.has(x)))
+        left: last.filter(x => !current.includes(x)),
+        joined: current.filter(x => !last.includes(x))
     }
 };

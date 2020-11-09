@@ -6,27 +6,25 @@ import {
 } from './functions';
 
 
-export default {
+class Capturers {
+    constructor() {
+        // holds a map between participant and video stream capturer
+        this._capturers = new Map();
 
-    /**
-     * Holds a map between participant and video stream capturer
-     */
-    _capturers: new Map(),
+        // holds a link to dispatcher resource for analysis processes creation
+        this._dispatcherUrl = null;
+    }
 
-    /**
-     * Holds a link to dispatcher resource for analysis processes creation
-     */
-    _dispatcherUrl: null,
-
-    start(dispatcherUrl) {
+    start = (dispatcherUrl) => {
         this._dispatcherUrl = dispatcherUrl;
-        this._handleParticipantsUpdate(); // init call to avoid waiting for first update in store
+        // init call to avoid waiting for first update in store
+        this._handleParticipantsUpdate();
 
         APP.store.subscribe(this._handleParticipantsUpdate);
-    },
+    }
 
-    _handleParticipantsUpdate() {
-        const update = selectUpdatedParticipants(this._capturers.keys());
+    _handleParticipantsUpdate = () => {
+        const update = selectUpdatedParticipants(Array.from(this._capturers.keys()));
 
         for (let participantId of update.left) {
             this._capturers.get(participantId).disconnect();
@@ -42,9 +40,9 @@ export default {
             this._capturers.set(participantId, capturer);
             capturer.connect(this._dispatcherUrl);
         }
-    },
+    }
 
-    stop() {
+    stop = () => {
         for (let capturer of this._capturers.values()) {
             capturer.disconnect();
         }
@@ -52,4 +50,6 @@ export default {
         this._capturers.clear();
     }
 
-};
+}
+
+export default new Capturers();
