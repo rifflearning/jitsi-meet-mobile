@@ -21,7 +21,7 @@ class Capturer {
      * @returns {void}
      */
     connect = async (dispatcherUrl) => {
-        let response = await fetch(`${dispatcherUrl}/job/${this._userId}`);
+        let response = await fetch(`${dispatcherUrl}/job/${this._userId}`,{method:'post'});
         if (response.ok) { 
             let json = await response.json();
             this._socket = io(`https://${json.data.ip}:${json.data.port}`);
@@ -45,7 +45,7 @@ class Capturer {
         if (this._isLive) {
             try {
                 const blob = await this._capturer.takePhoto();
-                this._socket.send(blob);
+                this._socket.emit('next-frame', blob);
                 this._pushNextFrame(); // schedule next one
             } catch (err) {
                 console.error(err);
