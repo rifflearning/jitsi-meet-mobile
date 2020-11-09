@@ -2,15 +2,15 @@ import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(participantId, stream) {
+    constructor(userId, stream) {
         this._socket = null;
         this._isLive = false;
-        this._participantId = participantId;
+        this._userId = userId;
         this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
 
-        // log participant's frame data to be visible inside jibri
+        // log user's frame data to be visible inside jibri
         this._capturer.getPhotoCapabilities().then(capabilities => {
-            console.log(`Photo capabilities for ${participantId}: `);
+            console.log(`Photo capabilities for ${this._userId}: `);
             console.log(capabilities);
         });
     }
@@ -21,10 +21,10 @@ class Capturer {
      * @returns {void}
      */
     connect = async (dispatcherUrl) => {
-        let response = await fetch(`${dispatcherUrl}/job/${participantId}`);
+        let response = await fetch(`${dispatcherUrl}/job/${this._userId}`);
         if (response.ok) { 
             let json = await response.json();
-            this._socket = io(`${json.data.ip}:${json.data.port}`);
+            this._socket = io(`https://${json.data.ip}:${json.data.port}`);
 
             this._socket.on('connect', () => {
                 this._isLive = true;
