@@ -1,5 +1,9 @@
 import Capturer from './Capturer';
-import { getAllActiveVideoTracks, getUserIdByParticipantId } from './functions';
+import { 
+    getUserIdByParticipantId, 
+    getTrackByParticipantId, 
+    selectUpdatedParticipants 
+} from './functions';
 
 
 export default {
@@ -9,25 +13,34 @@ export default {
      */
     _capturers: new Map(),
 
+    /**
+     * Holds a link to dispatcher resource for analysis processes creation
+     */
+    _dispatcherUrl: null,
+
     start(dispatcherUrl) {
-        const tracks = getAllActiveVideoTracks() || [];
-        
-        if (!tracks.length) {
-            console.error('Error while start capturer. Will try again in 1 second...');
-            setTimeout(() => this.start(dispatcherUrl), 1000);
-            return;
+        this._dispatcherUrl = dispatcherUrl;
+        this._handleParticipantsUpdate(); // init call to avoid waiting for first update in store
+
+        APP.store.subscribe(this._handleParticipantsUpdate);
+    },
+
+    _handleParticipantsUpdate() {
+        const update = selectUpdatedParticipants(this._capturers.keys());
+
+        for (let participantId of update.left) {
+            this._capturers.get(participantId).disconnect();
+            this._capturers.delete(participantId);
         }
-        
-        tracks.forEach(track => {
-            const participantId = track.participantId;
+
+        for (let participantId of update.joined) {
+            const track = getTrackByParticipantId(participantId);
             const userId = getUserIdByParticipantId(participantId);
             const stream = track.jitsiTrack.stream;
-
-            this._capturers.set(participantId, new Capturer(userId, stream));
-        });
-
-        for (let capturer of this._capturers.values()) {
-            capturer.connect(dispatcherUrl);
+            const capturer = new Capturer(userId, stream);
+            
+            this._capturers.set(participantId, capturer);
+            capturer.connect(this._dispatcherUrl);
         }
     },
 
@@ -35,6 +48,8 @@ export default {
         for (let capturer of this._capturers.values()) {
             capturer.disconnect();
         }
+
+        this._capturers.clear();
     }
 
 };
