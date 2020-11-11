@@ -7,7 +7,6 @@ class Capturer {
         this._isLive = false;
         this._userId = userId;
         this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
-
         // log user's frame data to be visible inside jibri
         this._capturer.getPhotoCapabilities().then(capabilities => {
             console.log(`Photo capabilities for ${this._userId}: `);
@@ -21,7 +20,16 @@ class Capturer {
      * @returns {void}
      */
     connect = async (dispatcherUrl) => {
-        let response = await fetch(`${dispatcherUrl}/job/${this._userId}`,{method:'post'});
+        let capabilities = await this._capturer.getPhotoCapabilities();
+        let response = await fetch(`${dispatcherUrl}/job/${this._userId}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+                body: JSON.stringify(capabilities), 
+                method:'post'
+            }
+        );
         if (response.ok) { 
             let json = await response.json();
             this._socket = io(`https://${json.data.ip}:${json.data.port}`);
