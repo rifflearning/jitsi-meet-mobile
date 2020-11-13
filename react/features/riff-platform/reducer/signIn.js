@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import * as actionTypes from '../actionTypes';
+import * as actionTypes from '../constants/actionTypes';
 import { getJwt } from '../functions';
 
 const token = getJwt();

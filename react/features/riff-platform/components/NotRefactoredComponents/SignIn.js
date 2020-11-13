@@ -3,21 +3,21 @@
 import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import {Link as LinkTo} from 'react-router-dom';
+import {Link as LinkTo, useHistory} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { connect } from '../../base/redux';
-import { signIn } from '../actions/signIn';
+
+import { connect } from '../../../base/redux';
+import { signIn } from '../../actions/signIn';
+import * as ROUTES from '../../constants/routes';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(4),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SignIn({ doLogin, loginError, loggingIn }) {
+  const history = useHistory();
   const classes = useStyles();
   const [ email, setEmail ] = useState('');
   const [ emailError, setEmailError ] = useState('');
@@ -73,12 +74,13 @@ function SignIn({ doLogin, loginError, loggingIn }) {
     doLogin({
         email,
         password
+    }).then(prevPath => {
+      if(prevPath) history.push(`${ROUTES.WAITING}${prevPath}`)
     });
   };
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />

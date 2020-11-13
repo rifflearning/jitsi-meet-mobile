@@ -1,5 +1,5 @@
 /* eslint-disable */
-import * as actionTypes from '../actionTypes';
+import * as actionTypes from '../constants/actionTypes';
 import api from '../api';
 
 function profileRequest(){

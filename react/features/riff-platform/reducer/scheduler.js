@@ -2,12 +2,14 @@ import * as actionTypes from '../constants/actionTypes';
 
 export default (state = {}, action) => {
     switch (action.type) {
-    case actionTypes.PROFILE_REQUEST:
+    case actionTypes.SCHEDULER_REQUEST:
         return { loading: true };
-    case actionTypes.PROFILE_SUCCESS:
-        return { profile: action.payload };
-    case actionTypes.PROFILE_FAILURE:
+    case actionTypes.SCHEDULER_SUCCESS:
+        return { meeting: action.meeting };
+    case actionTypes.SCHEDULER_FAILURE:
         return { error: action.error };
+    case actionTypes.SCHEDULER_RESET:
+        return {};
 
     default:
         return state;

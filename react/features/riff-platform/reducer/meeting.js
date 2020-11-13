@@ -2,11 +2,11 @@ import * as actionTypes from '../constants/actionTypes';
 
 export default (state = {}, action) => {
     switch (action.type) {
-    case actionTypes.PROFILE_REQUEST:
+    case actionTypes.MEETING_REQUEST:
         return { loading: true };
-    case actionTypes.PROFILE_SUCCESS:
-        return { profile: action.payload };
-    case actionTypes.PROFILE_FAILURE:
+    case actionTypes.MEETING_SUCCESS:
+        return { meetingLists: action.meeting };
+    case actionTypes.MEETING_FAILURE:
         return { error: action.error };
 
     default:

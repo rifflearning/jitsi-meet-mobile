@@ -1,8 +1,9 @@
 /* eslint-disable */
-import * as actionTypes from '../actionTypes';
+import * as actionTypes from '../constants/actionTypes';
 import api from '../api';
-import { setJwt, removeJwt, getPrevPath, navigateToConference } from '../functions';
+import { setJwt, removeJwt, getPrevPath, setPrevPath, navigateToConference } from '../functions';
 import { _getRouteToRender } from '../../app/getRouteToRender';
+import { setRiffFirebaseCredentials } from '../../riff-dashboard-page/actions';
 
 function signInRequest(){
   return {
@@ -14,18 +15,33 @@ export function signInSuccess(token) {
   return (dispatch, getState) => {
     setJwt(token)
 
-    const prevPathname = getPrevPath();
-    const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
-    if (isPrevPathRoomName()) {
-      // navigate to room name
-      navigateToConference(getPrevPath())
-    } else {
-      // set token, what will redirect main app to /app root
-      dispatch({
-        type: actionTypes.LOGIN_SUCCESS,
-        token
-      })
-    }
+    return api.isAuth().then(user => {
+      if (user === null) {
+        setJwt('')
+      } else {
+          dispatch({
+              type: actionTypes.LOGIN_SUCCESS,
+              token
+          })
+          
+          const { uid, email, displayName } = user;
+
+          dispatch(setRiffFirebaseCredentials({
+              displayName: displayName || (email? email.split('@')[0] : 'Anonymous'),
+              email: email || 'anonymous',
+              uid
+          }));
+          
+
+          const prevPathname = getPrevPath();
+          const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
+          if (isPrevPathRoomName()) {
+            // navigate to room name
+            setPrevPath('')
+            return prevPathname;
+          }
+        }
+    });
   }
 }
 
@@ -51,8 +67,7 @@ export function signIn({ email, password }) {
     try {
       const res = await api.signIn({email, password})
 
-
-      dispatch(signInSuccess(res.token));
+      return dispatch(signInSuccess(res.token));
     } catch (e) {
       dispatch(signInFailure(e.message));
     }
