@@ -96,16 +96,6 @@ type Props = AbstractProps & {
      */
     _showPrejoin: boolean,
 
-    /**
-     * displayName for MeetingMediator.
-     */
-    displayName: boolean,
-
-    /**
-     * webRtcPeers for MeetingMediator.
-     */
-    webRtcPeers: boolean,
-
     dispatch: Function,
     t: Function
 }
@@ -203,9 +193,7 @@ class Conference extends AbstractConference<Props, *> {
             _iAmRecorder,
             _isLobbyScreenVisible,
             _layoutClassName,
-            _showPrejoin,
-            displayName,
-            webRtcPeers
+            _showPrejoin
         } = this.props;
         const hideLabels = filmstripOnly || _iAmRecorder;
 
@@ -215,11 +203,7 @@ class Conference extends AbstractConference<Props, *> {
                 id = 'videoconference_page'
                 onMouseMove = { this._onShowToolbar }>
 
-                {!_showPrejoin
-                    && <DraggableMeetingMediator
-                        displayName = { displayName }
-                        webRtcPeers = { webRtcPeers } />
-                }
+                {!_showPrejoin && <DraggableMeetingMediator />}
 
                 <Notice />
                 <Subject />
@@ -306,17 +290,7 @@ function _mapStateToProps(state) {
         _isLobbyScreenVisible: state['features/base/dialog']?.component === LobbyScreen,
         _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state)],
         _roomName: getConferenceNameForTitle(state),
-        _showPrejoin: isPrejoinPageVisible(state),
-        displayName: state['features/riff-metrics'].userData.displayName || '',
-        webRtcPeers: state['features/base/participants'].map((p, i) => {
-            if (i === 0) {
-                const { uid, displayName } = state['features/riff-metrics'].userData;
-
-                return { nick: `${uid}|${displayName}` };
-            }
-
-            return { nick: p.name };
-        })
+        _showPrejoin: isPrejoinPageVisible(state)
     };
 }
 
