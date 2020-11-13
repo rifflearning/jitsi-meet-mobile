@@ -10,7 +10,7 @@ import { subscribeToEmotionsData } from '../riff-emotions/actions';
 import { sendStatsOnConnect } from './nodejs-browser-stats';
 import RiffPlatform from '../riff-platform/components';
 import api from '../riff-platform/api';
-import { setPrevPath } from '../riff-platform/functions';
+import { getJwt, setPrevPath } from '../riff-platform/functions';
 import { navigateWithoutReload } from './functions';
 
 export function setRiffServerRoomId(roomId) {
@@ -136,28 +136,62 @@ function sendUtteranceToServer(data, {uid: participant}, room, token ) {
     }
 }
 
+export async function maybeRedirectToWaitingRoom() {
+    return new Promise(res => {
+        if (config.iAmRecorder) return res();
+
+        api.fetchMeeting(window.location.pathname.split('/')[1]).then(meeting => {
+            if (meeting === null) {
+                // navigateWithoutReload(RiffPlatform);
+                window.location.pathname = `/app/waiting/${window.location.pathname.split('/')[1]}`;
+            } else {
+                res();
+            }
+        });
+        // if meeting exists,
+        // and not allowAnonymous
+        // if no auth
+        // redir to auth, then to meeting/waiting room(if time isn't ok)
+    
+        // if meeting exists
+        // and allowAnonymous
+        // bypass auth, redir to meeting/waiting room(if time is'nt ok)
+
+        // if no meeting,
+        // redir to join room, say 'no meeting', propose to sign in/ sign up.
+
+        // waiting room states: meeting exists, waiting time to meeting, authed
+        // waiting room states: meet`ing exists, waiting time to meeting, no auth, propose to sign-up
+        // join room states: meeting no exists, no auth/auth, propose to sign-up
+    })
+};
+
 export function maybeRedirectToLoginPage() {
     return new Promise(res => {
-        if (!config.iAmRecorder) {
-            api.isAuth().then(user => {
-                if (user === null) {
-                    setPrevPath(window.location.pathname)
-                    navigateWithoutReload(RiffPlatform);
-                } else {
-                    const { uid, email, displayName } = user;
-
-                    APP.store.dispatch(setRiffFirebaseCredentials({
-                        displayName: displayName || (email? email.split('@')[0] : 'Anonymous'),
-                        email: email || 'anonymous',
-                        uid
-                    }));
-
-                    res();
-                }
-            });
-        } else {
-            res();
+        if (config.iAmRecorder) {
+            return res()
         }
+        api.isAuth().then(user => {
+            if (user === null) {
+                setPrevPath(window.location.pathname)
+                navigateWithoutReload(RiffPlatform);
+            } else {
+                APP.store.dispatch({
+                    type: 'LOGIN_SUCCESS',
+                    token: getJwt()
+                })
+                
+                const { uid, email, displayName } = user;
+
+                APP.store.dispatch(setRiffFirebaseCredentials({
+                    displayName: displayName || (email? email.split('@')[0] : 'Anonymous'),
+                    email: email || 'anonymous',
+                    uid
+                }));
+
+                res();
+            }
+        });
     });
 };
 
