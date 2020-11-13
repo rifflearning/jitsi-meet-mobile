@@ -80,6 +80,7 @@ class Capturer {
      * @returns {void}
      */
     disconnect = () => {
+        this._socket.emit('remove', this._userId);
         this._isLive = false;
         this._socket.close();
     }
