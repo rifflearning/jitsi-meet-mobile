@@ -38,6 +38,24 @@ export function getTrackByParticipantId(participantId) {
 };
 
 /**
+ * Returns meeting room name
+ *
+ * @returns {String}
+ */
+export function getRoom() {
+    return APP.store.getState()[FEATURES.ROOM].room; 
+};
+
+/**
+ * Returns meeting room id
+ *
+ * @returns {String}
+ */
+export function getRoomId() {
+    return APP.store.getState()[FEATURES.ROOMID].roomid; 
+};
+
+/**
  * Collects a list of all participants with active streams
  *
  * @returns {Array}

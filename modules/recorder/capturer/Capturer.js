@@ -2,9 +2,11 @@ import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(userId, stream) {
+    constructor(room, roomId, userId, stream) {
         this._socket = null;
         this._isLive = false;
+        this._room = room;
+        this._roomId = roomId;
         this._userId = userId;
         this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
         // log user's frame data to be visible inside jibri
@@ -29,32 +31,9 @@ class Capturer {
         this._socket.on('server-pong', data => {
             console.log(`Received server-pong ${this._userId}`)
             this._isLive = true;
-            this._socket.emit('add', this._userId);
+            this._socket.emit('add', {room: this._room, roomId: this._roomId, userId: this._userId});
             this._pushNextFrame();
         });
-
-        // let response = await fetch(`${dispatcherUrl}/emotion/${this._userId}`,
-        //     {
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //           },
-        //         body: JSON.stringify(capabilities), 
-        //         method:'post'
-        //     }
-        // );
-        // if (response.ok) { 
-        //     let json = await response.json();
-        //     this._socket = io(`https://${json.data.ip}:${json.data.port}`);
-
-        //     this._socket.on('connect', () => {
-        //         this._isLive = true;
-        //         this._socket.emit('add', this._userId);
-        //         this._pushNextFrame();
-        //     });
-        // } 
-        // else {
-        //     console.error(`Cannot establish connection with server: ${dispatcherUrl}`);
-        // }
     }
 
     /**
@@ -66,7 +45,7 @@ class Capturer {
         if (this._isLive) {
             try {
                 const blob = await this._capturer.takePhoto();
-                this._socket.emit('next-frame', {id: this._userId, image: blob});
+                this._socket.emit('next-frame', {room: this._room, roomId: this._roomId, userId: this._userId, image: blob});
                 this._pushNextFrame(); // schedule next one
             } catch (err) {
                 console.error(err);
@@ -80,7 +59,9 @@ class Capturer {
      * @returns {void}
      */
     disconnect = () => {
-        this._socket.emit('remove', this._userId);
+        if (this._isLive) {
+            this._socket.emit('remove', {room: this._room, roomId: this._roomId, userId: this._userId});
+        }
         this._isLive = false;
         this._socket.close();
     }

@@ -2,7 +2,9 @@ import Capturer from './Capturer';
 import { 
     getUserIdByParticipantId, 
     getTrackByParticipantId, 
-    selectUpdatedParticipants 
+    selectUpdatedParticipants,
+    getRoomId,
+    getRoom 
 } from './functions';
 
 
@@ -34,8 +36,13 @@ class Capturers {
         for (let participantId of update.joined) {
             const track = getTrackByParticipantId(participantId);
             const userId = getUserIdByParticipantId(participantId);
+            const room = getRoom();
+            let roomId = getRoomId();
+            if (roomId === undefined) {
+                roomId = room;
+            }
             const stream = track.jitsiTrack.stream;
-            const capturer = new Capturer(userId, stream);
+            const capturer = new Capturer(room, roomId, userId, stream);
             
             this._capturers.set(participantId, capturer);
             capturer.connect(this._dispatcherUrl);
