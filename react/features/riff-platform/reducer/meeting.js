@@ -5,7 +5,7 @@ export default (state = {}, action) => {
     case actionTypes.MEETING_REQUEST:
         return { loading: true };
     case actionTypes.MEETING_SUCCESS:
-        return { meetingLists: action.meeting };
+        return { meeting: action.meeting };
     case actionTypes.MEETING_FAILURE:
         return { error: action.error };
 

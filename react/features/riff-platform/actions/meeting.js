@@ -25,45 +25,38 @@ function meetingFailure(error){
 export function checkMeeting(meetingId) {
   return async (dispatch) => {
     dispatch(meetingRequest());
-
-    const meeting = await api.fetchMeeting(meetingId); //api.getMeeting();
-
-    if (!meeting) {
+    try {
+      const meeting = await api.fetchMeeting(meetingId);
+      if (!meeting) {
+        dispatch(meetingFailure('No meeting with this ID'));
+      } else {
+        dispatch(meetingSuccess(meeting));
+      }
+      return meeting;
+      
+    } catch (error) {
       dispatch(meetingFailure('No meeting with this ID'));
-    } else {
-      dispatch(meetingSuccess(meeting));
+      console.error(error);
+      return null;
     }
-    return meeting;
-
-    /*
-
-    //--- do it later
-    // if(notAuth){
-    //   if(meeting.allowAnonymous){
-    //     generateRandomUserId();
-    //   } else {
-    //     setJoinError('Meeting not allowed anonymous users, please login or sign in');
-    //     history.push('Join');
-    //   };
-    // }
-
-
-    */    
-    // if meeting exists,
-    // and not allowAnonymous
-    // if no auth
-    // redir to auth, then to meeting/waiting room(if time isn't ok)
-    
-    // if meeting exists
-    // and allowAnonymous
-    // bypass auth, redir to meeting/waiting room(if time is'nt ok)
-
-    // if no meeting,
-    // redir to join room, say 'no meeting', propose to sign in/ sign up.
-
-    // waiting room states: meeting exists, waiting time to meeting, authed
-    // waiting room states: meeting exists, waiting time to meeting, no auth, propose to sign-up
-    // join room states: meeting no exists, no auth/auth, propose to sign-up
   }
 }
 
+export function checkIsMeetingAllowed(meetingId) {
+  return async (dispatch) => {
+    try {
+      const meeting = await dispatch(checkMeeting(meetingId));
+      
+      if (!meeting) return null;
+      
+      const timeToMeeting = new Date(meeting.dateStart).getTime() - Date.now();
+      if (timeToMeeting > 5 * 60 * 1000) {
+        return { error: 'not a meeting time', meeting };
+      }
+      
+      return meeting;
+    } catch (error) {
+      return { error };
+    }
+  }
+}

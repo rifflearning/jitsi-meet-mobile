@@ -1,18 +1,17 @@
-import { Button, Grid, Paper } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React, { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router';
 
-import { connect } from '../../../../base/redux';
-import { getMeetings } from '../../../actions/meetings';
-import * as ROUTES from '../../../constants/routes';
-import { groupMeetingsByDays } from '../../../functions';
-import useStyles from '../useStyles';
+import { connect } from '../../../base/redux';
+import { getMeetings } from '../../actions/meetings';
+import * as ROUTES from '../../constants/routes';
+import { groupMeetingsByDays } from '../../functions';
+import StyledPaper from '../StyledPaper';
 
 import MeetingsTable from './MeetingsTable';
 
 const Meetings = ({ meetingsLists = [], getMeetingsLists }) => {
-    const classes = useStyles();
     const history = useHistory();
     const handleScheduleClick = useCallback(() => history.push(ROUTES.SCHEDULE), [ history ]);
 
@@ -44,11 +43,10 @@ const Meetings = ({ meetingsLists = [], getMeetingsLists }) => {
                     item = { true }
                     key = { date }
                     xs = { 12 }>
-                    <Paper className = { classes.paper }>
+                    <StyledPaper title = { date }>
                         <MeetingsTable
-                            date = { date }
                             meetingsList = { groupedMeetings[date] } />
-                    </Paper>
+                    </StyledPaper>
                 </Grid>)
             )}
         </Grid>

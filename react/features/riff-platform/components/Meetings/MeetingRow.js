@@ -1,25 +1,45 @@
-import { Button, Typography } from '@material-ui/core';
+import { Button, makeStyles, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { connect } from '../../../../base/redux';
-import { deleteMeeting } from '../../../actions/meetings';
-import * as ROUTES from '../../../constants/routes';
-import { formatDurationTime } from '../../../functions';
-import useStyles from '../useStyles';
+import { connect } from '../../../base/redux';
+import { deleteMeeting } from '../../actions/meetings';
+import * as ROUTES from '../../constants/routes';
+import { formatDurationTime } from '../../functions';
+
+const useStyles = makeStyles(() => {
+    return {
+        meetingButton: {
+            marginLeft: '10px',
+            visibility: 'hidden'
+        },
+        tableRow: {
+            '&:hover': {
+                '& $meetingButton': {
+                    visibility: 'visible'
+                }
+            }
+        }
+    };
+});
 
 const MeetingsRow = ({ meeting = {}, removeMeeting }) => {
     const classes = useStyles();
     const history = useHistory();
 
-    const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
+    const [ isLinkCopied, setLinkCopied ] = useState(false);
 
+    const handleLinkCopy = useCallback(() => {
+        navigator.clipboard.writeText(`${window.location.origin}/${meeting._id}`);
+        setLinkCopied(true);
+    }, []);
     const handleStartClick = useCallback(() => history.push(`${ROUTES.WAITING}/${meeting._id}`), [ history ]);
-    const handleEditClick = useCallback(() => history.push(`${ROUTES.MEETINGS}/${meeting._id}`), [ history ]);
     const handleDeleteClick = useCallback(() => removeMeeting(meeting._id), []);
+
+    const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
     return (
         <TableRow
@@ -43,10 +63,13 @@ const MeetingsRow = ({ meeting = {}, removeMeeting }) => {
                 <Button
                     className = { classes.meetingButton }
                     color = 'primary'
-                    onClick = { handleStartClick }>Start</Button>
+                    onClick = { handleStartClick }
+                    variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
-                    onClick = { handleEditClick }>Edit</Button>
+                    color = { isLinkCopied ? 'default' : 'primary' }
+                    onClick = { handleLinkCopy }
+                    variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 <Button
                     className = { classes.meetingButton }
                     onClick = { handleDeleteClick }>Delete</Button>

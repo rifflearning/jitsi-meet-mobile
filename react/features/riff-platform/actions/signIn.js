@@ -12,36 +12,35 @@ function signInRequest(){
 }
 
 export function signInSuccess(token) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     setJwt(token)
 
-    return api.isAuth().then(user => {
-      if (user === null) {
-        setJwt('')
-      } else {
-          dispatch({
-              type: actionTypes.LOGIN_SUCCESS,
-              token
-          })
-          
-          const { uid, email, displayName } = user;
+    const user = await api.isAuth();
+    if (user === null) {
+      removeJwt();
+    } else {
+      dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        user
+      });
 
-          dispatch(setRiffFirebaseCredentials({
-              displayName: displayName || (email? email.split('@')[0] : 'Anonymous'),
-              email: email || 'anonymous',
-              uid
-          }));
-          
+      const { uid, email, displayName } = user;
 
-          const prevPathname = getPrevPath();
-          const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
-          if (isPrevPathRoomName()) {
-            // navigate to room name
-            setPrevPath('')
-            return prevPathname;
-          }
-        }
-    });
+      dispatch(setRiffFirebaseCredentials({
+        displayName: displayName || (email ? email.split('@')[0] : 'Anonymous'),
+        email: email || 'anonymous',
+        uid
+      }));
+
+
+      const prevPathname = getPrevPath();
+      const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
+      if (isPrevPathRoomName()) {
+        // navigate to room name
+        setPrevPath('');
+        return prevPathname;
+      }
+    }
   }
 }
 

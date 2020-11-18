@@ -1,18 +1,13 @@
 import * as actionTypes from '../constants/actionTypes';
-import { getJwt } from '../functions';
 
-const token = getJwt();
-const initialState = token ? { loggedIn: true,
-    token } : {};
-
-export default (state = initialState, action) => {
+export default (state = {}, action) => {
     switch (action.type) {
     case actionTypes.LOGIN_REQUEST:
         return { loading: true };
     case actionTypes.LOGIN_SUCCESS:
         return {
             loggedIn: true,
-            token: action.token
+            user: action.user
         };
     case actionTypes.LOGIN_FAILURE:
         return { error: action.error };

@@ -7,7 +7,8 @@ import { isSupportedBrowser } from '../base/environment';
 import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
-import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-dashboard-page/actions';
+import { maybeRedirectToLoginPage } from '../riff-dashboard-page/actions';
+import { maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
 import RiffPlatform from '../riff-platform/components';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
 import {
@@ -42,9 +43,7 @@ export async function _getRouteToRender(stateful: Function | Object): Promise<Ro
     const state = toState(stateful);
 
     await maybeRedirectToLoginPage();
-    if (window.location.pathname.split('/')[1] !== 'app') {
-        await maybeRedirectToWaitingRoom();
-    }
+    await maybeRedirectToWaitingRoom();
 
     if (navigator.product === 'ReactNative') {
         return _getMobileRoute(state);

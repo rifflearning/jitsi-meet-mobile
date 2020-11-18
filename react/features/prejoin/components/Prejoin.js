@@ -276,9 +276,6 @@ class Prejoin extends Component<Props, State> {
                     <div className = 'prejoin-input-area-container'>
                         <div className = 'prejoin-input-area'>
                             <InputField
-                                placeHolder = 'Room Name (* Required)'
-                                value = { window.location.pathname.slice(1) } />
-                            <InputField
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onChange = { value => _setName(`${firebaseIdWithSeparator}${value}`) }
                                 onSubmit = { joinConference }

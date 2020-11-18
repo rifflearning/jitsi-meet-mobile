@@ -69,3 +69,22 @@ export const formatDurationTime = (startDate, endDate) => {
 
     return `${timeStart} - ${timeEnd}`;
 };
+
+export const msToTime = milliseconds => {
+    let s = milliseconds;
+    const ms = s % 1000;
+
+    s = (s - ms) / 1000;
+    const secs = s % 60;
+
+    s = (s - secs) / 60;
+    const mins = s % 60;
+
+    s = (s - mins) / 60;
+    const hrs = s % 24;
+
+    const d = (s - hrs) / 24;
+    const days = d && `${d} days and `;
+
+    return `${days}${hrs}:${mins}:${secs}`;
+};

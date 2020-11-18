@@ -136,36 +136,6 @@ function sendUtteranceToServer(data, {uid: participant}, room, token ) {
     }
 }
 
-export async function maybeRedirectToWaitingRoom() {
-    return new Promise(res => {
-        if (config.iAmRecorder) return res();
-
-        api.fetchMeeting(window.location.pathname.split('/')[1]).then(meeting => {
-            if (meeting === null) {
-                // navigateWithoutReload(RiffPlatform);
-                window.location.pathname = `/app/waiting/${window.location.pathname.split('/')[1]}`;
-            } else {
-                res();
-            }
-        });
-        // if meeting exists,
-        // and not allowAnonymous
-        // if no auth
-        // redir to auth, then to meeting/waiting room(if time isn't ok)
-    
-        // if meeting exists
-        // and allowAnonymous
-        // bypass auth, redir to meeting/waiting room(if time is'nt ok)
-
-        // if no meeting,
-        // redir to join room, say 'no meeting', propose to sign in/ sign up.
-
-        // waiting room states: meeting exists, waiting time to meeting, authed
-        // waiting room states: meet`ing exists, waiting time to meeting, no auth, propose to sign-up
-        // join room states: meeting no exists, no auth/auth, propose to sign-up
-    })
-};
-
 export function maybeRedirectToLoginPage() {
     return new Promise(res => {
         if (config.iAmRecorder) {
@@ -178,7 +148,7 @@ export function maybeRedirectToLoginPage() {
             } else {
                 APP.store.dispatch({
                     type: 'LOGIN_SUCCESS',
-                    token: getJwt()
+                    user
                 })
                 
                 const { uid, email, displayName } = user;

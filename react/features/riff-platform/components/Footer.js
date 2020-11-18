@@ -4,19 +4,18 @@ import React from 'react';
 const styles = {
     container: { display: 'flex' },
     marginRight: { marginRight: '20px' }
-
 };
 
 export default () => (<div style = { styles.container }>
     <Typography
         style = { styles.marginRight }
         variant = 'body2'>
-      Copyright ©{' '}
+        Copyright ©{' '}
         <Link
             color = 'inherit'
             href = 'https://riffanalytics.ai'
             target = '_blank'>
-        Riff Analytics
+            Riff Analytics
         </Link>
         {` ${new Date().getFullYear()}.`}
     </Typography>
@@ -27,7 +26,7 @@ export default () => (<div style = { styles.container }>
             color = 'inherit'
             href = 'https://riffanalytics.ai'
             target = '_blank'>
-        Contact us
+            Contact us
         </Link>
     </Typography>
     <Typography
@@ -37,7 +36,7 @@ export default () => (<div style = { styles.container }>
             color = 'inherit'
             href = 'https://riffanalytics.ai'
             target = '_blank'>
-        Privacy Policy
+            Privacy Policy
         </Link>
     </Typography>
 </div>

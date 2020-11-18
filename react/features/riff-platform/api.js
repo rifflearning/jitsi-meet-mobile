@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { getJwt, removeJwt } from './functions';
+import { getJwt } from './functions';
 
 const API_URL = "https://localhost:4445/api";
 
@@ -60,10 +60,8 @@ class ApiService {
             const { uid, email, name: displayName } = await this.fetchProfile() // name: "r", email: "r"
 
             user = { uid, email, displayName };
-            // user = { uid:'XYU5l9PRibST29m7oYQ9GWGoCwN2', email:'denys@riffanalytics.ai', displayName:'Denys Savisko' };
         } catch (error) {
             user = null;
-            removeJwt();
         }
         return user;
     }

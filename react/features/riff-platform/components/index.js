@@ -3,9 +3,10 @@ import { createBrowserHistory } from 'history';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import App from './NotRefactoredComponents/App';
+import App from './App';
 
 export const customHistory = createBrowserHistory();
+window.testH = customHistory;
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -21,9 +22,7 @@ const darkTheme = createMuiTheme({
 
 export default () => (
     <ThemeProvider theme = { darkTheme }>
-        <Router
-            basename = '/app'
-            history = { customHistory }>
+        <Router basename = '/app'>
             <App />
         </Router>
     </ThemeProvider>

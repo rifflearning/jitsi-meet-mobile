@@ -44,10 +44,10 @@ DraggableMeetingMediator.propTypes = {
  */
 function _mapStateToProps(state) {
     return {
-        displayName: state['features/riff-metrics'].userData.displayName || '',
+        displayName: state['features/riff-platform'].signIn.user.displayName || '',
         webRtcPeers: state['features/base/participants'].map((p, i) => {
             if (i === 0) {
-                const { uid, displayName } = state['features/riff-metrics'].userData;
+                const { uid, displayName } = state['features/riff-platform'].signIn.user || {};
 
                 return { nick: `${uid}|${displayName}` };
             }
