@@ -1,13 +1,3 @@
-import { customHistory } from "../riff-platform/components";
-
-export function navigateWithoutReload(component, route) {
-    if(route) customHistory.push(route);
-    APP.store.getState()['features/base/app'].app._navigate({
-        component,
-        href: null
-    });
-}
-
 export function maybeExtractIdFromDisplayName(displayNameMaybeWithFirebaseId) {
   if (typeof displayNameMaybeWithFirebaseId !== 'string') return {};
 

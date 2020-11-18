@@ -1,8 +1,7 @@
 /* eslint-disable */
 import * as actionTypes from '../constants/actionTypes';
 import api from '../api';
-import { setJwt, removeJwt, getPrevPath, setPrevPath, navigateToConference } from '../functions';
-import { _getRouteToRender } from '../../app/getRouteToRender';
+import { setJwt, removeJwt, getPrevPath, setPrevPath } from '../functions';
 import { setRiffFirebaseCredentials } from '../../riff-dashboard-page/actions';
 
 function signInRequest(){

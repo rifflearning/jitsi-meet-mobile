@@ -11,7 +11,7 @@ import { sendStatsOnConnect } from './nodejs-browser-stats';
 import RiffPlatform from '../riff-platform/components';
 import api from '../riff-platform/api';
 import { getJwt, setPrevPath } from '../riff-platform/functions';
-import { navigateWithoutReload } from './functions';
+import { navigateWithoutReload } from '../riff-platform/functions';
 
 export function setRiffServerRoomId(roomId) {
     return {

@@ -1,12 +1,8 @@
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { createBrowserHistory } from 'history';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import App from './App';
-
-export const customHistory = createBrowserHistory();
-window.testH = customHistory;
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -20,10 +16,12 @@ const darkTheme = createMuiTheme({
     }
 });
 
-export default () => (
+const RiffPlatform = () => (
     <ThemeProvider theme = { darkTheme }>
         <Router basename = '/app'>
             <App />
         </Router>
     </ThemeProvider>
 );
+
+export default RiffPlatform;

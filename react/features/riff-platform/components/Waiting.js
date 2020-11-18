@@ -11,9 +11,11 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
+import { Conference } from '../../conference';
 import { checkIsMeetingAllowed } from '../actions/meeting';
 import * as ROUTES from '../constants/routes';
-import { msToTime } from '../functions';
+import { navigateWithoutReload, msToTime } from '../functions';
+
 
 const useStyles = makeStyles(theme => {
     return {
@@ -46,7 +48,8 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
     const [ waitingTime, setWaitingTime ] = useState(false);
 
     const redirectToMeeting = () => {
-        window.location.href = params.meetingId;
+        // window.location.href = params.meetingId;
+        navigateWithoutReload(Conference, params.meetingId);
     };
 
     const waitForMeeting = m => {

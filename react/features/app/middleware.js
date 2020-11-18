@@ -142,7 +142,7 @@ function _isMaybeSplitBrainError(getState, action) {
  * @private
  * @returns {void}
  */
-export function _navigate({ getState }) {
+function _navigate({ getState }) {
     const state = getState();
     const { app } = state['features/base/app'];
 
