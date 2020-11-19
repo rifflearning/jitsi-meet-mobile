@@ -30,7 +30,7 @@ const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
 
 DraggableMeetingMediator.propTypes = {
     displayName: PropTypes.string,
-    webRtcPeers: PropTypes.object
+    webRtcPeers: PropTypes.array
 };
 
 

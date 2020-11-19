@@ -32,7 +32,7 @@ function sendAdditionalNetworkStats(key) {
 
 function getUserData() {
   const state = APP.store.getState();
-  const userData = state['features/riff-metrics'].userData;
+  const userData = getState()['features/riff-platform'].signIn.user;;
   const jitsiId = state["features/base/participants"][0].id;
 
   const obj = {};

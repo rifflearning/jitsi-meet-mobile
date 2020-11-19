@@ -1,18 +1,3 @@
-/* global APP */
-import { createBrowserHistory } from 'history';
-const customHistory = createBrowserHistory();
-
-// Navigate to jitsi app from riff-platform app or vice versa.
-export const navigateWithoutReload = (component, route) => {
-    if (route) {
-        customHistory.push(route);
-    }
-    APP.store.getState()['features/base/app'].app._navigate({
-        component,
-        href: null
-    });
-};
-
 // Save room name before redirecting to signIn page, so we could redirect back to meeting after login.
 export const previousLocationRoomName = {
     isPrevPathRoomName: path => path?.split('/')[1] && (path?.split('/')[1] !== 'app'),

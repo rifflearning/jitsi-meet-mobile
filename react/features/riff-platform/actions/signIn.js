@@ -2,7 +2,7 @@
 import * as actionTypes from '../constants/actionTypes';
 import api from '../api';
 import { jwt, previousLocationRoomName } from '../functions';
-import { setRiffFirebaseCredentials } from '../../riff-dashboard-page/actions';
+import { setLocalDisplayNameAndEmail } from '../actions/jitsiActions';
 
 function signInRequest(){
   return {
@@ -11,7 +11,7 @@ function signInRequest(){
 }
 
 export function signInSuccess(token) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     jwt.set(token);
 
     const user = await api.isAuth();
@@ -19,19 +19,12 @@ export function signInSuccess(token) {
     if (user === null) {
       jwt.remove();
     } else {
+      setLocalDisplayNameAndEmail(user);
+
       dispatch({
         type: actionTypes.LOGIN_SUCCESS,
         user
       });
-
-      const { uid, email, displayName } = user;
-
-      dispatch(setRiffFirebaseCredentials({
-        displayName: displayName || (email ? email.split('@')[0] : 'Anonymous'),
-        email: email || 'anonymous',
-        uid
-      }));
-
 
       const prevPathname = previousLocationRoomName.get();
 

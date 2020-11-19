@@ -48,7 +48,7 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
 
     const redirectToMeeting = () => {
         // Need to reload page
-        window.location.href = params.meetingId;
+        window.location.replace(`/${params.meetingId}`);
     };
 
     const waitForMeeting = m => {

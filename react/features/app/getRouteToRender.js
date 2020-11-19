@@ -7,8 +7,7 @@ import { isSupportedBrowser } from '../base/environment';
 import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
-import { maybeRedirectToLoginPage } from '../riff-dashboard-page/actions';
-import { maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
+import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
 import RiffPlatform from '../riff-platform/components';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
 import {
