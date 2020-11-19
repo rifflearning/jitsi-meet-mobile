@@ -123,7 +123,6 @@ import {
     isPrejoinPageEnabled,
     isPrejoinPageVisible
 } from './react/features/prejoin';
-import { sendStatsOnHangup } from './react/features/riff-dashboard-page/nodejs-browser-stats';
 import { startRiffServices } from './react/features/riff-platform/actions/jitsiActions';
 import { createRnnoiseProcessorPromise } from './react/features/rnnoise';
 import { toggleScreenshotCaptureEffect } from './react/features/screenshot-capture';
@@ -2820,8 +2819,6 @@ export default {
      * requested
      */
     hangup(requestFeedback = false) {
-
-        sendStatsOnHangup();
 
         eventEmitter.emit(JitsiMeetConferenceEvents.BEFORE_HANGUP);
 

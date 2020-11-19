@@ -1,7 +1,6 @@
 /* global config, APP */
 import { createBrowserHistory } from 'history';
 
-import { sendStatsOnConnect } from '../../riff-dashboard-page/nodejs-browser-stats';
 import { subscribeToEmotionsData } from '../../riff-emotions/actions';
 import { setTileView } from '../../video-layout';
 import { attachSibilant, participantLeaveRoom } from '../actions/sibilantActions';
@@ -129,8 +128,6 @@ export function startRiffServices(tracks) {
         maybeRedirectToLoginPage().then(() => {
             dispatch(attachSibilant(tracks));
             dispatch(subscribeToEmotionsData());
-
-            sendStatsOnConnect();
         });
     };
 }
