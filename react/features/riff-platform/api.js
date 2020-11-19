@@ -1,9 +1,10 @@
+/* global process */
 /* eslint-disable object-property-newline */
 /* eslint-disable valid-jsdoc */
 /* eslint-disable no-invalid-this */
 import { jwt } from './functions';
 
-const API_GATEWAY_LINK = 'https://localhost:4445/api';
+const API_GATEWAY_LINK = process.env.API_GATEWAY;
 
 /**
  * ApiService for REST calls to api-gateway.
