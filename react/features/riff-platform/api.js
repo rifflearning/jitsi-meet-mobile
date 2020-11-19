@@ -3,7 +3,7 @@
 /* eslint-disable no-invalid-this */
 import { jwt } from './functions';
 
-const API_URL = 'https://localhost:4445/api';
+const API_GATEWAY_LINK = 'https://localhost:4445/api';
 
 /**
  * ApiService for REST calls to api-gateway.
@@ -19,7 +19,7 @@ class ApiService {
     }
 
     fetchWithJwt = async (url, options) => {
-        const r = await fetch(API_URL + url, { ...this.getHeaders(),
+        const r = await fetch(API_GATEWAY_LINK + url, { ...this.getHeaders(),
             ...options });
 
         if (!r.ok) {
