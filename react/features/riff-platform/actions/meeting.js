@@ -22,30 +22,30 @@ function meetingFailure(error){
   }
 }
 
-export function checkMeeting(meetingId) {
+export function getMeeting(meetingId) {
   return async (dispatch) => {
     dispatch(meetingRequest());
+    let meeting = null;
     try {
-      const meeting = await api.fetchMeeting(meetingId);
-      if (!meeting) {
+      const res = await api.fetchMeeting(meetingId);
+      if (!res) {
         dispatch(meetingFailure('No meeting with this ID'));
       } else {
+        meeting = res;
         dispatch(meetingSuccess(meeting));
       }
-      return meeting;
-      
     } catch (error) {
       dispatch(meetingFailure('No meeting with this ID'));
-      console.error('Error in checkMeeting', error);
-      return null;
+      console.error('Error in getMeeting', error);
     }
+    return meeting;
   }
 }
 
 export function checkIsMeetingAllowed(meetingId) {
   return async (dispatch) => {
     try {
-      const meeting = await dispatch(checkMeeting(meetingId));
+      const meeting = await dispatch(getMeeting(meetingId));
       
       if (!meeting) return null;
       
