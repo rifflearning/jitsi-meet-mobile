@@ -307,7 +307,7 @@ SchedulerForm.propTypes = {
 
 const mapStateToProps = state => {
     return {
-        userId: state['features/riff-metrics'].userData.uid,
+        userId: state['features/riff-platform'].signIn.user.uid,
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
         meeting: state['features/riff-platform'].scheduler.meeting
