@@ -3,10 +3,10 @@
 # you need to provide enviroment variables to /.env file
 # and run "make deploy-aws" or only deploy with "sh deploy-aws.sh".
 
-# Set all vars from .env file, we need for PEM_PATH, AWS_NAME
+# Set all vars from .env file, we need for PEM_PATH, AWS_PATH
 set -o allexport; source .env; set +o allexport
 
-EXAMPLE_TEXT="Add to /.env file variables:\nPEM_PATH=/path-to-key.pem\nAWS_NAME=username@0.0.0.0\n\nand run 'make deploy-aws'."
+EXAMPLE_TEXT="Add to .env file variables:\nPEM_PATH=/path-to-key.pem\nAWS_PATH=username@0.0.0.0\n\nand run 'make deploy-aws'."
 
 if [ -z "$PEM_PATH" ]
   then
@@ -15,9 +15,9 @@ if [ -z "$PEM_PATH" ]
     exit 1
 fi
 
-if [ -z "$AWS_NAME" ]
+if [ -z "$AWS_PATH" ]
   then
-    echo "No AWS_NAME provided.\n"
+    echo "No AWS_PATH provided.\n"
     echo $EXAMPLE_TEXT
     exit 1
 fi
@@ -61,13 +61,13 @@ zip -r temp-deploy-aws.zip temp-deploy-aws
 rm -r temp-deploy-aws
 
 # upload to aws instance
-scp -i $PEM_PATH temp-deploy-aws.zip $AWS_NAME:/home/ubuntu
+scp -i $PEM_PATH temp-deploy-aws.zip $AWS_PATH:/home/ubuntu
 
 # clean locally
 rm -fr temp-deploy-aws.zip
 
 # unzip and deploy:
-ssh -i $PEM_PATH $AWS_NAME ' \
+ssh -i $PEM_PATH $AWS_PATH ' \
 rm -rf /home/ubuntu/temp-deploy-aws; \
 unzip /home/ubuntu/temp-deploy-aws.zip; \
 rm /home/ubuntu/temp-deploy-aws.zip; \
