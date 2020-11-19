@@ -30,7 +30,7 @@ export function getMeetings() {
       const res = await api.fetchMeetings();
       dispatch(meetingsSuccess(res));
     } catch (e) {
-      console.error(e);
+      console.error('Error in getMeetings', e);
       dispatch(meetingsFailure(e.message));
     }
   }
@@ -43,7 +43,7 @@ export function deleteMeeting(id) {
       await api.deleteMeeting(id);
       dispatch(getMeetings());
     } catch (e) {
-      console.error(e);
+      console.error('Error in deleteMeeting', e);
     }
   }
 }

@@ -37,7 +37,11 @@ export function signUp({email, password, name}) {
 
       dispatch(signUpSuccess(res.token));
     } catch (e) {
-      dispatch(signUpFailure(e.message));
+      if (e.status === 401) {
+        dispatch(signUpFailure('User already exists'));
+      } else { 
+        dispatch(signUpFailure('Error in signUp'));
+      }
     }
   }
 }

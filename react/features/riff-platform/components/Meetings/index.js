@@ -19,7 +19,6 @@ const Meetings = ({ meetingsLists = [], getMeetingsLists }) => {
         getMeetingsLists();
     }, []);
 
-    // formats meetingsLists to {Today: meetingList, [otherDate]: meetingList ...}
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
     return (

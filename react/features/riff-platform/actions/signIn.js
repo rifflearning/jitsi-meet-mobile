@@ -1,7 +1,7 @@
 /* eslint-disable */
 import * as actionTypes from '../constants/actionTypes';
 import api from '../api';
-import { setJwt, removeJwt, getPrevPath, setPrevPath } from '../functions';
+import { jwt, previousLocationRoomName } from '../functions';
 import { setRiffFirebaseCredentials } from '../../riff-dashboard-page/actions';
 
 function signInRequest(){
@@ -12,11 +12,12 @@ function signInRequest(){
 
 export function signInSuccess(token) {
   return async (dispatch, getState) => {
-    setJwt(token)
+    jwt.set(token);
 
     const user = await api.isAuth();
+
     if (user === null) {
-      removeJwt();
+      jwt.remove();
     } else {
       dispatch({
         type: actionTypes.LOGIN_SUCCESS,
@@ -32,11 +33,10 @@ export function signInSuccess(token) {
       }));
 
 
-      const prevPathname = getPrevPath();
-      const isPrevPathRoomName = () => prevPathname?.split('/')[1] && (prevPathname?.split('/')[1] !== 'app');
-      if (isPrevPathRoomName()) {
+      const prevPathname = previousLocationRoomName.get();
+
+      if (prevPathname) {
         // navigate to room name
-        setPrevPath('');
         return prevPathname;
       }
     }
@@ -51,7 +51,7 @@ function signInFailure(error){
 }
 
 export function logout() {
-  removeJwt()
+  jwt.remove()
 
   return {
     type: actionTypes.LOGOUT
@@ -63,11 +63,12 @@ export function signIn({ email, password }) {
     dispatch(signInRequest());
 
     try {
-      const res = await api.signIn({email, password})
+      const res = await api.signIn({ email, password });
 
       return dispatch(signInSuccess(res.token));
     } catch (e) {
-      dispatch(signInFailure(e.message));
+      console.error('Error in signIn', e);
+      dispatch(signInFailure('Error in SignIn'));
     }
   }
 }

@@ -10,7 +10,7 @@ import { subscribeToEmotionsData } from '../riff-emotions/actions';
 import { sendStatsOnConnect } from './nodejs-browser-stats';
 import RiffPlatform from '../riff-platform/components';
 import api from '../riff-platform/api';
-import { getJwt, setPrevPath } from '../riff-platform/functions';
+import { previousLocationRoomName } from '../riff-platform/functions';
 import { navigateWithoutReload } from '../riff-platform/functions';
 
 export function setRiffServerRoomId(roomId) {
@@ -143,7 +143,7 @@ export function maybeRedirectToLoginPage() {
         }
         api.isAuth().then(user => {
             if (user === null) {
-                setPrevPath(window.location.pathname)
+                previousLocationRoomName.set(window.location.pathname);
                 navigateWithoutReload(RiffPlatform);
             } else {
                 APP.store.dispatch({

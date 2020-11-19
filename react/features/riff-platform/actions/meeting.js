@@ -36,7 +36,7 @@ export function checkMeeting(meetingId) {
       
     } catch (error) {
       dispatch(meetingFailure('No meeting with this ID'));
-      console.error(error);
+      console.error('Error in checkMeeting', error);
       return null;
     }
   }

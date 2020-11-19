@@ -22,7 +22,6 @@ export async function maybeRedirectToWaitingRoom() {
 
         APP.store.dispatch(checkIsMeetingAllowed(meetingId)).then(m => {
             if (m === null || m.error) {
-                // window.location.pathname = `/app/waiting/${meetingId}`;
                 navigateWithoutReload(RiffPlatform, `/app/waiting/${meetingId}`);
             } else {
                 res();

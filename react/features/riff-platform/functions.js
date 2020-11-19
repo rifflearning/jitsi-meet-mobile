@@ -2,6 +2,7 @@
 import { createBrowserHistory } from 'history';
 const customHistory = createBrowserHistory();
 
+// Navigate to jitsi app from riff-platform app or vice versa.
 export const navigateWithoutReload = (component, route) => {
     if (route) {
         customHistory.push(route);
@@ -12,23 +13,42 @@ export const navigateWithoutReload = (component, route) => {
     });
 };
 
-export const getJwt = () => localStorage.getItem('jwt-token');
+// Save room name before redirecting to signIn page, so we could redirect back to meeting after login.
+export const previousLocationRoomName = {
+    isPrevPathRoomName: path => path?.split('/')[1] && (path?.split('/')[1] !== 'app'),
+    get() {
+        const prevPathname = sessionStorage.getItem('prevPathname');
 
-export const setJwt = token => {
-    localStorage.setItem('jwt-token', token);
+        sessionStorage.removeItem('prevPathname');
+
+        return prevPathname;
+    },
+    set(pathName) {
+        if (this.isPrevPathRoomName(pathName)) {
+            sessionStorage.setItem('prevPathname', pathName);
+        }
+    }
 };
 
-export const removeJwt = () => {
-    localStorage.removeItem('jwt-token');
+export const jwt = {
+    get() {
+        return localStorage.getItem('jwt-token');
+    },
+    set(token) {
+        localStorage.setItem('jwt-token', token);
+    },
+    remove() {
+        localStorage.removeItem('jwt-token');
+    }
 };
 
-export const getPrevPath = () => sessionStorage.getItem('prevPathname');
-
-export const setPrevPath = pathName => {
-    sessionStorage.setItem('prevPathname', pathName);
-};
-
-export const groupMeetingsByDays = meetings => {
+/**
+ * Groups meetingsLists to object: {Today: meetingList, [otherDate]: meetingList ...}.
+ *
+ * @param {Array} meetings - Array of meetings from db.
+ * @returns {string} - Returns object map of meetings: {Today: meetingObj, 'thu, 04 04': meetingObj}.
+ */
+export function groupMeetingsByDays(meetings) {
     if (!meetings || !meetings.length) {
         return {};
     }
@@ -54,9 +74,16 @@ export const groupMeetingsByDays = meetings => {
     });
 
     return groupedMeetings;
-};
+}
 
-export const formatDurationTime = (startDate, endDate) => {
+/**
+ * Transforms milliseconds to duration string time.
+ *
+ * @param {number} startDate - Start date in milliseconds.
+ * @param {number} endDate - End date in milliseconds.
+ * @returns {string} - Returns in format: HH:MM - HH:MM.
+ */
+export function formatDurationTime(startDate, endDate) {
     // eslint-disable-next-line no-confusing-arrow
     const addZero = i => i < 10 ? `0${i}` : i;
 
@@ -71,9 +98,18 @@ export const formatDurationTime = (startDate, endDate) => {
     const timeEnd = `${addZero(dateEnd.getHours())}:${addZero(dateEnd.getMinutes())}`;
 
     return `${timeStart} - ${timeEnd}`;
-};
+}
 
-export const msToTime = milliseconds => {
+/**
+ * Transforms milliseconds to string time.
+ *
+ * @param {number} milliseconds - Date in milliseconds.
+ * @returns {string} - Returns in format: DD days and HH:MM:SS..
+ */
+export function msToTime(milliseconds) {
+    // eslint-disable-next-line no-confusing-arrow
+    const addZero = i => i < 10 ? `0${i}` : i;
+
     let s = milliseconds;
     const ms = s % 1000;
 
@@ -89,5 +125,5 @@ export const msToTime = milliseconds => {
     const d = (s - hrs) / 24;
     const days = d && `${d} days and `;
 
-    return `${days}${hrs}:${mins}:${secs}`;
-};
+    return `${days}${hrs}:${addZero(mins)}:${addZero(secs)}`;
+}
