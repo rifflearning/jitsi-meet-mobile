@@ -1,10 +1,9 @@
-/* eslint-disable */
-/* global APP, config */
+/* eslint-disable require-jsdoc */
 
 import Sibilant from 'sibilant-webaudio';
 
-import * as actionTypes from '../constants/actionTypes';
 import { app, socket } from '../../riff-dashboard-page/src/libs/riffdata-client';
+import * as actionTypes from '../constants/actionTypes';
 
 function setRiffServerRoomId(roomId) {
     return {
@@ -17,7 +16,10 @@ export function attachSibilant(tracks) {
     return async (dispatch, getState) => {
         try {
             const stream = tracks.find(t => t.isAudioTrack())?.stream;
-            if (!stream) return console.error('No audio stream. Error while attaching sibilant in attachSibilant action.');
+
+            if (!stream) {
+                return console.error('No audio stream. Error while attaching sibilant in attachSibilant action.');
+            }
 
             const speakingEvents = new Sibilant(stream);
 
@@ -29,7 +31,10 @@ export function attachSibilant(tracks) {
 
             await riffAddUserToMeeting(userData, meetingUrl, room, accessToken);
 
-            speakingEvents.bind('stoppedSpeaking', data => dispatch(sendUtteranceToServer(data, userData, room, accessToken)));      
+            speakingEvents.bind(
+                'stoppedSpeaking',
+                data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
+            );
         } catch (error) {
             console.error('Error while attachSibilant', error);
         }
@@ -38,7 +43,7 @@ export function attachSibilant(tracks) {
 
 async function riffAddUserToMeeting({ uid, displayName, email }, meetingUrl, room, token) {
     try {
-        await socket.emit('meetingJoined', {
+        socket.emit('meetingJoined', {
             participant: uid,
             email,
             name: displayName,
@@ -56,13 +61,10 @@ async function riffAddUserToMeeting({ uid, displayName, email }, meetingUrl, roo
 
 export function participantLeaveRoom(meetingId, participantId) {
     return app.service('meetings').patch(meetingId, {
+        // eslint-disable-next-line camelcase
         remove_participants: [ participantId ]
     })
-        .then(res => {
-            // console.log(`Action.Riff: removed participant: ${participantId} from meeting ${meetingId}`, res);
-
-            return true;
-        })
+        .then(() => true)
         .catch(err => {
             console.error('Action.Riff: caught an error leaving the room:', err);
 
@@ -72,24 +74,23 @@ export function participantLeaveRoom(meetingId, participantId) {
 
 async function loginToServerForSibilant() {
     try {
-
         const { accessToken, user: { _id: uid } } = await app.authenticate({
             strategy: 'local',
             email: 'default-user-email',
             password: 'default-user-password'
         });
 
-        return { accessToken,
+        return {
+            accessToken,
             uid
         };
-
     } catch (err) {
         console.error('Error while loginToServerForSibilant', err);
     }
 }
 
-function sendUtteranceToServer(data, {uid: participant}, room, token ) {
-    return async (dispatch) => {
+function sendUtteranceToServer(data, { uid: participant }, room, token) {
+    return async dispatch => {
         try {
             const res = await app.service('utterances').create({
                 participant,
@@ -104,9 +105,8 @@ function sendUtteranceToServer(data, {uid: participant}, room, token ) {
             dispatch(setRiffServerRoomId(res.meeting));
 
             return undefined;
-
         } catch (err) {
             console.error('Listener.WebRtc: ERROR', err);
         }
-    }
+    };
 }

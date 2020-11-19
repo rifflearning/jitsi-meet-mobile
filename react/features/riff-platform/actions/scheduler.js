@@ -1,43 +1,44 @@
-/* eslint-disable */
-import * as actionTypes from '../constants/actionTypes';
+/* eslint-disable require-jsdoc */
+
 import api from '../api';
+import * as actionTypes from '../constants/actionTypes';
 
-function schedulerRequest(){
-  return {
-    type: actionTypes.SCHEDULER_REQUEST
-  }
+function schedulerRequest() {
+    return {
+        type: actionTypes.SCHEDULER_REQUEST
+    };
 }
 
-function schedulerSuccess(meeting) {    
-  return {
-    type: actionTypes.SCHEDULER_SUCCESS,
-    meeting
-  }
+function schedulerSuccess(meeting) {
+    return {
+        type: actionTypes.SCHEDULER_SUCCESS,
+        meeting
+    };
 }
 
-function schedulerFailure(error){
-  return {
-    type: actionTypes.SCHEDULER_FAILURE,
-    error
-  }
+function schedulerFailure(error) {
+    return {
+        type: actionTypes.SCHEDULER_FAILURE,
+        error
+    };
 }
 
 export function schedule(meeting) {
-  return async (dispatch) => {
-    dispatch(schedulerRequest());
+    return async dispatch => {
+        dispatch(schedulerRequest());
 
-    try {
-      const res = await api.scheduleMeeting(meeting);
+        try {
+            const res = await api.scheduleMeeting(meeting);
 
-      dispatch(schedulerSuccess(res));
-    } catch (e) {
-      dispatch(schedulerFailure(e.message));
-    }
-  }
+            dispatch(schedulerSuccess(res));
+        } catch (e) {
+            dispatch(schedulerFailure(e.message));
+        }
+    };
 }
 
 export function schedulerReset() {
-  return {
-    type: actionTypes.SCHEDULER_RESET
-  }
+    return {
+        type: actionTypes.SCHEDULER_RESET
+    };
 }

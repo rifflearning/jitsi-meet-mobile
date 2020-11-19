@@ -1,50 +1,52 @@
-/* eslint-disable */
-import * as actionTypes from '../constants/actionTypes';
+/* eslint-disable require-jsdoc */
+
 import api from '../api';
+import * as actionTypes from '../constants/actionTypes';
 
-function meetingsRequest(){
-  return {
-    type: actionTypes.MEETINGS_REQUEST
-  }
+function meetingsRequest() {
+    return {
+        type: actionTypes.MEETINGS_REQUEST
+    };
 }
 
-function meetingsSuccess(meetingsLists) {    
-  return {
-    type: actionTypes.MEETINGS_SUCCESS,
-    meetingsLists
-  }
+function meetingsSuccess(meetingsLists) {
+    return {
+        type: actionTypes.MEETINGS_SUCCESS,
+        meetingsLists
+    };
 }
 
-function meetingsFailure(error){
-  return {
-    type: actionTypes.MEETINGS_FAILURE,
-    error
-  }
+function meetingsFailure(error) {
+    return {
+        type: actionTypes.MEETINGS_FAILURE,
+        error
+    };
 }
 
 export function getMeetings() {
-  return async (dispatch) => {
-    dispatch(meetingsRequest());
+    return async dispatch => {
+        dispatch(meetingsRequest());
 
-    try {
-      const res = await api.fetchMeetings();
-      dispatch(meetingsSuccess(res));
-    } catch (e) {
-      console.error('Error in getMeetings', e);
-      dispatch(meetingsFailure(e.message));
-    }
-  }
+        try {
+            const res = await api.fetchMeetings();
+
+            dispatch(meetingsSuccess(res));
+        } catch (e) {
+            console.error('Error in getMeetings', e);
+            dispatch(meetingsFailure(e.message));
+        }
+    };
 }
 
 export function deleteMeeting(id) {
-  return async (dispatch) => {
+    return async dispatch => {
 
-    try {
-      await api.deleteMeeting(id);
-      dispatch(getMeetings());
-    } catch (e) {
-      console.error('Error in deleteMeeting', e);
-    }
-  }
+        try {
+            await api.deleteMeeting(id);
+            dispatch(getMeetings());
+        } catch (e) {
+            console.error('Error in deleteMeeting', e);
+        }
+    };
 }
 

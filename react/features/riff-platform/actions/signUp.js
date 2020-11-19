@@ -1,48 +1,52 @@
-/* eslint-disable */
-import * as actionTypes from '../constants/actionTypes';
+/* eslint-disable require-jsdoc */
+
 import api from '../api';
+import * as actionTypes from '../constants/actionTypes';
+
 import { signInSuccess } from './signIn';
 
-function signUpRequest(){
-  return {
-    type: actionTypes.REGISTER_REQUEST
-  }
+function signUpRequest() {
+    return {
+        type: actionTypes.REGISTER_REQUEST
+    };
 }
 
 function signUpSuccess(token) {
-  return (dispatch) => {
+    return dispatch => {
 
-    dispatch(signInSuccess(token))
-    
-    dispatch({
-      type: actionTypes.REGISTER_SUCCESS,
-      token
-    })
-  }
+        dispatch(signInSuccess(token));
+
+        dispatch({
+            type: actionTypes.REGISTER_SUCCESS,
+            token
+        });
+    };
 }
 
-function signUpFailure(error){
-  return {
-    type: actionTypes.REGISTER_FAILURE,
-    error
-  }
+function signUpFailure(error) {
+    return {
+        type: actionTypes.REGISTER_FAILURE,
+        error
+    };
 }
 
-export function signUp({email, password, name}) {
-  return async (dispatch) => {
-    dispatch(signUpRequest());
+export function signUp({ email, password, name }) {
+    return async dispatch => {
+        dispatch(signUpRequest());
 
-    try {
-      const res = await api.signUp({name, email, password})
+        try {
+            const res = await api.signUp({ name,
+                email,
+                password });
 
-      dispatch(signUpSuccess(res.token));
-    } catch (e) {
-      if (e.status === 401) {
-        dispatch(signUpFailure('User already exists'));
-      } else { 
-        dispatch(signUpFailure('Error in signUp'));
-      }
-    }
-  }
+            dispatch(signUpSuccess(res.token));
+        } catch (e) {
+            if (e.status === 401) {
+                dispatch(signUpFailure('User already exists'));
+            } else {
+                dispatch(signUpFailure('Error in signUp'));
+            }
+        }
+    };
 }
 
