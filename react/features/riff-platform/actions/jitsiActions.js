@@ -1,5 +1,6 @@
 /* global config, APP */
 import RiffPlatform from '../components';
+import * as ROUTES from '../constants/routes';
 import { navigateWithoutReload } from '../functions';
 
 import { checkIsMeetingAllowed } from './meeting';
@@ -22,7 +23,7 @@ export async function maybeRedirectToWaitingRoom() {
 
         APP.store.dispatch(checkIsMeetingAllowed(meetingId)).then(m => {
             if (m === null || m.error) {
-                navigateWithoutReload(RiffPlatform, `/app/waiting/${meetingId}`);
+                navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.WAITING}/${meetingId}`);
             } else {
                 res();
             }

@@ -2,6 +2,8 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import * as ROUTES from '../constants/routes';
+
 import App from './App';
 
 const darkTheme = createMuiTheme({
@@ -18,7 +20,7 @@ const darkTheme = createMuiTheme({
 
 const RiffPlatform = () => (
     <ThemeProvider theme = { darkTheme }>
-        <Router basename = '/app'>
+        <Router basename = { ROUTES.BASENAME }>
             <App />
         </Router>
     </ThemeProvider>

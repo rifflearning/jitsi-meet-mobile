@@ -1,3 +1,5 @@
+export const BASENAME = '/app';
+
 export const SIGNIN = '/login';
 export const SIGNUP = '/signup';
 export const JOIN = '/join';
