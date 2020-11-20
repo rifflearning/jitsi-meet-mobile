@@ -22,16 +22,16 @@ class Capturer {
      * @returns {void}
      */
     connect = async (dispatcherUrl) => {
-        let capabilities = await this._capturer.getPhotoCapabilities();
+        //let capabilities = await this._capturer.getPhotoCapabilities();
         this._socket = io(dispatcherUrl);
         this._socket.on('connect', () => {
             console.log(`Send server-ping ${this._userId}`);
             this._socket.emit('server-ping', this._userId);
         });
-        this._socket.on('server-pong', data => {
+        this._socket.on('server-pong', () => {
             console.log(`Received server-pong ${this._userId}`)
             this._isLive = true;
-            this._socket.emit('add', {room: this._room, roomId: this._roomId, userId: this._userId});
+            this._socket.emit('add', { room: this._room, roomId: this._roomId, userId: this._userId });
             this._pushNextFrame();
         });
     }
@@ -45,7 +45,7 @@ class Capturer {
         if (this._isLive) {
             try {
                 const blob = await this._capturer.takePhoto();
-                this._socket.emit('next-frame', {room: this._room, roomId: this._roomId, userId: this._userId, image: blob});
+                this._socket.emit('next-frame', { room: this._room, roomId: this._roomId, userId: this._userId, image: blob });
                 this._pushNextFrame(); // schedule next one
             } catch (err) {
                 console.error(err);

@@ -43,7 +43,7 @@ export function getTrackByParticipantId(participantId) {
  * @returns {String}
  */
 export function getRoom() {
-    return APP.store.getState()[FEATURES.ROOM].room; 
+    return APP.store.getState()[FEATURES.CONFERENCE].room; 
 };
 
 /**
@@ -52,7 +52,7 @@ export function getRoom() {
  * @returns {String}
  */
 export function getRoomId() {
-    return APP.store.getState()[FEATURES.ROOMID].roomid; 
+    return APP.store.getState()[FEATURES.RIFF_METRICS].roomId; 
 };
 
 /**

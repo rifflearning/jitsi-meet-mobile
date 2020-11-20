@@ -10,11 +10,14 @@ import {
 
 class Capturers {
     constructor() {
-        // holds a map between participant and video stream capturer
+        // map between participant and video stream capturer
         this._capturers = new Map();
 
-        // holds a link to dispatcher resource for analysis processes creation
+        // link to dispatcher resource for analysis processes creation
         this._dispatcherUrl = null;
+
+        // subscription cancellation function from store updates
+        this.cancelStoreSubscription = null;
     }
 
     start = (dispatcherUrl) => {
@@ -22,7 +25,7 @@ class Capturers {
         // init call to avoid waiting for first update in store
         this._handleParticipantsUpdate();
 
-        APP.store.subscribe(this._handleParticipantsUpdate);
+        this.cancelStoreSubscription = APP.store.subscribe(this._handleParticipantsUpdate);
     }
 
     _handleParticipantsUpdate = () => {
@@ -37,10 +40,7 @@ class Capturers {
             const track = getTrackByParticipantId(participantId);
             const userId = getUserIdByParticipantId(participantId);
             const room = getRoom();
-            let roomId = getRoomId();
-            if (roomId === undefined) {
-                roomId = room;
-            }
+            const roomId = getRoomId() || room;
             const stream = track.jitsiTrack.stream;
             const capturer = new Capturer(room, roomId, userId, stream);
             
@@ -50,6 +50,8 @@ class Capturers {
     }
 
     stop = () => {
+        this.cancelStoreSubscription();
+
         for (let capturer of this._capturers.values()) {
             capturer.disconnect();
         }

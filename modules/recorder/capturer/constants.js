@@ -11,6 +11,6 @@ export const MEDIA_TYPE = {
 export const FEATURES = {
     TRACKS: 'features/base/tracks',
     PARTICIPANTS: 'features/base/participants',
-    ROOM: 'features/base/conference',
-    ROOMID: 'features/riff-metrics'
+    CONFERENCE: 'features/base/conference',
+    RIFF_METRICS: 'features/riff-metrics'
 }
