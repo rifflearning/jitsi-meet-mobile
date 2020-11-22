@@ -6,8 +6,11 @@ export const MEDIA_TYPE = {
 };
 
 /**
- * The set of params for frame captured from video stream 
+ * The set of features in global store
  */
-export const FRAME = {
-    WIDTH: 720
-};
+export const FEATURES = {
+    TRACKS: 'features/base/tracks',
+    PARTICIPANTS: 'features/base/participants',
+    CONFERENCE: 'features/base/conference',
+    RIFF_METRICS: 'features/riff-metrics'
+}

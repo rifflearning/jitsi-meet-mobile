@@ -1,53 +1,70 @@
-import { FRAME } from './constants';
+import io from 'socket.io-client';
 
 
 class Capturer {
-    constructor(stream) {
-        this._video = document.createElement('video');
-        this._canvas = document.createElement('canvas');
-
-        // Indicates whether or not streaming is on and 
-        // we can capture frames from it
-        this._streaming = false;
-
-        // Width of frame, will be set to the default value
-        this._frameWidth = null;
-
-        // Height of frame, will be calculated based on the aspect ratio
-        // of the input stream
-        this._frameHeight = null;
-
-        this._video.srcObject = stream;
-        this._video.addEventListener('canplay', (e) => {
-            this._streaming = true;
-            this._frameWidth = FRAME.WIDTH;
-            this._frameHeight = this._video.videoHeight / (this._video.videoWidth / FRAME.WIDTH);
-        }, false);
-        
-        this._video.play();
-    }
-
-    /**
-     * Captures a frame of the video stream by drawing it into an offscreen canvas
-     * 
-     * @returns {Promise}
-     */
-    captureFrame = () => {
-        return new Promise((resolve, reject) => {
-            if (this._streaming) {
-                const context = this._canvas.getContext('2d');
-                this._canvas.width = this._frameWidth;
-                this._canvas.height = this._frameHeight;
-            
-                context.drawImage(this._video, 0, 0, this._frameWidth, this._frameHeight);
-
-                this._canvas.toBlob(resolve, 'image/png', 1);
-            } else {
-                reject('video stream is not ready for capturing yet');
-            }
+    constructor(room, roomId, userId, stream) {
+        this._socket = null;
+        this._isLive = false;
+        this._room = room;
+        this._roomId = roomId;
+        this._userId = userId;
+        this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
+        // log user's frame data to be visible inside jibri
+        this._capturer.getPhotoCapabilities().then(capabilities => {
+            console.log(`Photo capabilities for ${this._userId}: `);
+            console.log(capabilities);
         });
     }
 
+    /**
+     * Connects to socket and initializes capturing process
+     * 
+     * @returns {void}
+     */
+    connect = async (dispatcherUrl) => {
+        //let capabilities = await this._capturer.getPhotoCapabilities();
+        this._socket = io(dispatcherUrl);
+        this._socket.on('connect', () => {
+            console.log(`Send server-ping ${this._userId}`);
+            this._socket.emit('server-ping', this._userId);
+        });
+        this._socket.on('server-pong', () => {
+            console.log(`Received server-pong ${this._userId}`)
+            this._isLive = true;
+            this._socket.emit('add', { room: this._room, roomId: this._roomId, userId: this._userId });
+            this._pushNextFrame();
+        });
+    }
+
+    /**
+     * Infinite loop of capturing next available frame in stream
+     * 
+     * @returns {void}
+     */
+    _pushNextFrame = async () => {
+        if (this._isLive) {
+            try {
+                const blob = await this._capturer.takePhoto();
+                this._socket.emit('next-frame', { room: this._room, roomId: this._roomId, userId: this._userId, image: blob });
+                this._pushNextFrame(); // schedule next one
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    /**
+     * Stops frames pushing and closes socket connection
+     * 
+     * @returns {void}
+     */
+    disconnect = () => {
+        if (this._isLive) {
+            this._socket.emit('remove', {room: this._room, roomId: this._roomId, userId: this._userId});
+        }
+        this._isLive = false;
+        this._socket.close();
+    }
 }
 
 export default Capturer;
