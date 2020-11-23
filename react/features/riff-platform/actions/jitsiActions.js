@@ -136,9 +136,6 @@ export function redirectToRiffMetrics() {
 export function startRiffServices(tracks) {
     return dispatch => {
         dispatch(setTileViewByDefault());
-
-        maybeRedirectToLoginPage().then(() => {
-            dispatch(attachSibilant(tracks));
-        });
+        dispatch(attachSibilant(tracks));
     };
 }
