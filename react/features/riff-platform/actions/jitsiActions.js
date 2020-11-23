@@ -124,6 +124,10 @@ export function startRiffServices(tracks) {
     return dispatch => {
         dispatch(setTileViewByDefault());
 
+        if (config.iAmRecorder) {
+            return;
+        }
+
         maybeRedirectToLoginPage().then(() => {
             dispatch(attachSibilant(tracks));
         });
