@@ -58,6 +58,19 @@ export async function maybeRedirectToWaitingRoom() {
 export function maybeRedirectToLoginPage() {
     return new Promise(res => {
         if (config.iAmRecorder) {
+            const user = {
+                uid: 'Recorder',
+                displayName: 'Recorder',
+                email: 'Recorder@Recorder.Recorder'
+            };
+
+            APP.store.dispatch({
+                type: actionTypes.LOGIN_SUCCESS,
+                user
+            });
+
+            // setLocalDisplayNameAndEmail(user);
+
             return res();
         }
         api.isAuth().then(user => {
@@ -123,10 +136,6 @@ export function redirectToRiffMetrics() {
 export function startRiffServices(tracks) {
     return dispatch => {
         dispatch(setTileViewByDefault());
-
-        if (config.iAmRecorder) {
-            return;
-        }
 
         maybeRedirectToLoginPage().then(() => {
             dispatch(attachSibilant(tracks));

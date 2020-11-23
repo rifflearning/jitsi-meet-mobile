@@ -1,3 +1,4 @@
+/* global config */
 /* eslint-disable require-jsdoc */
 
 import Sibilant from 'sibilant-webaudio';
@@ -35,6 +36,15 @@ export function attachSibilant(tracks) {
                 'stoppedSpeaking',
                 data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
             );
+
+            if (config.iAmRecorder) {
+                const data = {
+                    start: new Date(),
+                    end: new Date()
+                };
+
+                dispatch(sendUtteranceToServer(data, userData, room, accessToken));
+            }
         } catch (error) {
             console.error('Error while attachSibilant', error);
         }
