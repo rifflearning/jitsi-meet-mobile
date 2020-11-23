@@ -41,8 +41,7 @@ class Capturers {
             const userId = getUserIdByParticipantId(participantId);
             const room = getRoom();
             const roomId = getRoomId() || room;
-            const stream = track.jitsiTrack.stream;
-            const capturer = new Capturer(room, roomId, userId, stream);
+            const capturer = new Capturer(room, roomId, userId, track);
             
             this._capturers.set(participantId, capturer);
             capturer.connect(this._dispatcherUrl);
