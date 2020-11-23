@@ -12,5 +12,5 @@ export const FEATURES = {
     TRACKS: 'features/base/tracks',
     PARTICIPANTS: 'features/base/participants',
     CONFERENCE: 'features/base/conference',
-    RIFF_METRICS: 'features/riff-metrics'
+    RIFF_PLATFORM: 'features/riff-platform'
 }

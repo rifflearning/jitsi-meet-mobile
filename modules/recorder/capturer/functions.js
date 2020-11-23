@@ -52,7 +52,7 @@ export function getRoom() {
  * @returns {String}
  */
 export function getRoomId() {
-    return APP.store.getState()[FEATURES.RIFF_METRICS].roomId; 
+    return APP.store.getState()[FEATURES.RIFF_PLATFORM].riff.roomId; 
 };
 
 /**
