@@ -167,6 +167,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             spacing = { 2 }>
                             <Grid item>
                                 <KeyboardDatePicker
+                                    autoOk
                                     disableToolbar
                                     variant = 'inline'
                                     format = 'MM/dd/yyyy'
@@ -181,6 +182,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             </Grid>
                             <Grid item>
                                 <KeyboardTimePicker
+                                    autoOk
                                     margin = 'normal'
                                     id = 'time-picker'
                                     label = 'Time'
