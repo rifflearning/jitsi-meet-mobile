@@ -16,10 +16,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { Link as LinkTo } from 'react-router-dom';
+import { Link as LinkTo, useHistory } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
 import { signUp } from '../actions/signUp';
+import * as ROUTES from '../constants/routes';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -45,6 +46,7 @@ const useStyles = makeStyles(theme => {
 
 const SignUp = ({ doRegister, signUpError, signingUp }) => {
     const classes = useStyles();
+    const history = useHistory();
 
     const [ name, setName ] = useState('');
     const [ email, setEmail ] = useState('');
@@ -115,6 +117,10 @@ const SignUp = ({ doRegister, signUpError, signingUp }) => {
             name,
             email,
             password
+        }).then(prevPath => {
+            if (prevPath) {
+                history.push(`${ROUTES.WAITING}${prevPath}`);
+            }
         });
     };
 

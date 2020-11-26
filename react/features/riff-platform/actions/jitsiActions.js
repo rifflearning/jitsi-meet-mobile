@@ -7,7 +7,7 @@ import api from '../api';
 import RiffPlatform from '../components';
 import * as actionTypes from '../constants/actionTypes';
 import * as ROUTES from '../constants/routes';
-import { previousLocationRoomName } from '../functions';
+import { isRiffPlatformCurrentPath, previousLocationRoomName } from '../functions';
 
 import { checkIsMeetingAllowed } from './meeting';
 
@@ -31,9 +31,9 @@ export const navigateWithoutReload = (component, route) => {
 */
 export async function maybeRedirectToWaitingRoom() {
     return new Promise(res => {
-        const isRoomId = window.location.pathname.split('/')[1] !== 'app';
 
-        if (!isRoomId || config.iAmRecorder) {
+        // no redirect if we're on riff-platform app already. And no redirect for recorder.
+        if (isRiffPlatformCurrentPath() || config.iAmRecorder) {
             return res();
         }
 

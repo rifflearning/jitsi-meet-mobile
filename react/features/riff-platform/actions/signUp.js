@@ -14,12 +14,9 @@ function signUpRequest() {
 function signUpSuccess(token) {
     return dispatch => {
 
-        dispatch(signInSuccess(token));
+        dispatch({ type: actionTypes.REGISTER_SUCCESS });
 
-        dispatch({
-            type: actionTypes.REGISTER_SUCCESS,
-            token
-        });
+        return dispatch(signInSuccess(token));
     };
 }
 
@@ -39,7 +36,7 @@ export function signUp({ email, password, name }) {
                 email,
                 password });
 
-            dispatch(signUpSuccess(res.token));
+            return dispatch(signUpSuccess(res.token));
         } catch (e) {
             if (e.status === 401) {
                 dispatch(signUpFailure('User already exists'));
