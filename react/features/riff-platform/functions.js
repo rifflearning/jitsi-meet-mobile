@@ -1,6 +1,8 @@
+import * as ROUTES from './constants/routes';
+
 // Save room name before redirecting to signIn page, so we could redirect back to meeting after login.
 export const previousLocationRoomName = {
-    isPrevPathRoomName: path => path?.split('/')[1] && (path?.split('/')[1] !== 'app'),
+    isPrevPathRoomName: path => path?.split('/')[1] && (path?.split('/')[1] !== ROUTES.BASENAME.slice(1)),
     get() {
         const prevPathname = sessionStorage.getItem('prevPathname');
 
@@ -108,7 +110,17 @@ export function msToTime(milliseconds) {
     const hrs = s % 24;
 
     const d = (s - hrs) / 24;
-    const days = d && `${d} days and `;
+    const days = d ? `${d} ${d === 1 ? 'day' : 'days'} and ` : '';
 
-    return `${days}${hrs}:${addZero(mins)}:${addZero(secs)}`;
+    return `${days}${addZero(hrs)}:${addZero(mins)}:${addZero(secs)}`;
+}
+
+/**
+ * Checks if current pathname equals to riff-platform basename.
+ *
+ *
+ * @returns {boolean} - True if we're on platform, false if on roomId or '/'.
+ */
+export function isRiffPlatformCurrentPath() {
+    return window.location.pathname.split('/')[1] === ROUTES.BASENAME.slice(1);
 }

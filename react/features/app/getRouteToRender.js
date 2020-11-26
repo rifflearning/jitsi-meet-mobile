@@ -9,6 +9,7 @@ import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
 import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
 import RiffPlatform from '../riff-platform/components';
+import { isRiffPlatformCurrentPath } from '../riff-platform/functions';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
 import {
     BlankPage,
@@ -59,7 +60,7 @@ export async function _getRouteToRender(stateful: Function | Object): Promise<Ro
  * @returns {Promise<Route>|undefined}
  */
 function _getRiffPlatformRoute(state): ?Promise<Route> {
-    if (window.location.pathname.split('/')[1] !== 'app') {
+    if (!isRiffPlatformCurrentPath()) {
         return;
     }
 

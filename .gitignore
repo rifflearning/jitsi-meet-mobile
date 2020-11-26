@@ -87,3 +87,4 @@ ios/app/GoogleService-Info.plist
 # .env variables for firebase, riff, client aws deployment
 .env
 temp-deploy-aws
+temp-deploy-aws.zip
