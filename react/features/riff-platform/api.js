@@ -31,6 +31,7 @@ class ApiService {
     }
 
     postWithJwt = (url, body) => this.fetchWithJwt(url, { method: 'post', body: JSON.stringify(body) });
+    putWithJwt = (url, body) => this.fetchWithJwt(url, { method: 'put', body: JSON.stringify(body) });
 
     // auth
     signIn = ({ email, password }) => this.postWithJwt('/login', { email, password });
@@ -38,10 +39,11 @@ class ApiService {
     fetchProfile = () => this.fetchWithJwt('/profile');
 
     // meetings
-    fetchMeeting = async name => await this.fetchWithJwt(`/meetings/${name}`);
-    fetchMeetings = async () => await this.fetchWithJwt('/meetings');
-    scheduleMeeting = async meeting => await this.postWithJwt('/meetings', { meeting });
-    deleteMeeting = async id => await this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });
+    fetchMeeting = name => this.fetchWithJwt(`/meetings/${name}`);
+    fetchMeetings = () => this.fetchWithJwt('/meetings');
+    scheduleMeeting = meeting => this.postWithJwt('/meetings', { meeting });
+    deleteMeeting = id => this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });
+    updateMeeting = (id, meeting) => this.putWithJwt(`/meetings/${id}`, { meeting });
 
     // helper, returns userObj if authenticated, otherwise null
     isAuth = async () => {

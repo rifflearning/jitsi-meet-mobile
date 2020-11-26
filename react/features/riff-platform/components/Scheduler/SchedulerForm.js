@@ -95,7 +95,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             description,
             dateStart: date.getTime(),
             dateEnd: dateEnd.getTime(),
-            allowAnonymous
+            allowAnonymous,
+            waitForHost
         });
     };
 

@@ -12,6 +12,7 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
 import { checkIsMeetingAllowed } from '../actions/meeting';
+import * as errorTypes from '../constants/errorTypes';
 import * as ROUTES from '../constants/routes';
 import { msToTime } from '../functions';
 
@@ -45,6 +46,7 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
     let interval;
 
     const [ waitingTime, setWaitingTime ] = useState(false);
+    const [ noHostError, setNoHostError ] = useState(false);
 
     const redirectToMeeting = () => {
         // Need to reload page
@@ -58,7 +60,8 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
             setWaitingTime(prev => {
                 if (prev === 0) {
                     clearInterval(interval);
-                    redirectToMeeting();
+                    // eslint-disable-next-line no-use-before-define
+                    checkMeeting();
 
                     return false;
                 }
@@ -68,17 +71,32 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
         }, 1000);
     };
 
-    useEffect(() => {
+    const waitForHost = () => {
+        setNoHostError(true);
+        interval = setTimeout(() => {
+            // eslint-disable-next-line no-use-before-define
+            checkMeeting();
+        }, 10000);
+    };
+
+    const checkMeeting = () => {
         checkIsMeetingAllowedProp(params.meetingId).then(m => {
             if (m === null) {
                 return history.push(ROUTES.JOIN);
             }
-            if (m.error === 'not a meeting time') {
+            if (m.error === errorTypes.NOT_A_MEETING_TIME) {
                 return waitForMeeting(m.meeting);
             }
-
+            if (m.error === errorTypes.NO_HOST_ERROR) {
+                return waitForHost(m.meeting);
+            }
+            setNoHostError(false);
             redirectToMeeting();
         });
+    };
+
+    useEffect(() => {
+        checkMeeting();
 
         return () => {
             if (interval) {
@@ -127,6 +145,7 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
                 {/* host will be able to edit meeting, can go to meeting directly, can send invitation?' */}
                 <Typography color = 'error'>
                     {Boolean(waitingTime) && `You'll be able to join meeting in ${time}`}
+                    {Boolean(noHostError) && 'No host, waiting for a host...'}
                 </Typography>
             </div>
         </Container>
