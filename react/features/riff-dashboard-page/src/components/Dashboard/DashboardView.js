@@ -33,6 +33,7 @@ import {
     SpeakingTime,
     StackedBarGraph,
     TimelineChart,
+    EmotionsChart,
 } from './Metrics';
 
 const HelmetComponent = () => {
@@ -248,6 +249,19 @@ class DashboardView extends React.Component {
                             </div>
                             <div className='metric-row' style={timelineRowStyle}>
                                 <TimelineChart
+                                    graphType={GraphTypes.TIMELINE}
+                                    eventTypes={[
+                                        GraphTypes.MY_INTERRUPTIONS,
+                                        GraphTypes.THEIR_INTERRUPTIONS,
+                                        GraphTypes.MY_AFFIRMATIONS,
+                                        GraphTypes.THEIR_AFFIRMATIONS,
+                                        GraphTypes.MY_INFLUENCE,
+                                        GraphTypes.THEIR_INFLUENCE,
+                                    ]}
+                                />
+                            </div>
+                            <div className='metric-row' style={timelineRowStyle}>
+                                <EmotionsChart
                                     graphType={GraphTypes.TIMELINE}
                                     eventTypes={[
                                         GraphTypes.MY_INTERRUPTIONS,
