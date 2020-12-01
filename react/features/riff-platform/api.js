@@ -4,6 +4,8 @@
 /* eslint-disable no-invalid-this */
 import { jwt } from './functions';
 
+// import { emotionsData } from './mockData';
+
 const API_GATEWAY_LINK = process.env.API_GATEWAY;
 
 /**
@@ -44,6 +46,11 @@ class ApiService {
     scheduleMeeting = meeting => this.postWithJwt('/meetings', { meeting });
     deleteMeeting = id => this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });
     updateMeeting = (id, meeting) => this.putWithJwt(`/meetings/${id}`, { meeting });
+
+    // emotions
+    fetchEmotions = meetingId => this.fetchWithJwt(`/emotion/roomid/${meetingId}`);
+
+    // fetchEmotions = meetingId => Promise.resolve(emotionsData);
 
     // helper, returns userObj if authenticated, otherwise null
     isAuth = async () => {
