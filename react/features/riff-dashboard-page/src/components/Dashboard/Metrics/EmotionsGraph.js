@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { memo, PureComponent } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
@@ -14,38 +14,37 @@ function getRandomColor() {
   return color;
 }
 
-export default ({data = []})=> {
-  let participants = {};
-  let translatedData = {};
+function getColor(i) {
+  return colors[i] || getRandomColor();
+}
 
-  data.forEach(el => {
-    const t = Math.round(new Date(el.timestamp).getTime() / 1000);
-    if (translatedData[t]) {
-      translatedData[t] = { ...translatedData[t], [el.participant_id]: el.classification };
+export default ({ data = [] }) => {
+  const seriesEmotions = data.reduce((acc, el) => {
+    console.warn('COMPUTED!')
+    if(acc[el.participant_id]){
+      acc[el.participant_id].push(el);
     } else {
-      translatedData[t] = { [el.participant_id]: el.classification };
+      acc[el.participant_id] = [el];
     }
-    participants[el.participant_id] = true;
-  })
-
-  translatedData = Object.keys(translatedData).map(el => {
-    return {timestamp: el, ...translatedData[el]};
-  })
-
-  participants = Object.keys(participants);
+    return acc;
+   }, {});
 
     return (
       <ResponsiveContainer height={300}>
-        <LineChart 
-          data={translatedData}
+        <LineChart
           margin={{left: 20, right: 20, top: 50, bottom: 5}}
         >
-          <YAxis tickCount={3}/>
-          <Tooltip />
+          <XAxis dataKey="timestamp" tickFormatter={el=>el.split(/[T|.]/)[1]}/>
+          <YAxis domain={[-1,1]} dataKey="classification" tickCount={3} tickFormatter={el => {
+            if (el > 0) return 'Emotional';
+            if (el < 0) return 'Neutral';
+            if (el === 0) return '0';
+          }} />
+          <Tooltip labelFormatter={el=>el.split(/[T|.]/)[1]} />
           <Legend />
-
-          {participants.map((el, i) =>
-            <Line dot={false} key={el} type="monotone" dataKey={el} stroke={colors[i] || getRandomColor()} />)}
+          {Object.keys(seriesEmotions).map((el, i) => (
+            <Line dot={false} dataKey="classification" data={seriesEmotions[el]} name={seriesEmotions[el][0].userName || el} key={el} stroke={getColor(i)} />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     );
