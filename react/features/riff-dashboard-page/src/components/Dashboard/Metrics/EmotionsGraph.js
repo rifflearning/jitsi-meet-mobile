@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
+// need to get appropriate colors from riff-dashboard?
 const colors = ['#f4b642', '#93759d', '#8884d8', '#e380a1'];
 
 function getRandomColor() {
@@ -19,7 +20,9 @@ function getColor(i) {
 }
 
 export default ({ data = [] }) => {
-  const seriesEmotions = data.reduce((acc, el) => {
+
+  // emotions data reduced by users
+  const dataFormatted = data.reduce((acc, el) => {
     if(acc[el.participant_id]){
       acc[el.participant_id].push(el);
     } else {
@@ -41,8 +44,8 @@ export default ({ data = [] }) => {
           }} />
           <Tooltip formatter={(v, n, entry) => entry.payload.compound} labelFormatter={el => new Date(el).toLocaleTimeString()} />
           <Legend />
-          {Object.keys(seriesEmotions).map((el, i) => (
-            <Line dot={false} dataKey="classification" data={seriesEmotions[el]} name={seriesEmotions[el][0].userName || el} key={el} stroke={getColor(i)} />
+          {Object.keys(dataFormatted).map((el, i) => (
+            <Line dot={false} dataKey="classification" data={dataFormatted[el]} name={dataFormatted[el][0].userName || el} key={el} stroke={getColor(i)} />
           ))}
         </LineChart>
       </ResponsiveContainer>
