@@ -16,14 +16,6 @@ function setRiffServerRoomId(roomId) {
 export function attachSibilant(tracks) {
     return async (dispatch, getState) => {
         try {
-            const stream = tracks.find(t => t.isAudioTrack())?.stream;
-
-            if (!stream) {
-                return console.error('No audio stream. Error while attaching sibilant in attachSibilant action.');
-            }
-
-            const speakingEvents = new Sibilant(stream);
-
             const { accessToken } = await loginToServerForSibilant();
 
             const userData = getState()['features/riff-platform'].signIn.user;
@@ -32,18 +24,26 @@ export function attachSibilant(tracks) {
 
             await riffAddUserToMeeting(userData, meetingUrl, room, accessToken);
 
-            speakingEvents.bind(
-                'stoppedSpeaking',
-                data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
-            );
-
             if (config.iAmRecorder) {
-                const data = {
+                const mockData = {
                     start: new Date(),
                     end: new Date()
                 };
 
-                dispatch(sendUtteranceToServer(data, userData, room, accessToken));
+                dispatch(sendUtteranceToServer(mockData, userData, room, accessToken));
+            }
+
+            const stream = tracks.find(t => t.isAudioTrack())?.stream;
+
+            if (stream) {
+                const speakingEvents = new Sibilant(stream);
+
+                speakingEvents.bind(
+                    'stoppedSpeaking',
+                    data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
+                );
+            } else {
+                console.error('No audio stream. Error while attaching sibilant in attachSibilant action.');
             }
         } catch (error) {
             console.error('Error while attachSibilant', error);
