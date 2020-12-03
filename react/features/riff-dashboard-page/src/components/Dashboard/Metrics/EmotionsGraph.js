@@ -20,7 +20,6 @@ function getColor(i) {
 
 export default ({ data = [] }) => {
   const seriesEmotions = data.reduce((acc, el) => {
-    console.warn('COMPUTED!')
     if(acc[el.participant_id]){
       acc[el.participant_id].push(el);
     } else {
@@ -34,13 +33,13 @@ export default ({ data = [] }) => {
         <LineChart
           margin={{left: 20, right: 20, top: 50, bottom: 5}}
         >
-          <XAxis dataKey="timestamp" tickFormatter={el=>el.split(/[T|.]/)[1]}/>
-          <YAxis domain={[-1,1]} dataKey="classification" tickCount={3} tickFormatter={el => {
+          <XAxis dataKey="timestamp" tickFormatter={el => new Date(el).toLocaleTimeString()} />
+          <YAxis padding={{bottom: 10, top: 10}} domain={[-1,1]} dataKey="classification" tickCount={3} tickFormatter={el => {
             if (el > 0) return 'Emotional';
             if (el < 0) return 'Neutral';
-            if (el === 0) return '0';
+            if (el === 0) return 'Moderate';
           }} />
-          <Tooltip labelFormatter={el=>el.split(/[T|.]/)[1]} />
+          <Tooltip formatter={(v, n, entry) => entry.payload.compound} labelFormatter={el => new Date(el).toLocaleTimeString()} />
           <Legend />
           {Object.keys(seriesEmotions).map((el, i) => (
             <Line dot={false} dataKey="classification" data={seriesEmotions[el]} name={seriesEmotions[el][0].userName || el} key={el} stroke={getColor(i)} />
