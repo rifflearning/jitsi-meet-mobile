@@ -1,7 +1,7 @@
 import Capturer from './Capturer';
 import { 
     getUserIdByParticipantId, 
-    getTrackByParticipantId, 
+    getVideoStreamByParticipantId, 
     selectUpdatedParticipants,
     getRoomId,
     getRoom 
@@ -42,11 +42,11 @@ class Capturers {
         }
 
         for (let participantId of update.joined) {
-            const track = getTrackByParticipantId(participantId);
+            const stream = getVideoStreamByParticipantId(participantId);
             const userId = getUserIdByParticipantId(participantId);
             const room = getRoom();
             const roomId = getRoomId();
-            const capturer = new Capturer(room, roomId, userId, track);
+            const capturer = new Capturer(room, roomId, userId, stream);
             
             this._capturers.set(participantId, capturer);
             capturer.connect(this._dispatcherUrl);
@@ -59,7 +59,6 @@ class Capturers {
         for (let capturer of this._capturers.values()) {
             capturer.disconnect();
         }
-
         this._capturers.clear();
     }
 

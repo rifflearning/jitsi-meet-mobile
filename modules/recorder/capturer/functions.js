@@ -27,15 +27,15 @@ export function getUserIdByParticipantId(participantId) {
 };
 
 /**
- * Returns track associated with given participantId
+ * Returns video stream associated with given participantId
  *
- * @returns {MediaStreamTrack}
+ * @returns {MediaStream}
  */
-export function getTrackByParticipantId(participantId) {
+export function getVideoStreamByParticipantId(participantId) {
     return APP.store.getState()[FEATURES.TRACKS]
             .filter(track => track.mediaType === MEDIA_TYPE.VIDEO)
             .find(track => track.participantId === participantId)
-            .jitsiTrack.track; 
+            .jitsiTrack.stream; 
 };
 
 /**

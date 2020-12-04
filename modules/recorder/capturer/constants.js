@@ -6,6 +6,14 @@ export const MEDIA_TYPE = {
 };
 
 /**
+ * The set of params for frame captured from video stream 
+ */
+export const FRAME = {
+    WIDTH: 720,
+    PULLING_DELAY: 1000
+};
+
+/**
  * The set of features in global store
  */
 export const FEATURES = {
