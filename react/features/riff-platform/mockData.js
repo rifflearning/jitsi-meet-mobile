@@ -1,4 +1,4 @@
-export const emotionsData = [
+const mockEmotionsData = [
     {
         '_id': '5fc4f6bbfed14649e9fa1b3d',
         'participant_id': '5fbfb9114786572f6e641ad5',
@@ -2940,3 +2940,10 @@ export const emotionsData = [
         'classification': -0.73
     }
 ];
+
+export const mockFetchEmotions = meetingId => Promise.resolve(mockEmotionsData);
+
+export const mockFetchUserNames = arrUids => Promise.resolve(arrUids.map((id, i) => {
+    return { _id: id,
+        name: `Name${i} Nameovich${i}` };
+}));

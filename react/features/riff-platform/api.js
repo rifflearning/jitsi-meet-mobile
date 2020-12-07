@@ -4,7 +4,7 @@
 /* eslint-disable no-invalid-this */
 import { jwt } from './functions';
 
-// import { emotionsData } from './mockData';
+// import { mockFetchEmotions, mockFetchUserNames } from './mockData';
 
 const API_GATEWAY_LINK = process.env.API_GATEWAY;
 
@@ -39,6 +39,10 @@ class ApiService {
     signIn = ({ email, password }) => this.postWithJwt('/login', { email, password });
     signUp = ({ name, email, password }) => this.postWithJwt('/register', { name, email, password });
     fetchProfile = () => this.fetchWithJwt('/profile');
+    // eslint-disable-next-line prefer-template
+    fetchUserNames = arrUids => this.fetchWithJwt(`/profiles?${arrUids.map(id => '&id=' + id).join('')}`);
+
+    // fetchUserNames = mockFetchUserNames;
 
     // meetings
     fetchMeeting = name => this.fetchWithJwt(`/meetings/${name}`);
@@ -50,7 +54,7 @@ class ApiService {
     // emotions
     fetchEmotions = meetingId => this.fetchWithJwt(`/emotion/roomid/${meetingId}`);
 
-    // fetchEmotions = meetingId => Promise.resolve(emotionsData);
+    // fetchEmotions = mockFetchEmotions;
 
     // helper, returns userObj if authenticated, otherwise null
     isAuth = async () => {
