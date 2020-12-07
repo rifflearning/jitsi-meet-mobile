@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 
-import { getConferenceName } from '../../../base/conference/functions';
 import { getParticipantCount } from '../../../base/participants/functions';
 import { connect } from '../../../base/redux';
 import { isToolboxVisible } from '../../../toolbox';
@@ -74,7 +73,7 @@ function _mapStateToProps(state) {
 
     return {
         _showParticipantCount: participantCount > 2,
-        _subject: getConferenceName(state),
+        _subject: state['features/riff-platform']?.meeting?.meeting?.name,
         _visible: isToolboxVisible(state) && participantCount > 1
     };
 }
