@@ -4,7 +4,6 @@ import _ from 'lodash';
 import React from 'react';
 
 import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
-import { getConferenceNameForTitle } from '../../../base/conference';
 import { connect, disconnect } from '../../../base/connection';
 import { translate } from '../../../base/i18n';
 import { connect as reactReduxConnect } from '../../../base/redux';
@@ -289,7 +288,7 @@ function _mapStateToProps(state) {
         _iAmRecorder: state['features/base/config'].iAmRecorder,
         _isLobbyScreenVisible: state['features/base/dialog']?.component === LobbyScreen,
         _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state)],
-        _roomName: getConferenceNameForTitle(state),
+        _roomName: state['features/riff-platform']?.meeting?.meeting?.name,
         _showPrejoin: isPrejoinPageVisible(state)
     };
 }
