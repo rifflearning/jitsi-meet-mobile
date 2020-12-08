@@ -207,10 +207,10 @@ class Prejoin extends Component<Props, State> {
      * @param {string} displayName - Participant name.
      * @returns {void}
      */
-    _setName(displayName) {
-        this.props.updateSettings({
-            displayName
-        });
+    _setName(/* displayName */) {
+        // this.props.updateSettings({
+        //     displayName
+        // });
     }
 
     _closeDialog: () => void;
