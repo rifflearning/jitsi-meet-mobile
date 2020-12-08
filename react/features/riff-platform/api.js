@@ -32,8 +32,8 @@ class ApiService {
         return await r.json();
     }
 
-    postWithJwt = (url, body) => this.fetchWithJwt(url, { method: 'post', body: JSON.stringify(body) });
-    putWithJwt = (url, body) => this.fetchWithJwt(url, { method: 'put', body: JSON.stringify(body) });
+    postWithJwt = (url, body = {}) => this.fetchWithJwt(url, { method: 'post', body: JSON.stringify(body) });
+    putWithJwt = (url, body = {}) => this.fetchWithJwt(url, { method: 'put', body: JSON.stringify(body) });
 
     // auth
     signIn = ({ email, password }) => this.postWithJwt('/login', { email, password });
@@ -50,6 +50,7 @@ class ApiService {
     scheduleMeeting = meeting => this.postWithJwt('/meetings', { meeting });
     deleteMeeting = id => this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });
     updateMeeting = (id, meeting) => this.putWithJwt(`/meetings/${id}`, { meeting });
+    joinMeeting = id => this.postWithJwt(`/meetings/${id}/join`);
 
     // emotions
     fetchEmotions = meetingId => this.fetchWithJwt(`/emotion/roomid/${meetingId}`);

@@ -52,18 +52,33 @@ export function getMeeting(meetingId) {
 export function checkIsMeetingAllowed(meetingId) {
     return async (dispatch, getState) => {
         try {
+            const myUid = getState()['features/riff-platform'].signIn.user.uid;
             const meeting = await dispatch(getMeeting(meetingId));
+            const meetingError = errorType => {
+                return { meeting, error: errorType };
+            };
 
-            if (!meeting) return null;
+            if (!meeting) return meetingError(errorTypes.NO_MEETING);
 
             // is time to meeting left less than 5 minutes
-            if (timeToMeeting(meeting) > 5 * 60 * 1000) return { error: errorTypes.NOT_A_MEETING_TIME, meeting };
+            if (timeToMeeting(meeting) > 5 * 60 * 1000) return meetingError(errorTypes.NOT_A_MEETING_TIME);
 
-            const isHost = meeting.createdBy === getState()['features/riff-platform'].signIn.user.uid;
+            const isHost = meeting.createdBy === myUid;
+
+            // New user can join meeting only before dateEnd.
+            // if not in list of participants and nowDate>dateEnd, then error
+            const didIVisitMeeting = myUid === meeting.participantsVisited.find(el => el === myUid);
+            const isMetengExpired = new Date() > new Date(meeting.dateEnd);
+
+            if (!isHost && !didIVisitMeeting && isMetengExpired) {
+                return meetingError(errorTypes.NOT_JOIN_NEW_USER_TO_ENDED_MEETING);
+            }
+
+            if (!didIVisitMeeting) await sendAddParticipantToMeeting(meeting);
 
             // if waitForHost required, check if host entered
             // eslint-disable-next-line max-len
-            if (!isHost && meeting.waitForHost && !isHostEntered(meeting)) return { error: errorTypes.NO_HOST_ERROR, meeting };
+            if (!isHost && meeting.waitForHost && !isHostEntered(meeting)) return meetingError(errorTypes.NO_HOST_ERROR);
 
             // if host, send isHostJoined - timestamp;
             if (meeting.waitForHost && isHost) await sendIsHostJoinedTimeStamp(meeting); // or not await?
@@ -89,17 +104,25 @@ async function sendIsHostJoinedTimeStamp(meeting) {
     }
 }
 
+async function sendAddParticipantToMeeting(meeting) {
+    try {
+        await api.joinMeeting(meeting._id);
+    } catch (error) {
+        console.error('Error in sendAddParticipantToMeeting', error);
+    }
+}
+
 function isHostEntered(meeting) {
     if (meeting.hostJoinedAt) {
 
         // host joined not older than 2 hours
-        const fiveHours = 2 * 60 * 60 * 1000;
+        const threeHours = 3 * 60 * 60 * 1000;
         const fiveMinutes = 5 * 60 * 1000;
         const hostJoinedAtDate = new Date(meeting.hostJoinedAt);
         const timeFromHostJoined = Date.now() - hostJoinedAtDate;
         const timeFromMeetingCouldStart = new Date(meeting.dateStart) - fiveMinutes;
         // eslint-disable-next-line max-len
-        const isJoinedNotLongAgo = fiveHours > timeFromHostJoined && hostJoinedAtDate > timeFromMeetingCouldStart;
+        const isJoinedNotLongAgo = threeHours > timeFromHostJoined && hostJoinedAtDate > timeFromMeetingCouldStart;
 
         return isJoinedNotLongAgo;
     }

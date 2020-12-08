@@ -1,2 +1,4 @@
-export const NOT_A_MEETING_TIME = 'not a meeting time';
-export const NO_HOST_ERROR = 'no host error';
+export const NO_MEETING = 'NO_MEETING';
+export const NOT_A_MEETING_TIME = 'NOT_A_MEETING_TIME';
+export const NO_HOST_ERROR = 'NO_HOST_ERROR';
+export const NOT_JOIN_NEW_USER_TO_ENDED_MEETING = 'NOT_JOIN_NEW_USER_TO_ENDED_MEETING';
