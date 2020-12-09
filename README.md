@@ -13,12 +13,15 @@ Also see official guide here [here](https://jitsi.github.io/handbook/docs/dev-gu
 ## Customization and deployment to AWS
 In order to customize **jitsi-meet** with riff theme, all features and set up a new enviroment please follow next steps:
 
-1. Install Jitsi-Meet to aws with [official guide](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart).
+1. Install Jitsi-Meet to **AWS** following the [installation guide](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart).
 
-2. Deploy *develop* branch to the instance:
+2. On your local dev machine clone _*rifflearning/jitsi-meet*_ (branch) *develop* branch:
     ```
     git clone https://github.com/rifflearning/jitsi-meet.git
     git checkout develop
+    git pull develop
+    git checkout integration-riff-platform
+    git pull integration-riff-platform
     npm install
     ```
     Add enviroment variables `.env` file (*ask colleagues for the config file*) with appropriate variables for deployment:
