@@ -50,7 +50,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
-    const [ waitForHost, setWaitForHost ] = useState(true);
+    const [ waitForHost, setWaitForHost ] = useState(false);
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
