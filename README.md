@@ -1,6 +1,7 @@
 <p align="center"><img align="center" src="images/jitsilogo.png" /></p>
+<div style="text-align:center">
 # Jitsi Meet
-
+</div>
 ## Development:
 Running with webpack-dev-server for development:
 ```
