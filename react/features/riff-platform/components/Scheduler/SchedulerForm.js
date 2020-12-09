@@ -3,7 +3,7 @@
 /* eslint-disable react/jsx-sort-props */
 
 import DateFnsUtils from '@date-io/date-fns';
-import { Button, Checkbox, FormControlLabel, Grid, MenuItem, TextField, Typography, Radio } from '@material-ui/core';
+import { Button, Checkbox, FormControlLabel, Grid, MenuItem, TextField, Typography, Radio, Switch } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     MuiPickersUtilsProvider,
@@ -11,10 +11,12 @@ import {
     KeyboardDatePicker
 } from '@material-ui/pickers';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 
 import { connect } from '../../../base/redux';
 import { schedule } from '../../actions/scheduler';
+import { getLocalizedDateFormatter } from '../../../base/i18n';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -46,12 +48,36 @@ const MenuProps = {
     },
   };
 
+const getNumberArr = (length) => Array.from(Array(length).keys(), n => n + 1);
+
 const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const minutesArray = [ 0, 15, 30, 45 ];
-const recurrenceTypeArray = ['Daily', 'Weekly', 'Monthly', 'No fixed time'];
-const dailyIntervalArray = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
+const recurrenceIntervalArray = getNumberArr(20);
+const recurrenceTypeArray = ['daily', 'weekly', 'monthly', 'noFixedTime'];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const monthlyByWeekIndexArray = [ 'First', 'Second', 'Third', 'Fourth', 'Last' ]
+const monthlyByPositionArray = [ 'First', 'Second', 'Third', 'Fourth', 'Last' ];
+
+const repeatIntervalMap = {
+    daily: {
+        label: 'Day', 
+        interval: getNumberArr(15)
+    },
+    weekly: {
+        label: 'Week', 
+        interval: getNumberArr(12)
+    },
+    monthly: {
+        label: 'Month', 
+        interval: getNumberArr(3)
+    },
+};
+
+const recurrenceTypeMap = {
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    noFixedTime: 'No Fixed Time'
+}
 
 const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const classes = useStyles();
@@ -64,20 +90,28 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
     const [ waitForHost, setWaitForHost ] = useState(true);
     const [ recurringMeeting, setRecurringMeeting ] = useState(false);
-    const [ recurrenceType, setRecurrenceType ] = useState('Daily');
-    const [ dailyInterval, setDailyInterval ] = useState(1);
+    const [ recurrenceType, setRecurrenceType ] = useState('daily');
+    const [ recurrenceInterval, setRecurrenceInterval ] = useState(1);
     const [ endDateBy, setEndDateBy ] = useState('endDateTime');
     const [ endDate, setEndDate ] = useState(new Date());
     const [ endTimes, setEndTimes] = useState(1);
-    const [ daysOfWeek, setDaysOfWeek ] = useState({});
     const [ monthlyBy, setMonthlyBy ] = useState('monthlyByDay');
-    const [ monthlyByWeekIndex, setMonthlyByWeekIndex ] = useState('First');
-    const [ monthlyByWeekDay, setMonthlyByWeekDay ] = useState('Sun');
+    const [ monthlyByPosition, setMonthlyByPosition ] = useState('First');
+    const [ monthlyByWeekDay, setMonthlyByWeekDay ] = useState('Mon');
     const [ monthlyByDay, setMonthlyByDay ] = useState(1);
+    const [ daysOfWeek, setDaysOfWeek] = useState({
+        Sun: false,
+        Mon: false,
+        Tue: false,
+        Wed: false,
+        Thu: false,
+        Fri: false,
+        Sat: false,
+        [getLocalizedDateFormatter(date).format("ddd")]: true,
+    } );
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
-
 
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
@@ -101,6 +135,43 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         return isValid;
     };
 
+    const getDaysOfWeekArr =  Object.keys(daysOfWeek).reduce((acc, v) =>  {
+        daysOfWeek[v] && acc.push(v);
+        return acc;
+    }, []);
+
+    useEffect(() => {
+        setRecurrenceInterval(1);
+    }, [recurrenceType]);
+  
+    const recurrenceValues = () => {
+        const recurrence = {
+            type: recurrenceType,
+        }
+
+        if (recurrenceType !== 'noFixedTime') {
+            recurrence.interval = recurrenceInterval;
+            if (endDateBy === 'endDateTime') {
+                recurrence.endDate = endDate;
+            } else {
+                recurrence.endDateCount = endTimes;
+            }
+        }
+        if (recurrenceType === 'weekly') {
+            recurrence.byDay = getDaysOfWeekArr;
+        }
+        if (recurrenceType === 'monthly') {
+            if (monthlyBy === 'monthlyByDay') {
+                recurrence.byMonthDay = monthlyByDay
+            } else {
+                recurrence.byPosition = monthlyByPosition;
+                recurrence.byDay = monthlyByWeekDay
+            }
+        }
+        return recurrence
+    }
+
+
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -112,6 +183,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setHours(dateEnd.getHours() + hours);
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
+        const recurrence = recurringMeeting ? recurrenceValues() : null;
+
         scheduleMeeting({
             createdBy: userId,
             name,
@@ -119,9 +192,12 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             dateStart: date.getTime(),
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
-            waitForHost
+            waitForHost,
+            recurrence
         });
     };
+
+    const recurrenceMaxEndDate = moment(date).add(3, 'months').endOf('month');
 
     return (
         <form
@@ -269,10 +345,11 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 spacing = { 1 }>
                 <Grid
                     item
-                    xs = { 12 }>
+                    xs = { 12 }
+                    sm={ 6 }>
                     <FormControlLabel
                         label = 'Recurring meeting'
-                        control = { <Checkbox
+                        control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
                             onChange = { e => setRecurringMeeting(e.target.checked) } />
@@ -303,56 +380,25 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                 <TextField
                                     id = 'recurrence-type'
                                     select
-                                    //label = 'Daily interval'
                                     value = { recurrenceType }
                                     onChange = { e => setRecurrenceType(e.target.value) }>
                                     { recurrenceTypeArray.map(el => (<MenuItem
                                         key = { el }
-                                        value = { el }>{ el }</MenuItem>))}
+                                        value = { el }>{ recurrenceTypeMap[el] }</MenuItem>))}
                                 </TextField>
                             </Grid>
                         </Grid>
                     </Grid>
-
-                    <Grid
-                        item
-                        xs = { 12 }
-                        sm = { 2 }>
-                        <Typography>
-                            Repeat every
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        container
-                        item
-                        xs = { 12 }
-                        sm = { 10 }
-                        spacing = { 3 }>
-                        <Grid item>
-                            <TextField
-                                id = 'daily-interval'
-                                select
-                                SelectProps={{MenuProps}}
-                                label = 'Day'
-                                value = { dailyInterval }
-                                onChange = { e => setDailyInterval(e.target.value) }>
-                                { dailyIntervalArray.map(el => (<MenuItem
-                                    key = { el }
-                                    value = { el }>{ el }</MenuItem>))}
-                            </TextField>
-                        </Grid>
-                </Grid>
-                {(recurrenceType === 'Weekly' || recurrenceType === 'Monthly') &&
-                    <>
-                        <Grid
-                            item
-                            xs={12}
-                            sm={2}>
-                            <Typography>
-                                Occurs on
-                        </Typography>
-                        </Grid>
-                        {recurrenceType === 'Weekly' &&
+                    {recurrenceType !== 'noFixedTime' &&
+                        <>
+                            <Grid
+                                item
+                                xs={12}
+                                sm={2}>
+                                <Typography>
+                                    Repeat every
+                                </Typography>
+                            </Grid>
                             <Grid
                                 container
                                 item
@@ -360,20 +406,153 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                 sm={10}
                                 spacing={3}>
                                 <Grid item>
-                                    {daysOfWeekArray.map(el => (<FormControlLabel
-                                        key={el}
-                                        label={el}
-                                        control={<Checkbox
-                                            name={el}
-                                            checked={daysOfWeek[el]}
-                                            onChange={e => setDaysOfWeek({
-                                                ...daysOfWeek,
-                                                [e.target.name]: e.target.checked
-                                            })} />
-                                        } />))}
+                                    <TextField
+                                        id='recurrence-interval'
+                                        select
+                                        SelectProps={{ MenuProps }}
+                                        label={repeatIntervalMap[recurrenceType].label}
+                                        value={recurrenceInterval}
+                                        onChange={e => setRecurrenceInterval(e.target.value)}>
+                                        {repeatIntervalMap[recurrenceType].interval.map(el => (<MenuItem
+                                            key={el}
+                                            value={el}>{el}</MenuItem>))}
+                                    </TextField>
                                 </Grid>
                             </Grid>
-                        } {recurrenceType === 'Monthly' &&
+                        </>
+                    }
+                    {(recurrenceType === 'weekly' || recurrenceType === 'monthly') &&
+                        <>
+                            <Grid
+                                item
+                                xs={12}
+                                sm={2}>
+                                <Typography>
+                                    Occurs on
+                                 </Typography>
+                            </Grid>
+                            {recurrenceType === 'weekly' &&
+                                <Grid
+                                    container
+                                    item
+                                    xs={12}
+                                    sm={10}
+                                    spacing={3}>
+                                    <Grid item>
+                                        {daysOfWeekArray.map(el => (<FormControlLabel
+                                            key={el}
+                                            label={el}
+                                            control={<Checkbox
+                                                name={el}
+                                                checked={daysOfWeek[el]}
+                                                onChange={e => setDaysOfWeek({
+                                                    ...daysOfWeek,
+                                                    [e.target.name]: e.target.checked
+                                                })} />
+                                            } />))}
+                                    </Grid>
+                                </Grid>
+                            } {recurrenceType === 'monthly' &&
+                                <Grid
+                                    container
+                                    item
+                                    alignItems='center'
+                                    xs={12}
+                                    sm={10}
+                                    spacing={3}>
+                                    <Grid item>
+                                        <Grid
+                                            container
+                                            alignItems='center' spacing={2}>
+                                            <Grid item>
+                                                <FormControlLabel
+                                                    label='Day'
+                                                    control={<Radio
+                                                        name='monthlyBy'
+                                                        value='monthlyByDay'
+                                                        checked={monthlyBy === 'monthlyByDay'}
+                                                        onChange={e => setMonthlyBy(e.target.value)} />
+                                                    } />
+                                            </Grid>
+                                            <Grid item>
+                                                <TextField
+                                                    id='monthly-by-day'
+                                                    select
+                                                    SelectProps={{ MenuProps }}
+                                                    value={monthlyByDay}
+                                                    onChange={e => setMonthlyByDay(e.target.value)}>
+                                                    {recurrenceIntervalArray.map(el => (<MenuItem
+                                                        key={el}
+                                                        value={el}>{el}</MenuItem>))}
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item>
+                                                <Typography>of the month</Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography>
+                                            or
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Grid
+                                            container
+                                            alignItems='center' spacing={2}>
+                                            <Grid item>
+                                                <FormControlLabel
+                                                    label='The'
+                                                    control={<Radio
+                                                        name='monthlyBy'
+                                                        value='monthlyByWeekDay'
+                                                        checked={monthlyBy === 'monthlyByWeekDay'}
+                                                        onChange={e => setMonthlyBy(e.target.value)} />
+                                                    } />
+                                            </Grid>
+                                            <Grid item>
+                                                <TextField
+                                                    id='monthly-by-week-index'
+                                                    select
+                                                    margin='normal'
+                                                    value={monthlyByPosition}
+                                                    onChange={e => setMonthlyByPosition(e.target.value)}>
+                                                    {monthlyByPositionArray.map(el => (<MenuItem
+                                                        key={el}
+                                                        value={el}>{el}</MenuItem>))}
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item>
+                                                <TextField
+                                                    id='monthly-by-week-day'
+                                                    select
+                                                    margin='normal'
+                                                    value={monthlyByWeekDay}
+                                                    onChange={e => setMonthlyByWeekDay(e.target.value)}>
+                                                    {daysOfWeekArray.map(el => (<MenuItem
+                                                        key={el}
+                                                        value={el}>{el}</MenuItem>))}
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item>
+                                                <Typography>of the month</Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            }
+                        </>
+                    }
+                    {recurrenceType !== 'noFixedTime' &&
+                        <>
+                            <Grid
+                                item
+                                xs={12}
+                                sm={2}>
+                                <Typography>
+                                    End date
+                                </Typography>
+                            </Grid>
                             <Grid
                                 container
                                 item
@@ -384,166 +563,70 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                 <Grid item>
                                     <Grid
                                         container
-                                        alignItems='center' spacing={2}>
+                                        alignItems='center'>
                                         <Grid item>
                                             <FormControlLabel
-                                                label='Day'
+                                                label='By'
                                                 control={<Radio
-                                                    name='monthlyBy'
-                                                    value='monthlyByDay'
-                                                    checked={monthlyBy === 'monthlyByDay'}
-                                                    onChange={e => setMonthlyBy(e.target.value)} />
+                                                    name='endDate'
+                                                    value='endDateTime'
+                                                    checked={endDateBy === 'endDateTime'}
+                                                    onChange={e => setEndDateBy(e.target.value)} />
                                                 } />
                                         </Grid>
-                                        <Grid item>
-                                            <TextField
-                                                id='monthly-by-day'
-                                                select
-                                                SelectProps={{ MenuProps }}
-                                                label='Day'
-                                                value={monthlyByDay}
-                                                onChange={e => setMonthlyByDay(e.target.value)}>
-                                                {dailyIntervalArray.map(el => (<MenuItem
-                                                    key={el}
-                                                    value={el}>{el}</MenuItem>))}
-                                            </TextField>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography>of the month</Typography>
-                                        </Grid>
+                                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                            <KeyboardDatePicker
+                                                autoOk
+                                                disableToolbar
+                                                variant='inline'
+                                                format='MM/dd/yyyy'
+                                                margin='normal'
+                                                id='date-picker-inline'
+                                                disablePast={true}
+                                                maxDate={recurrenceMaxEndDate}
+                                                label='End Date'
+                                                value={endDate}
+                                                onChange={setEndDate}
+                                                KeyboardButtonProps={{
+                                                    'aria-label': 'change date'
+                                                }} />
+                                        </MuiPickersUtilsProvider>
                                     </Grid>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item>
                                     <Typography>
                                         or
-                        </Typography>
+                                    </Typography>
                                 </Grid>
                                 <Grid item>
                                     <Grid
                                         container
-                                        alignItems='center' spacing={2}>
+                                        alignItems='center'>
                                         <Grid item>
                                             <FormControlLabel
+                                                label='After'
                                                 control={<Radio
-                                                    name='monthlyBy'
-                                                    value='monthlyByWeekDay'
-                                                    checked={monthlyBy === 'monthlyByWeekDay'}
-                                                    onChange={e => setMonthlyBy(e.target.value)} />
+                                                    name='endDate'
+                                                    value='endTimes'
+                                                    checked={endDateBy === 'endTimes'}
+                                                    onChange={e => setEndDateBy(e.target.value)} />
                                                 } />
                                         </Grid>
-                                        <Grid item>
-                                            <TextField
-                                                id='monthly-by-week-index'
-                                                select
-                                                margin='normal'
-                                                value={monthlyByWeekIndex}
-                                                onChange={e => setMonthlyByWeekIndex(e.target.value)}>
-                                                {monthlyByWeekIndexArray.map(el => (<MenuItem
-                                                    key={el}
-                                                    value={el}>{el}</MenuItem>))}
-                                            </TextField>
-                                        </Grid>
-                                        <Grid item>
-                                            <TextField
-                                                id='monthly-by-week-day'
-                                                select
-                                                margin='normal'
-                                                value={monthlyByWeekDay}
-                                                onChange={e => setMonthlyByWeekDay(e.target.value)}>
-                                                {daysOfWeekArray.map(el => (<MenuItem
-                                                    key={el}
-                                                    value={el}>{el}</MenuItem>))}
-                                            </TextField>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography>of the month</Typography>
-                                        </Grid>
+                                        <TextField
+                                            id='end-times'
+                                            select
+                                            margin='normal'
+                                            label='Occurrences'
+                                            value={endTimes}
+                                            onChange={e => setEndTimes(e.target.value)}>
+                                            {recurrenceIntervalArray.map(el => (<MenuItem
+                                                key={el}
+                                                value={el}>{el}</MenuItem>))}
+                                        </TextField>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        }
-                    </>
-                }
-
-                    <Grid
-                        item
-                        xs = { 12 }
-                        sm = { 2 }>
-                        <Typography>
-                            End date
-                        </Typography>
-                    </Grid>
-                    <Grid
-                        container
-                        item
-                        alignItems = 'center'
-                        xs = { 12 }
-                        sm = { 10 }
-                        spacing = { 3 }>
-                        <Grid item>
-                            <Grid
-                                container
-                                alignItems = 'center'>
-                                <Grid item>
-                                    <FormControlLabel
-                                        label = 'By'
-                                        control = {<Radio
-                                            name = 'endDate'
-                                            value = 'endDateTime'
-                                            checked = { endDateBy === 'endDateTime' }
-                                            onChange = { e => setEndDateBy(e.target.value) } />
-                                        } />
-                                </Grid>
-                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <KeyboardDatePicker
-                                        autoOk
-                                        disableToolbar
-                                        variant = 'inline'
-                                        format = 'MM/dd/yyyy'
-                                        margin = 'normal'
-                                        id = 'date-picker-inline'
-                                        label = 'End Date'
-                                        value = { endDate }
-                                        onChange = { setEndDate }
-                                        KeyboardButtonProps = { {
-                                            'aria-label': 'change date'
-                                        } } />
-                                </MuiPickersUtilsProvider>
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            <Typography>
-                                or
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Grid
-                                container
-                                alignItems = 'center'>
-                                <Grid item>
-                                    <FormControlLabel
-                                        label = 'After'
-                                        control = { <Radio
-                                            name = 'endDate'
-                                            value = 'endTimes'
-                                            checked = { endDateBy === 'endTimes' }
-                                            onChange = { e => setEndDateBy(e.target.value) } />
-                                        } />
-                                </Grid>
-                                <TextField
-                                    id = 'end-times'
-                                    select
-                                    margin = 'normal'
-                                    label = 'Occurrences'
-                                    value = { endTimes }
-                                    onChange = { e => setEndTimes(e.target.value) }>
-                                    { dailyIntervalArray.map(el => (<MenuItem
-                                        key = { el }
-                                        value = { el }>{ el }</MenuItem>))}
-                                </TextField>
-                            </Grid>
-                        </Grid>
-                    </Grid>
+                        </>}
                 </Grid>
             }
 
