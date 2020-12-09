@@ -114,6 +114,14 @@ Open **http port 4455** on aws for connecting facial recognition server to nodej
         proxy_set_header Connection "upgrade";
     }
     ```
+    Add nginx to api-gateway redirects to allow tunneling rest calls through nginx to api-gateway
+    ```
+    # config for api-gateway for Riff-Jitsi-Platform
+    location ^~ /api-gateway/ {
+        proxy_pass https://localhost:4445/api/;
+    }
+    ```
+    
     and restart nginx:
     ```
     sudo systemctl restart nginx
