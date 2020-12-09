@@ -1,3 +1,4 @@
+<div style="text-align:center"><img src="" /></div>
 # Jitsi Meet
 
 ## Development:
@@ -46,7 +47,7 @@ In order to customize **jitsi-meet** with riff theme, all features and set up a 
     ```
     Build and deploy with:
     ```
-    make deploy-aws
+    ./deploy-aws.sh
     ```
 
 ## Add emotional intelligence detection (optional)
