@@ -1,4 +1,4 @@
-<div style="text-align:center"><img align="center" src="images/jitsilogo.png" /></div>
+<p align="center"><img align="center" src="images/jitsilogo.png" /></p>
 # Jitsi Meet
 
 ## Development:
