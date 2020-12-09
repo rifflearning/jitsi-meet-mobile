@@ -51,6 +51,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
     const [ waitForHost, setWaitForHost ] = useState(false);
+    const [ forbidNewParticipantsAfterDateEnd, setForbidNewParticipantsAfterDateEnd ] = useState(false);
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
@@ -96,7 +97,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             dateStart: date.getTime(),
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
-            waitForHost
+            waitForHost,
+            forbidNewParticipantsAfterDateEnd
         });
     };
 
@@ -265,6 +267,18 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             name = 'waitForHost'
                             checked = { waitForHost }
                             onChange = { e => setWaitForHost(e.target.checked) } />
+                        } />
+                </Grid>
+
+                <Grid
+                    item
+                    xs = { 12 }>
+                    <FormControlLabel
+                        label = 'Forbid new participants after the meeting is over'
+                        control = { <Checkbox
+                            name = 'forbidNewParticipantsAfterDateEnd'
+                            checked = { forbidNewParticipantsAfterDateEnd }
+                            onChange = { e => setForbidNewParticipantsAfterDateEnd(e.target.checked) } />
                         } />
                 </Grid>
             </Grid>

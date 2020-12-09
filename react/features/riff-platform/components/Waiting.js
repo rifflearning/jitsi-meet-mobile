@@ -139,7 +139,7 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
                         {`Meeting is scheduled for ${(new Date(meeting.dateStart)).toString()
                             .slice(0, 24)}`}
                     </Typography>
-                    : <Typography
+                    : expiredMeetingError ? null : <Typography
                         component = 'p'
                         variant = 'h5' >
                         Redirecting to the meeting...
@@ -150,7 +150,7 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
                 <Typography color = 'error'>
                     {Boolean(waitingTime) && `You can join the meeting 5 min before the start. You'll be able to join in ${time}`}
                     {Boolean(noHostError) && 'No host, waiting for a host...'}
-                    {Boolean(expiredMeetingError) && 'Meeting is expired, join another meeting.'}
+                    {Boolean(expiredMeetingError) && 'Meeting is expired. Please, join another meeting.'}
                 </Typography>
             </div>
         </Container>

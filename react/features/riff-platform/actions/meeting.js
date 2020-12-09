@@ -70,7 +70,7 @@ export function checkIsMeetingAllowed(meetingId) {
             const didIVisitMeeting = myUid === meeting.participantsVisited.find(el => el === myUid);
             const isMetengExpired = new Date() > new Date(meeting.dateEnd);
 
-            if (!isHost && !didIVisitMeeting && isMetengExpired) {
+            if (meeting.forbidNewParticipantsAfterDateEnd && !isHost && !didIVisitMeeting && isMetengExpired) {
                 return meetingError(errorTypes.NOT_JOIN_NEW_USER_TO_ENDED_MEETING);
             }
 
