@@ -20,6 +20,8 @@ import { connect } from '../../../base/redux';
 import { schedule } from '../../actions/scheduler';
 import { getLocalizedDateFormatter } from '../../../base/i18n';
 
+moment.locale("en");
+
 const useStyles = makeStyles(theme => {
     return {
         paper: {
@@ -79,7 +81,7 @@ const monthlyByPositionMap = {
 
 const repeatIntervalMap = {
     daily: {
-        name: 'day',
+        name: 'day(s)',
         label: 'Day', 
         interval: getNumberArr(15)
     },
@@ -160,7 +162,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         Thu: false,
         Fri: false,
         Sat: false,
-        [getLocalizedDateFormatter(date).format("ddd")]: true,
+        [moment(date).format("ddd")]: true,
     } );
     const [ occurrenceCount, setOccuranceCount ] = useState(defaultOccurrences);
     const [ recurrenceDate, setRecurrenceDate ] = useState([]);
@@ -315,17 +317,22 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         monthlyByPosition,
     ]);
 
-      const recurrenceDesc = `Every ${recurrenceInterval} ${
-          repeatIntervalMap[recurrenceType].name
-      }(s), ${
-          endDateBy === "endDateTime"
-              ? `until ${getLocalizedDateFormatter(endDate).format(
-                    "MMM DD, YYYY"
-                )},`
-              : ""
-      } ${
-          endDateBy === "endDateTime" ? occurrenceCount : endTimes
-      } occurence(s)`;
+    const recurrenceDesc = () => {
+        const intervalPart = `Every ${
+            recurrenceType === "daily" ? recurrenceInterval : ""
+        } ${repeatIntervalMap[recurrenceType].name}, `;
+
+        const endDatePart = `${
+            endDateBy === "endDateTime"
+                ? `until ${moment(endDate).format("MMM DD, YYYY")}, `
+                : ' '
+        } `;
+        const occurrencePart = `${
+            endDateBy === "endDateTime" ? occurrenceCount : endTimes
+        } occurrence(s)`;
+
+        return intervalPart + endDatePart + occurrencePart;
+    };
 
     return (
         <form
@@ -487,7 +494,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     item
                     xs={12}
                     sm={6}>
-                    <Typography> {recurrenceDesc} </Typography>
+                    <Typography> {recurrenceDesc()} </Typography>
                 </Grid>
                 }
             </Grid>
@@ -695,7 +702,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                                     onChange={e => setEndDateBy(e.target.value)} />
                                                 } />
                                         </Grid>
-                                        <MuiPickersUtilsProvider libInstance={moment}  utils={MomentUtils} >
+                                        <MuiPickersUtilsProvider  libInstance={moment} utils={MomentUtils} locale={moment.locale('en')}>
                                             <KeyboardDatePicker
                                                 autoOk
                                                 disableToolbar
@@ -707,7 +714,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                                 disabled={endDateBy !== 'endDateTime'}
                                                 maxDate={recurrenceMaxEndDate[recurrenceType]}
                                                 label='End Date'
-                                                value={getLocalizedDateFormatter(endDate || moment())}
+                                                value={endDate || moment()}
                                                 onChange={setEndDate}
                                                 KeyboardButtonProps={{
                                                     'aria-label': 'change date'
