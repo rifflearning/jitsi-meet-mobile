@@ -150,7 +150,27 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
     return acc;
 }, []);
 
-const recurringDateToISO = (dates) => dates.map(date => moment(date).toISOString());
+const getRecurringDatesWithTime = ({ dates, startDate, endDate }) => {
+    let recurrence = dates.map(date => ({
+        startDate: moment(date).toISOString(),
+        endDate: moment(date).toISOString()
+    }));
+
+    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
+    const [hEnd, mEnd] = endDate.toTimeString().split(' ')[0].split(":");
+
+    return recurrence.map(el => {
+        const newDateStart = new Date(el.startDate)
+        newDateStart.setHours(hStart, mStart);
+
+        const newDateEnd = new Date(el.endDate)
+        newDateEnd.setHours(hEnd, mEnd);
+        return {
+            startDate: newDateStart.toISOString(),
+            endDate: newDateEnd.toISOString()
+        };
+    });
+};
 
 
 const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
@@ -231,8 +251,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-        { recurrence: recurringDateToISO(recurrenceDate), endDate: endDate && endDate.toISOString() } :
-        null;
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, endDate: dateEnd })
+            :
+            null;
 
         scheduleMeeting({
             createdBy: userId,
@@ -250,12 +271,12 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const recurrenceMaxEndDate = {
         daily: moment(date).add(3, 'months').endOf('month'),
         weekly: moment(date).add(1, 'years').endOf('year'),
-        monthly: moment(date).add(5, 'years').endOf('year')
+        monthly: moment(date).add(2, 'years').endOf('year')
     }
 
     useEffect(() => {
         setEndDate(null);
-    }, [recurrenceType]);
+    }, [recurrenceType, date]);
 
     useEffect(() => {
         if (recurrenceType === "daily") {
