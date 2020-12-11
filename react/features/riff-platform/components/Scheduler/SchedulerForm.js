@@ -150,6 +150,9 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
     return acc;
 }, []);
 
+const recurringDateToISO = (dates) => dates.map(date => moment(date).toISOString());
+
+
 const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const classes = useStyles();
 
@@ -226,7 +229,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setHours(dateEnd.getHours() + hours);
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
-        const recurrence = recurringMeeting ? recurrenceDate : null;
+        const recurrenceValues = recurringMeeting ?
+        { recurrence: recurringDateToISO(recurrenceDate), endDate: endDate && endDate.toISOString() } :
+        null;
 
         scheduleMeeting({
             createdBy: userId,
@@ -236,7 +241,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
             waitForHost,
-            recurrence
+            recurrenceValues
         });
     };
 
