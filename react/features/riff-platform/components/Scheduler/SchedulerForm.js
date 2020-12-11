@@ -18,7 +18,6 @@ import 'moment-recur';
 
 import { connect } from '../../../base/redux';
 import { schedule } from '../../actions/scheduler';
-import { getLocalizedDateFormatter } from '../../../base/i18n';
 
 moment.locale("en");
 
@@ -61,14 +60,14 @@ const recurrenceTypeArray = ['daily', 'weekly', 'monthly'];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const monthlyByPositionArray = [ 'First', 'Second', 'Third', 'Fourth', 'Last' ];
 
-const daysOfWeekMap  = {
-'Mon': 1,
-'Tue': 2,
-'Wed': 3,
-'Thu': 4,
-'Fri': 5,
-'Sat': 6,
-'Sun': 7,
+const daysOfWeekMap = {
+    'Mon': 1,
+    'Tue': 2,
+    'Wed': 3,
+    'Thu': 4,
+    'Fri': 5,
+    'Sat': 6,
+    'Sun': 7,
 };
 
 const monthlyByPositionMap = {
@@ -82,17 +81,17 @@ const monthlyByPositionMap = {
 const repeatIntervalMap = {
     daily: {
         name: 'day(s)',
-        label: 'Day', 
+        label: 'Day',
         interval: getNumberArr(15)
     },
     weekly: {
         name: 'week',
-        label: 'Week', 
+        label: 'Week',
         interval: getNumberArr(12)
     },
     monthly: {
         name: 'month',
-        label: 'Month', 
+        label: 'Month',
         interval: getNumberArr(3)
     },
 };
@@ -103,24 +102,24 @@ const recurrenceTypeMap = {
     monthly: 'Monthly',
 };
 
-const getNextDailyEventsByOccurance = ({ startDate, daysOccurances, daysInterval }) => moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances, "MM/DD/YYYY");
+const getRecurringDailyEventsByOccurance = ({ startDate, daysOccurances, daysInterval }) => moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances, "MM/DD/YYYY");
 
-const getNextDailyEventsByEndDate = ({ startDate, endDate, daysInterval, daysOccurances }) => endDate ?
+const getRecurringDailyEventsByEndDate = ({ startDate, endDate, daysInterval, daysOccurances }) => endDate ?
     moment(startDate).recur(endDate).every(daysInterval, 'days').all("MM/DD/YYYY") :
     moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances - 1, "MM/DD/YYYY");
 
-const getNextWeeklyEventsByOccurance = ({ startDate, weeksOccurances, daysOfWeek }) => moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances, "MM/DD/YYYY");
+const getRecurringWeeklyEventsByOccurance = ({ startDate, weeksOccurances, daysOfWeek }) => moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances, "MM/DD/YYYY");
 
-const getNextWeeklyEventsByEndDate = ({ startDate, endDate, weeksOccurances, daysOfWeek }) => endDate ?
+const getRecurringWeeklyEventsByEndDate = ({ startDate, endDate, weeksOccurances, daysOfWeek }) => endDate ?
     moment(startDate).recur(endDate).every(daysOfWeek).daysOfWeek().all("MM/DD/YYYY") :
     moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances - 1, "MM/DD/YYYY");
 
-const getNextMonthlyEventsByOccurance = ({ startDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => monthlyBy === 'monthlyByDay' ?
+const getRecurringMonthlyEventsByOccurance = ({ startDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => monthlyBy === 'monthlyByDay' ?
     moment(startDate).recur().every(dayOfMonth).daysOfMonth().next(monthOccurances, "MM/DD/YYYY")
     :
     moment(startDate).recur().every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().next(monthOccurances, "MM/DD/YYYY");
 
-const getNextMonthlyEventsByEndDate = ({ startDate, endDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => {
+const getRecurringMonthlyEventsByEndDate = ({ startDate, endDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => {
     if (monthlyBy === 'monthlyByDay') {
         return endDate ?
             moment(startDate).recur(endDate).every(dayOfMonth).daysOfMonth().all("MM/DD/YYYY") :
@@ -196,7 +195,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         daysOfWeek[v] && acc.push(v);
         return acc;
     }, []);
-  
+
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -235,51 +234,48 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
         if (recurrenceType === "daily") {
             if (endDateBy === "endDateTime") {
-                const next = getNextDailyEventsByEndDate({
+                const recurringEvents = getRecurringDailyEventsByEndDate({
                     startDate: date,
                     endDate,
                     daysInterval: recurrenceInterval,
                     daysOccurances: defaultOccurrences,
                 });
-                setOccuranceCount(next.length);
-                setRecurrenceDate(next);
-                !endDate && setEndDate(moment(next[next.length - 1]));
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
             } else {
-                const next = getNextDailyEventsByOccurance({
+                const recurringEvents = getRecurringDailyEventsByOccurance({
                     startDate: date,
                     daysOccurances: endTimes,
                     daysInterval: recurrenceInterval,
                 });
-                setRecurrenceDate(next);
+                setRecurrenceDate(recurringEvents);
             }
-        }
-
-        if (recurrenceType === "weekly") {
+        } else  if (recurrenceType === "weekly") {
             const selectedDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
                 (day) => daysOfWeekMap[day]
             );
             if (endDateBy === "endDateTime") {
-                const next = getNextWeeklyEventsByEndDate({
+                const recurringEvents = getRecurringWeeklyEventsByEndDate({
                     startDate: date,
                     endDate,
                     weeksOccurances: defaultOccurrences,
                     daysOfWeek: selectedDaysOfWeek,
                 });
-                setOccuranceCount(next.length);
-                setRecurrenceDate(next);
-                !endDate && setEndDate(moment(next[next.length - 1]));
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
             } else {
-                const next = getNextWeeklyEventsByOccurance({
+                const recurringEvents = getRecurringWeeklyEventsByOccurance({
                     startDate: date,
                     weeksOccurances: endTimes,
                     daysOfWeek: selectedDaysOfWeek
                 });
-                setRecurrenceDate(next);
+                setRecurrenceDate(recurringEvents);
             }
-        }
-        if (recurrenceType === "monthly") {
+        } else if (recurrenceType === "monthly") {
             if (endDateBy === "endDateTime") {
-                const next = getNextMonthlyEventsByEndDate({
+                const recurringEvents = getRecurringMonthlyEventsByEndDate({
                     startDate: date,
                     endDate,
                     monthOccurances: defaultOccurrences,
@@ -288,11 +284,11 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     monthlyByWeekDay: daysOfWeekMap[monthlyByWeekDay],
                     monthlyByPosition: monthlyByPositionMap[monthlyByPosition],
                 });
-                setOccuranceCount(next.length);
-                setRecurrenceDate(next);
-                !endDate && setEndDate(moment(next[next.length - 1]));
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
             } else {
-                const next = getNextMonthlyEventsByOccurance({
+                const recurringEvents = getRecurringMonthlyEventsByOccurance({
                     startDate: date,
                     monthOccurances: endTimes,
                     monthlyBy,
@@ -300,7 +296,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     monthlyByWeekDay: daysOfWeekMap[monthlyByWeekDay],
                     monthlyByPosition: monthlyByPositionMap[monthlyByPosition],
                 });
-                setRecurrenceDate(next);
+                setRecurrenceDate(recurringEvents);
             }
         }
     }, [
@@ -331,7 +327,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             endDateBy === "endDateTime" ? occurrenceCount : endTimes
         } occurrence(s)`;
 
-        return intervalPart + endDatePart + occurrencePart;
+        return `${intervalPart} ${endDatePart} ${occurrencePart}`;
+    
     };
 
     return (
@@ -612,7 +609,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     </Grid>
                                 </Grid>
 
-                                <Grid item xs={12} p>
+                                <Grid item xs={12}>
                                     <Typography>
                                         or
                                     </Typography>
