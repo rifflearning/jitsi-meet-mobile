@@ -3,13 +3,24 @@
 /* eslint-disable react/jsx-sort-props */
 
 import DateFnsUtils from '@date-io/date-fns';
-import { Button, Checkbox, FormControlLabel, Grid, MenuItem, TextField, Typography, Radio, Switch } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+    Button,
+    Checkbox,
+    FormControlLabel,
+    Grid,
+    MenuItem,
+    TextField,
+    Typography,
+    Radio,
+    Switch,
+    FormHelperText,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
-    KeyboardDatePicker
-} from '@material-ui/pickers';
+    KeyboardDatePicker,
+} from "@material-ui/pickers";
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import MomentUtils from "@date-io/moment";
@@ -133,6 +144,12 @@ const getRecurringMonthlyEventsByEndDate = ({ startDate, endDate, monthOccurance
 
 const defaultOccurrences = 7;
 
+
+const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v) =>  {
+    daysOfWeek[v] && acc.push(v);
+    return acc;
+}, []);
+
 const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const classes = useStyles();
 
@@ -168,9 +185,12 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
+    const [ daysOfWeekError, setDaysOfWeekError ] = useState('');
+
 
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
+    const isSelectedDayOfWeekValid = () => Boolean(getDaysOfWeekArr(daysOfWeek).length);
 
     const isFormValid = () => {
         let isValid = true;
@@ -187,14 +207,13 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             isValid = false;
             setDurationError('Please, pick meeting duration');
         }
+        if(!isSelectedDayOfWeekValid()) {
+            isValid = false;
+            setDaysOfWeekError('Please, select day of the week')
+        }
 
         return isValid;
     };
-
-    const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v) =>  {
-        daysOfWeek[v] && acc.push(v);
-        return acc;
-    }, []);
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -571,6 +590,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                             [e.target.name]: e.target.checked
                                         })} />
                                     } />))}
+                                    { Boolean(daysOfWeekError) && 
+                                        <FormHelperText error={Boolean(daysOfWeekError)}>{daysOfWeekError}</FormHelperText> 
+                                    }
                             </Grid>
                         }
 
