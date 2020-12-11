@@ -347,7 +347,6 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             }
         }
     }, [
-        date,
         recurrenceInterval,
         endTimes,
         endDateBy,
@@ -452,6 +451,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     format = 'MM/dd/yyyy'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
+                                    disablePast={true}
                                     label = 'Date'
                                     value = { date }
                                     onChange = { setdate }
@@ -746,7 +746,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     } />
                             </Grid>
                             <Grid item>
-                                <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={moment.locale('en')}>
+                                <MuiPickersUtilsProvider utils={MomentUtils}>
                                     <KeyboardDatePicker
                                         autoOk
                                         disableToolbar
@@ -757,8 +757,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                         disablePast={true}
                                         disabled={endDateBy !== 'endDateTime'}
                                         maxDate={recurrenceMaxEndDate[recurrenceType]}
+                                        minDate={date}
                                         label='End Date'
-                                        value={endDate || moment()}
+                                        value={endDate || date}
                                         onChange={setEndDate}
                                         KeyboardButtonProps={{
                                             'aria-label': 'change date'
