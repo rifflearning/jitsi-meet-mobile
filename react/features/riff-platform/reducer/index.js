@@ -9,6 +9,7 @@ import riff from './riff';
 import scheduler from './scheduler';
 import signIn from './signIn';
 import signUp from './signUp';
+import resetPassword from './resetPassword';
 
 ReducerRegistry.register('features/riff-platform',
   combineReducers({
@@ -18,6 +19,7 @@ ReducerRegistry.register('features/riff-platform',
       meetings,
       meeting,
       scheduler,
-      riff
+      riff,
+      resetPassword,
   })
 );

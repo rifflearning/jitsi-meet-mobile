@@ -23,6 +23,7 @@ import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Waiting from './Waiting';
+import ResetPassword from './ResetPassword';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -79,6 +80,9 @@ const Main = ({ user }) => {
             <Route
                 path = { ROUTES.SIGNUP } >
                 <SignUp />
+            </Route>
+            <Route path={ ROUTES.RESETPASSWORD } >
+                <ResetPassword/>
             </Route>
             <Redirect to = { ROUTES.SIGNIN } />
         </Switch>
