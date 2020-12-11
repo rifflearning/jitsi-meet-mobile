@@ -429,7 +429,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 2 }>
+                    sm = { 3 }
+                    md = { 2 }>
                     <Typography>
                     When
                     </Typography>
@@ -438,7 +439,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 10 }>
+                    sm = { 8 }
+                    md = { 10 }>
                     <MuiPickersUtilsProvider utils = { DateFnsUtils }>
                         <Grid
                             container
@@ -478,7 +480,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 2 }>
+                    sm = { 3 }
+                    md = { 2 }>
                     <Typography>
             Duration
                     </Typography>
@@ -487,7 +490,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     container
                     item
                     xs = { 12 }
-                    sm = { 10 }
+                    sm = { 8 }
+                    md = { 10 }
                     spacing = { 3 }>
                     <Grid item>
                         <TextField
