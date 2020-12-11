@@ -162,7 +162,6 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
-    const [ waitForHost, setWaitForHost ] = useState(true);
     const [ recurringMeeting, setRecurringMeeting ] = useState(false);
     const [ recurrenceType, setRecurrenceType ] = useState('daily');
     const [ recurrenceInterval, setRecurrenceInterval ] = useState(1);
@@ -185,6 +184,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     } );
     const [ occurrenceCount, setOccuranceCount ] = useState(defaultOccurrences);
     const [ recurrenceDate, setRecurrenceDate ] = useState([]);
+    const [ waitForHost, setWaitForHost ] = useState(false);
+    const [ forbidNewParticipantsAfterDateEnd, setForbidNewParticipantsAfterDateEnd ] = useState(false);
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
@@ -241,7 +242,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
             waitForHost,
-            recurrenceValues
+            recurrenceValues,
+            forbidNewParticipantsAfterDateEnd
         });
     };
 
@@ -806,6 +808,18 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             name = 'waitForHost'
                             checked = { waitForHost }
                             onChange = { e => setWaitForHost(e.target.checked) } />
+                        } />
+                </Grid>
+
+                <Grid
+                    item
+                    xs = { 12 }>
+                    <FormControlLabel
+                        label = 'Forbid new participants after the meeting is over'
+                        control = { <Checkbox
+                            name = 'forbidNewParticipantsAfterDateEnd'
+                            checked = { forbidNewParticipantsAfterDateEnd }
+                            onChange = { e => setForbidNewParticipantsAfterDateEnd(e.target.checked) } />
                         } />
                 </Grid>
             </Grid>

@@ -10,7 +10,7 @@ import { MeetingMediator } from '../../../riff-dashboard-page/src/components/Cha
 import { Icon, IconClose } from '../../../base/icons';
 
 const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
-    const [isOpened, setIsOpened] = useState(true);
+    const [isOpened, setIsOpened] = useState(false);
     
     const size = useWindowSize();
     const bounds = { left: -200,

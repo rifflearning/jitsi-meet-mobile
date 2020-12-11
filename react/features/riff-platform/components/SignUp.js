@@ -69,7 +69,9 @@ const SignUp = ({ doRegister, signUpError, signingUp }) => {
     const isNameValid = () => Boolean(name.length);
     // eslint-disable-next-line max-len
     const isEmailValid = () => Boolean(email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/));
-    const isPasswordValid = () => Boolean(password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/));
+
+    // const isPasswordValid = () => Boolean(password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/));
+    const isPasswordValid = () => Boolean(password.length >= 8);
     const isPassword2Valid = () => password === password2;
     const isPolicyValid = () => policy;
 
@@ -93,7 +95,8 @@ const SignUp = ({ doRegister, signUpError, signingUp }) => {
         if (!isPasswordValid()) {
             isValid = false;
             // eslint-disable-next-line max-len
-            setPasswordError('Password must: have at least 8 characters, at least 1 letter (a, b, c...), at least 1 number (1, 2, 3...), include both uppercase and lowercase characters');
+            // setPasswordError('Password must: have at least 8 characters, at least 1 letter (a, b, c...), at least 1 number (1, 2, 3...), include both uppercase and lowercase characters');
+            setPasswordError('Password must: have at least 8 characters');
         }
         if (!isPassword2Valid()) {
             isValid = false;
