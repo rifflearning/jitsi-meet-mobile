@@ -3,6 +3,7 @@ export const BASENAME = '/app';
 export const SIGNIN = '/login';
 export const SIGNUP = '/signup';
 export const JOIN = '/join';
+export const RESETPASSWORD = '/reset';
 
 export const PROFILE = '/';
 export const MEETINGS = '/meetings';

@@ -41,6 +41,7 @@ class ApiService {
     fetchProfile = () => this.fetchWithJwt('/profile');
     // eslint-disable-next-line prefer-template
     fetchUserNames = arrUids => this.fetchWithJwt(`/profiles?${arrUids.map(id => '&id=' + id).join('')}`);
+    resetPassword = ({ email, password }) => this.postWithJwt('/reset', { email, password });
 
     // fetchUserNames = mockFetchUserNames;
 
