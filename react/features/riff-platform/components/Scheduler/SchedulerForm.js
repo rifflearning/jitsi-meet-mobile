@@ -3,18 +3,34 @@
 /* eslint-disable react/jsx-sort-props */
 
 import DateFnsUtils from '@date-io/date-fns';
-import { Button, Checkbox, FormControlLabel, Grid, MenuItem, TextField, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+    Button,
+    Checkbox,
+    FormControlLabel,
+    Grid,
+    MenuItem,
+    TextField,
+    Typography,
+    Radio,
+    Switch,
+    FormHelperText,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
-    KeyboardDatePicker
-} from '@material-ui/pickers';
+    KeyboardDatePicker,
+} from "@material-ui/pickers";
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import MomentUtils from "@date-io/moment";
+import moment from 'moment';
+import 'moment-recur';
 
 import { connect } from '../../../base/redux';
 import { schedule } from '../../actions/scheduler';
+
+moment.locale("en");
 
 const useStyles = makeStyles(theme => {
     return {
@@ -38,8 +54,124 @@ const useStyles = makeStyles(theme => {
     };
 });
 
+const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 300,
+      },
+    },
+  };
+
+const getNumberArr = (length) => Array.from(Array(length).keys(), n => n + 1);
+
 const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const minutesArray = [ 0, 15, 30, 45 ];
+const recurrenceIntervalArray = getNumberArr(20);
+const recurrenceTypeArray = ['daily', 'weekly', 'monthly'];
+const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const monthlyByPositionArray = [ 'First', 'Second', 'Third', 'Fourth', 'Last' ];
+
+const daysOfWeekMap = {
+    'Mon': 1,
+    'Tue': 2,
+    'Wed': 3,
+    'Thu': 4,
+    'Fri': 5,
+    'Sat': 6,
+    'Sun': 7,
+};
+
+const monthlyByPositionMap = {
+    'First': 0,
+    'Second': 1,
+    'Third': 2,
+    'Fourth': 3,
+    "Last": 4,
+}
+
+const repeatIntervalMap = {
+    daily: {
+        name: 'day(s)',
+        label: 'Day',
+        interval: getNumberArr(15)
+    },
+    weekly: {
+        name: 'week',
+        label: 'Week',
+        interval: getNumberArr(12)
+    },
+    monthly: {
+        name: 'month',
+        label: 'Month',
+        interval: getNumberArr(3)
+    },
+};
+
+const recurrenceTypeMap = {
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+};
+
+const getRecurringDailyEventsByOccurance = ({ startDate, daysOccurances, daysInterval }) => moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances, "MM/DD/YYYY");
+
+const getRecurringDailyEventsByEndDate = ({ startDate, endDate, daysInterval, daysOccurances }) => endDate ?
+    moment(startDate).recur(endDate).every(daysInterval, 'days').all("MM/DD/YYYY") :
+    moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances - 1, "MM/DD/YYYY");
+
+const getRecurringWeeklyEventsByOccurance = ({ startDate, weeksOccurances, daysOfWeek }) => moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances, "MM/DD/YYYY");
+
+const getRecurringWeeklyEventsByEndDate = ({ startDate, endDate, weeksOccurances, daysOfWeek }) => endDate ?
+    moment(startDate).recur(endDate).every(daysOfWeek).daysOfWeek().all("MM/DD/YYYY") :
+    moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances - 1, "MM/DD/YYYY");
+
+const getRecurringMonthlyEventsByOccurance = ({ startDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => monthlyBy === 'monthlyByDay' ?
+    moment(startDate).recur().every(dayOfMonth).daysOfMonth().next(monthOccurances, "MM/DD/YYYY")
+    :
+    moment(startDate).recur().every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().next(monthOccurances, "MM/DD/YYYY");
+
+const getRecurringMonthlyEventsByEndDate = ({ startDate, endDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => {
+    if (monthlyBy === 'monthlyByDay') {
+        return endDate ?
+            moment(startDate).recur(endDate).every(dayOfMonth).daysOfMonth().all("MM/DD/YYYY") :
+            moment(startDate).recur().every(dayOfMonth).daysOfMonth().next(monthOccurances, "MM/DD/YYYY");
+    } else {
+        return endDate ?
+            moment(startDate).recur(endDate).every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().all("MM/DD/YYYY") :
+            moment(startDate).recur().every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().next(monthOccurances, "MM/DD/YYYY");
+    }
+};
+
+const defaultOccurrences = 7;
+
+
+const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v) =>  {
+    daysOfWeek[v] && acc.push(v);
+    return acc;
+}, []);
+
+const getRecurringDatesWithTime = ({ dates, startDate, endDate }) => {
+    let recurrence = dates.map(date => ({
+        startDate: moment(date).toISOString(),
+        endDate: moment(date).toISOString()
+    }));
+
+    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
+    const [hEnd, mEnd] = endDate.toTimeString().split(' ')[0].split(":");
+
+    return recurrence.map(el => {
+        const newDateStart = new Date(el.startDate)
+        newDateStart.setHours(hStart, mStart);
+
+        const newDateEnd = new Date(el.endDate)
+        newDateEnd.setHours(hEnd, mEnd);
+        return {
+            startDate: newDateStart.toISOString(),
+            endDate: newDateEnd.toISOString()
+        };
+    });
+};
+
 
 const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const classes = useStyles();
@@ -50,15 +182,39 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
+    const [ recurringMeeting, setRecurringMeeting ] = useState(false);
+    const [ recurrenceType, setRecurrenceType ] = useState('daily');
+    const [ recurrenceInterval, setRecurrenceInterval ] = useState(1);
+    const [ endDateBy, setEndDateBy ] = useState('endDateTime');
+    const [ endDate, setEndDate ] = useState(moment());
+    const [ endTimes, setEndTimes] = useState(7);
+    const [ monthlyBy, setMonthlyBy ] = useState('monthlyByDay');
+    const [ monthlyByPosition, setMonthlyByPosition ] = useState('First');
+    const [ monthlyByWeekDay, setMonthlyByWeekDay ] = useState('Mon');
+    const [ monthlyByDay, setMonthlyByDay ] = useState(1);
+    const [ daysOfWeek, setDaysOfWeek] = useState({
+        Sun: false,
+        Mon: false,
+        Tue: false,
+        Wed: false,
+        Thu: false,
+        Fri: false,
+        Sat: false,
+        [moment(date).format("ddd")]: true,
+    } );
+    const [ occurrenceCount, setOccuranceCount ] = useState(defaultOccurrences);
+    const [ recurrenceDate, setRecurrenceDate ] = useState([]);
     const [ waitForHost, setWaitForHost ] = useState(false);
     const [ forbidNewParticipantsAfterDateEnd, setForbidNewParticipantsAfterDateEnd ] = useState(false);
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
+    const [ daysOfWeekError, setDaysOfWeekError ] = useState('');
 
 
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
+    const isSelectedDayOfWeekValid = () => Boolean(getDaysOfWeekArr(daysOfWeek).length);
 
     const isFormValid = () => {
         let isValid = true;
@@ -75,6 +231,10 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             isValid = false;
             setDurationError('Please, pick meeting duration');
         }
+        if(!isSelectedDayOfWeekValid()) {
+            isValid = false;
+            setDaysOfWeekError('Please, select day of the week')
+        }
 
         return isValid;
     };
@@ -90,6 +250,11 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setHours(dateEnd.getHours() + hours);
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
+        const recurrenceValues = recurringMeeting ?
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, endDate: dateEnd })
+            :
+            null;
+
         scheduleMeeting({
             createdBy: userId,
             name,
@@ -98,8 +263,118 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
             waitForHost,
+            recurrenceValues,
             forbidNewParticipantsAfterDateEnd
         });
+    };
+
+    const recurrenceMaxEndDate = {
+        daily: moment(date).add(3, 'months').endOf('month'),
+        weekly: moment(date).add(1, 'years').endOf('year'),
+        monthly: moment(date).add(2, 'years').endOf('year')
+    }
+
+    useEffect(() => {
+        setEndDate(null);
+    }, [recurrenceType, date]);
+
+    useEffect(() => {
+        if (recurrenceType === "daily") {
+            if (endDateBy === "endDateTime") {
+                const recurringEvents = getRecurringDailyEventsByEndDate({
+                    startDate: date,
+                    endDate,
+                    daysInterval: recurrenceInterval,
+                    daysOccurances: defaultOccurrences,
+                });
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
+            } else {
+                const recurringEvents = getRecurringDailyEventsByOccurance({
+                    startDate: date,
+                    daysOccurances: endTimes,
+                    daysInterval: recurrenceInterval,
+                });
+                setRecurrenceDate(recurringEvents);
+            }
+        } else  if (recurrenceType === "weekly") {
+            const selectedDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
+                (day) => daysOfWeekMap[day]
+            );
+            if (endDateBy === "endDateTime") {
+                const recurringEvents = getRecurringWeeklyEventsByEndDate({
+                    startDate: date,
+                    endDate,
+                    weeksOccurances: defaultOccurrences,
+                    daysOfWeek: selectedDaysOfWeek,
+                });
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
+            } else {
+                const recurringEvents = getRecurringWeeklyEventsByOccurance({
+                    startDate: date,
+                    weeksOccurances: endTimes,
+                    daysOfWeek: selectedDaysOfWeek
+                });
+                setRecurrenceDate(recurringEvents);
+            }
+        } else if (recurrenceType === "monthly") {
+            if (endDateBy === "endDateTime") {
+                const recurringEvents = getRecurringMonthlyEventsByEndDate({
+                    startDate: date,
+                    endDate,
+                    monthOccurances: defaultOccurrences,
+                    monthlyBy,
+                    dayOfMonth: monthlyByDay,
+                    monthlyByWeekDay: daysOfWeekMap[monthlyByWeekDay],
+                    monthlyByPosition: monthlyByPositionMap[monthlyByPosition],
+                });
+                setOccuranceCount(recurringEvents.length);
+                setRecurrenceDate(recurringEvents);
+                !endDate && setEndDate(moment(recurringEvents[recurringEvents.length - 1]));
+            } else {
+                const recurringEvents = getRecurringMonthlyEventsByOccurance({
+                    startDate: date,
+                    monthOccurances: endTimes,
+                    monthlyBy,
+                    dayOfMonth: monthlyByDay,
+                    monthlyByWeekDay: daysOfWeekMap[monthlyByWeekDay],
+                    monthlyByPosition: monthlyByPositionMap[monthlyByPosition],
+                });
+                setRecurrenceDate(recurringEvents);
+            }
+        }
+    }, [
+        recurrenceInterval,
+        endTimes,
+        endDateBy,
+        endDate,
+        daysOfWeek,
+        recurrenceType,
+        monthlyBy,
+        monthlyByDay,
+        monthlyByWeekDay,
+        monthlyByPosition,
+    ]);
+
+    const recurrenceDesc = () => {
+        const intervalPart = `Every ${
+            recurrenceType === "daily" ? recurrenceInterval : ""
+        } ${repeatIntervalMap[recurrenceType].name}, `;
+
+        const endDatePart = `${
+            endDateBy === "endDateTime"
+                ? `until ${moment(endDate).format("MMM DD, YYYY")}, `
+                : ' '
+        } `;
+        const occurrencePart = `${
+            endDateBy === "endDateTime" ? occurrenceCount : endTimes
+        } occurrence(s)`;
+
+        return `${intervalPart} ${endDatePart} ${occurrencePart}`;
+    
     };
 
     return (
@@ -154,7 +429,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 2 }>
+                    sm = { 3 }
+                    md = { 2 }>
                     <Typography>
                     When
                     </Typography>
@@ -163,7 +439,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 10 }>
+                    sm = { 8 }
+                    md = { 10 }>
                     <MuiPickersUtilsProvider utils = { DateFnsUtils }>
                         <Grid
                             container
@@ -176,6 +453,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     format = 'MM/dd/yyyy'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
+                                    disablePast={true}
                                     label = 'Date'
                                     value = { date }
                                     onChange = { setdate }
@@ -202,7 +480,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                 <Grid
                     item
                     xs = { 12 }
-                    sm = { 2 }>
+                    sm = { 3 }
+                    md = { 2 }>
                     <Typography>
             Duration
                     </Typography>
@@ -211,7 +490,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     container
                     item
                     xs = { 12 }
-                    sm = { 10 }
+                    sm = { 8 }
+                    md = { 10 }
                     spacing = { 3 }>
                     <Grid item>
                         <TextField
@@ -242,6 +522,293 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     </Grid>
                 </Grid>
             </Grid>
+
+            <Grid
+                container
+                spacing={2}>
+                <Grid
+                    item
+                    sm={12}
+                    md={6}>
+                    <FormControlLabel
+                        label='Recurring meeting'
+                        control={<Switch
+                            name='recurringMeeting'
+                            checked={recurringMeeting}
+                            onChange={e => setRecurringMeeting(e.target.checked)} />
+                        } />
+                </Grid>
+                {recurringMeeting && <Grid
+                    item
+                    sm={12}
+                    md={6}>
+                    <Typography> {recurrenceDesc()} </Typography>
+                </Grid>
+                }
+            </Grid>
+            {recurringMeeting &&
+                <Grid
+                    container
+                    alignItems='center'
+                    spacing={2}>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={3}
+                        md={2}>
+                        <Typography>
+                            Recurrence
+                        </Typography>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={8}
+                        md={10}>
+
+                        <TextField
+                            id='recurrence-type'
+                            select
+                            value={recurrenceType}
+                            onChange={e => setRecurrenceType(e.target.value)}>
+                            {recurrenceTypeArray.map(el => (<MenuItem
+                                key={el}
+                                value={el}>{recurrenceTypeMap[el]}</MenuItem>))}
+                        </TextField>
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        sm={3}
+                        md={2}>
+                        <Typography>
+                            Repeat every
+                        </Typography>
+                    </Grid>
+
+                    <Grid
+                        container
+                        item
+                        xs={12}
+                        sm={8}
+                        md={10}
+                        spacing={1}>
+                        {recurrenceType === 'daily' &&
+                            <Grid item>
+                                <TextField
+                                    id='recurrence-interval'
+                                    select
+                                    SelectProps={{ MenuProps }}
+                                    label={repeatIntervalMap[recurrenceType].label}
+                                    value={recurrenceInterval}
+                                    onChange={e => setRecurrenceInterval(e.target.value)}>
+                                    {repeatIntervalMap[recurrenceType].interval.map(el => (<MenuItem
+                                        key={el}
+                                        value={el}>{el}</MenuItem>))}
+                                </TextField>
+                            </Grid>
+                        }
+
+                        {recurrenceType === 'weekly' &&
+                            <Grid item>
+                                {daysOfWeekArray.map(el => (<FormControlLabel
+                                    key={el}
+                                    label={el}
+                                    control={<Checkbox
+                                        name={el}
+                                        checked={daysOfWeek[el]}
+                                        onChange={e => setDaysOfWeek({
+                                            ...daysOfWeek,
+                                            [e.target.name]: e.target.checked
+                                        })} />
+                                    } />))}
+                                    { Boolean(daysOfWeekError) && 
+                                        <FormHelperText error={Boolean(daysOfWeekError)}>{daysOfWeekError}</FormHelperText> 
+                                    }
+                            </Grid>
+                        }
+
+                        {recurrenceType === 'monthly' &&
+                            <>
+                                <Grid
+                                    container
+                                    item
+                                    alignItems='center' 
+                                    spacing={1}>
+                                    <Grid item>
+                                        <FormControlLabel
+                                            label='Day'
+                                            control={<Radio
+                                                name='monthlyBy'
+                                                value='monthlyByDay'
+                                                checked={monthlyBy === 'monthlyByDay'}
+                                                onChange={e => setMonthlyBy(e.target.value)} />
+                                            } />
+                                    </Grid>
+                                    <Grid item>
+                                        <TextField
+                                            id='monthly-by-day'
+                                            select
+                                            SelectProps={{ MenuProps }}
+                                            disabled={monthlyBy !== 'monthlyByDay'}
+                                            value={monthlyByDay}
+                                            onChange={e => setMonthlyByDay(e.target.value)}>
+                                            {recurrenceIntervalArray.map(el => (<MenuItem
+                                                key={el}
+                                                value={el}>{el}</MenuItem>))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography>of the month</Typography>
+                                    </Grid>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Typography>
+                                        or
+                                    </Typography>
+                                </Grid>
+                                <Grid
+                                    container
+                                    item
+                                    alignItems='center' spacing={1}>
+                                    <Grid item>
+                                        <FormControlLabel
+                                            label='The'
+                                            control={<Radio
+                                                name='monthlyBy'
+                                                value='monthlyByWeekDay'
+                                                checked={monthlyBy === 'monthlyByWeekDay'}
+                                                onChange={e => setMonthlyBy(e.target.value)} />
+                                            } />
+                                    </Grid>
+                                    <Grid item>
+                                        <TextField
+                                            id='monthly-by-week-index'
+                                            select
+                                            margin='normal'
+                                            disabled={monthlyBy !== 'monthlyByWeekDay'}
+                                            value={monthlyByPosition}
+                                            onChange={e => setMonthlyByPosition(e.target.value)}>
+                                            {monthlyByPositionArray.map(el => (<MenuItem
+                                                key={el}
+                                                value={el}>{el}</MenuItem>))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid item>
+                                        <TextField
+                                            id='monthly-by-week-day'
+                                            select
+                                            margin='normal'
+                                            disabled={monthlyBy !== 'monthlyByWeekDay'}
+                                            value={monthlyByWeekDay}
+                                            onChange={e => setMonthlyByWeekDay(e.target.value)}>
+                                            {daysOfWeekArray.map(el => (<MenuItem
+                                                key={el}
+                                                value={el}>{el}</MenuItem>))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography>of the month</Typography>
+                                    </Grid>
+                                </Grid>
+                            </>
+                        }
+                    </Grid>
+
+                    <Grid
+                        item
+                        xs={12}
+                        sm={3}
+                        md={2}>
+                        <Typography>
+                            End date
+                        </Typography>
+                    </Grid>
+                    <Grid
+                        container
+                        item
+                        alignItems='center'
+                        xs={12}
+                        sm={8}
+                        md={10}
+                        spacing={1}>
+                        <Grid
+                            container
+                            item
+                            alignItems='center'
+                            xs={12}
+                            spacing={1}>
+                            <Grid item>
+                                <FormControlLabel
+                                    label='By'
+                                    control={<Radio
+                                        name='endDate'
+                                        value='endDateTime'
+                                        checked={endDateBy === 'endDateTime'}
+                                        onChange={e => setEndDateBy(e.target.value)} />
+                                    } />
+                            </Grid>
+                            <Grid item>
+                                <MuiPickersUtilsProvider utils={MomentUtils}>
+                                    <KeyboardDatePicker
+                                        autoOk
+                                        disableToolbar
+                                        variant='inline'
+                                        format='MM/DD/YYYY'
+                                        margin='normal'
+                                        id='date-picker-inline'
+                                        disablePast={true}
+                                        disabled={endDateBy !== 'endDateTime'}
+                                        maxDate={recurrenceMaxEndDate[recurrenceType]}
+                                        minDate={date}
+                                        label='End Date'
+                                        value={endDate || date}
+                                        onChange={setEndDate}
+                                        KeyboardButtonProps={{
+                                            'aria-label': 'change date'
+                                        }} />
+                                </MuiPickersUtilsProvider>
+                            </Grid>
+                        </Grid>
+
+                        <Grid item sm={12}>
+                            <Typography>
+                                or
+                            </Typography>
+                        </Grid>
+                        <Grid
+                            container
+                            item
+                            spacing={1}
+                            alignItems='center'>
+                            <Grid item>
+                                <FormControlLabel
+                                    label='After'
+                                    control={<Radio
+                                        name='endDate'
+                                        value='endTimes'
+                                        checked={endDateBy === 'endTimes'}
+                                        onChange={e => setEndDateBy(e.target.value)} />
+                                    } />
+                            </Grid>
+                            <TextField
+                                id='end-times'
+                                select
+                                margin='normal'
+                                label='Occurrences'
+                                SelectProps={{ MenuProps }}
+                                disabled={endDateBy !== 'endTimes'}
+                                value={endTimes}
+                                onChange={e => setEndTimes(e.target.value)}>
+                                {recurrenceIntervalArray.map(el => (<MenuItem
+                                    key={el}
+                                    value={el}>{el}</MenuItem>))}
+                            </TextField>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            }
 
             <Grid
                 container
