@@ -122,5 +122,5 @@ export function msToTime(milliseconds) {
  * @returns {boolean} - True if we're on platform, false if on roomId or '/'.
  */
 export function isRiffPlatformCurrentPath() {
-    return window.location.pathname.split('/')[1] === ROUTES.BASENAME.slice(1);
+    return window.location.pathname.split('/')[1] === ROUTES.BASENAME.slice(1) || window.location.pathname === '/';
 }
