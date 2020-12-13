@@ -5,9 +5,12 @@ export default (state = {}, action) => {
     case actionTypes.RESET_REQUEST:
         return { loading: true };
     case actionTypes.RESET_SUCCESS:
-        return {};
+        return { success: action.success };
     case actionTypes.RESET_FAILURE:
         return { error: action.error };
+    case actionTypes.RESET_HIDE_MESSAGE : {
+        return { }
+    }
 
     default:
         return state;

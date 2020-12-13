@@ -3,7 +3,6 @@
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
 
-import { signInSuccess } from './signIn';
 
 function resetPasswordRequest() {
     return {
@@ -11,14 +10,12 @@ function resetPasswordRequest() {
     };
 }
 
-function resetPasswordSuccess(token) {
-    return dispatch => {
-
-        dispatch({ type: actionTypes.RESET_SUCCESS });
-
-     return dispatch(signInSuccess(token));
+function resetPasswordSuccess(success) {
+    return { 
+        type: actionTypes.RESET_SUCCESS, 
+        success: success
     };
-}
+};
 
 function resetPasswordFailure(error) {
     return {
@@ -32,18 +29,22 @@ export function resetPassword({ email, password }) {
         dispatch(resetPasswordRequest());
 
         try {
-            const res = await api.resetPassword({ email,
-                password });
-                console.log('res', res)
+            const res = await api.resetPassword({ email, password });
+            return dispatch(resetPasswordSuccess('The password has successfully been changed. You can now login with the new password. You will land to login page in 5 seconds'));
 
-            return dispatch(resetPasswordSuccess(res.token));
         } catch (e) {
             if (e.status === 404) {
-                dispatch(resetPasswordFailure('User is not exists. Please register before using this service.'));
+                dispatch(resetPasswordFailure('User is not exist. Please register before using this service.'));
             } else {
                 dispatch(resetPasswordFailure('Error in reset password'));
             }
         }
     };
+};
+
+export function hideResetMessage() {
+    return {
+        type: actionTypes.RESET_HIDE_MESSAGE 
+    }
 }
 

@@ -8,15 +8,17 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as LinkTo, useHistory } from 'react-router-dom';
 
-import { connect } from '../../base/redux';
-import { resetPassword } from '../actions/resetPassword';
 import * as ROUTES from '../constants/routes';
+import { connect } from '../../base/redux';
+import { resetPassword, hideResetMessage } from '../actions/resetPassword';
+
 
 const useStyles = makeStyles(theme => {
     return {
@@ -40,7 +42,7 @@ const useStyles = makeStyles(theme => {
     };
 });
 
-const ResetPassword = ({ doRegister, resetPasswordError, resetPassword }) => {
+const ResetPassword = ({ doReset, hideMessage, resetPasswordError, resetingPassword, resetPasswordSuccess }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -51,6 +53,8 @@ const ResetPassword = ({ doRegister, resetPasswordError, resetPassword }) => {
     const [ emailError, setEmailError ] = useState('');
     const [ passwordError, setPasswordError ] = useState('');
     const [ password2Error, setPassword2Error ] = useState('');
+
+    const [ isRedirecting, setIsRedirecting ] = useState(false);
 
     const onChangeEmail = e => setEmail(e.target.value);
     const onChangePassword = e => setPassword(e.target.value);
@@ -88,27 +92,37 @@ const ResetPassword = ({ doRegister, resetPasswordError, resetPassword }) => {
         return isValid;
     };
 
+
     const handleSubmit = e => {
         e.preventDefault();
 
         if (!isFormValid()) {
             return;
         }
-        doRegister({
+        doReset({
             email,
             password
-        }).then(prevPath => {
-            if (prevPath) {
-                history.push(`${ROUTES.WAITING}${prevPath}`);
-            }
+        }).then(res => {
+            if(res) {
+            setIsRedirecting(true);
+            setTimeout(() => {
+                history.push(`${ROUTES.SIGNIN}`);
+              }, 5000);
+            } 
         });
     };
+
+    useEffect(() => {
+       return () =>  hideMessage();
+    }, [])
 
     return (
         <Container
             component = 'main'
             maxWidth = 'xs'>
-            <div className = { classes.paper }>
+            { resetPasswordError && <Alert severity="error">{resetPasswordError}</Alert> }
+            { resetPasswordSuccess && <Alert severity="success">{resetPasswordSuccess}</Alert> }
+           <div className = { classes.paper }>
                 <Avatar className = { classes.avatar }>
                     <LockOutlinedIcon />
                 </Avatar>
@@ -181,12 +195,9 @@ const ResetPassword = ({ doRegister, resetPasswordError, resetPassword }) => {
                         variant = 'contained'
                         color = 'primary'
                         className = { classes.submit }
-                        disabled = { resetPassword }>
+                        disabled = { resetingPassword || isRedirecting }>
                         Reset Password
                     </Button>
-                    <Typography color = 'error'>
-                        {resetPasswordError}
-                    </Typography>
                     <Grid
                         container
                         justify = 'flex-end'>
@@ -205,20 +216,22 @@ const ResetPassword = ({ doRegister, resetPasswordError, resetPassword }) => {
 ResetPassword.propTypes = {
     doRegister: PropTypes.func,
     resetPasswordError: PropTypes.string,
-    resetPassword: PropTypes.bool
+    resetingPassword: PropTypes.bool,
+    resetPasswordSuccess: PropTypes.string,
 };
 
 const mapStateToProps = state => {
-    console.log( state['features/riff-platform'].resetPassword)
     return {
         resetPasswordError: state['features/riff-platform'].resetPassword.error,
-        resetPassword: state['features/riff-platform'].resetPassword.loading
+        resetingPassword: state['features/riff-platform'].resetPassword.loading,
+        resetPasswordSuccess: state['features/riff-platform'].resetPassword.success,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        doRegister: obj => dispatch(resetPassword(obj))
+        doReset: obj => dispatch(resetPassword(obj)),
+        hideMessage: () => dispatch(hideResetMessage()),
     };
 };
 
