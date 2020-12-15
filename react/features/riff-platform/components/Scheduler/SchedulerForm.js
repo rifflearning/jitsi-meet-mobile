@@ -30,6 +30,16 @@ import 'moment-recur';
 import { connect } from '../../../base/redux';
 import { schedule } from '../../actions/scheduler';
 
+import {
+    getRecurringDailyEventsByOccurance,
+    getRecurringDailyEventsByEndDate,
+    getRecurringWeeklyEventsByOccurance,
+    getRecurringWeeklyEventsByEndDate,
+    getRecurringMonthlyEventsByOccurance,
+    getRecurringMonthlyEventsByEndDate,
+    daysOfWeekMap,
+} from "./helpers";
+
 moment.locale("en");
 
 const useStyles = makeStyles(theme => {
@@ -71,16 +81,6 @@ const recurrenceTypeArray = ['daily', 'weekly', 'monthly'];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const monthlyByPositionArray = [ 'First', 'Second', 'Third', 'Fourth' ];
 
-const daysOfWeekMap = {
-    'Mon': 1,
-    'Tue': 2,
-    'Wed': 3,
-    'Thu': 4,
-    'Fri': 5,
-    'Sat': 6,
-    'Sun': 7,
-};
-
 const monthlyByPositionMap = {
     'First': 0,
     'Second': 1,
@@ -114,52 +114,6 @@ const recurrenceTypeMap = {
 
 const defaultOccurrences = 7;
 
-const getRecurringDailyEventsByOccurance = ({ startDate, daysOccurances, daysInterval }) => [startDate].concat(moment(startDate).recur().every(daysInterval, 'days').next(daysOccurances - 1));
-
-const getRecurringDailyEventsByEndDate = ({ startDate, endDate, daysInterval, daysOccurances }) => endDate ?
-    moment(startDate).recur(endDate).every(daysInterval, 'days').all() :
-    getRecurringDailyEventsByOccurance({ startDate, daysOccurances, daysInterval });
-
-const getRecurringWeeklyEventsByOccurance = ({ startDate, weeksOccurances, daysOfWeek }) => {
-    const isStartDateBelongsToDaysArr = daysOfWeek.find(day => day === daysOfWeekMap[moment(startDate).format("ddd")]);
-    return isStartDateBelongsToDaysArr ?
-        [startDate].concat(moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances - 1)) :
-        moment(startDate).recur().every(daysOfWeek).daysOfWeek().next(weeksOccurances)
-};
-
-const getRecurringWeeklyEventsByEndDate = ({ startDate, endDate, weeksOccurances, daysOfWeek }) => endDate ?
-    moment(startDate).recur(endDate).every(daysOfWeek).daysOfWeek().all() :
-    getRecurringWeeklyEventsByOccurance({ startDate, weeksOccurances, daysOfWeek });
-
-const getRecurringMonthlyEventsByOccurance = ({ startDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => {
-    if (monthlyBy === 'monthlyByDay') {
-        const isStartDayEqualToDayOfMonth = parseInt(moment(startDate).format('D')) === dayOfMonth;
-
-        return isStartDayEqualToDayOfMonth ?
-            [startDate].concat(moment(startDate).recur().every(dayOfMonth).daysOfMonth().next(monthOccurances - 1)) :
-            moment(startDate).recur().every(dayOfMonth).daysOfMonth().next(monthOccurances);
-    } else {
-        const recurrence = moment(startDate).recur().every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().next(monthOccurances);
-        const startDateFromRecurrence = moment(startDate).recur(recurrence[0]).every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().all()[0]
-
-        const isStartDayEqualToStartDateFromRecurrence = moment(startDate).isSame(startDateFromRecurrence, 'day');
-        return isStartDayEqualToStartDateFromRecurrence ?
-            [startDate].concat(moment(startDate).recur().every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().next(monthOccurances - 1)) :
-            recurrence;
-    }
-};
-
-const getRecurringMonthlyEventsByEndDate = ({ startDate, endDate, monthOccurances, monthlyBy, dayOfMonth, monthlyByWeekDay, monthlyByPosition }) => {
-    if (monthlyBy === 'monthlyByDay') {
-        return endDate ?
-            moment(startDate).recur(endDate).every(dayOfMonth).daysOfMonth().all() :
-            getRecurringMonthlyEventsByOccurance({ startDate, monthOccurances, monthlyBy: 'monthlyByDay', dayOfMonth, monthlyByWeekDay, monthlyByPosition });
-    } else {
-        return endDate ?
-            moment(startDate).recur(endDate).every(monthlyByWeekDay).daysOfWeek().every(monthlyByPosition).weeksOfMonthByDay().all() :
-            getRecurringMonthlyEventsByOccurance({ startDate, monthOccurances, monthlyBy: 'monthlyByWeekDay', dayOfMonth, monthlyByWeekDay, monthlyByPosition });
-    }
-};
 
 const calculateRecurringByEndDate = ({
     startDate,
@@ -258,9 +212,8 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
         newDateEnd.setMinutes(newDateEnd.getMinutes() + duration.minutes);
 
         return {
-            startDate: moment(newDateStart).format('MM/DD/YYYY  h:mm a'),
-          //  endDate: newDateEnd.toISOString()
-            endDate: moment(newDateEnd).format('MM/DD/YYYY  h:mm a')
+            startDate: newDateStart.toISOString(),
+            endDate: newDateEnd.toISOString()
         };
     });
 };
@@ -332,18 +285,6 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         return isValid;
     };
 
-    const dateEnd = new Date(date);
-
-    dateEnd.setHours(dateEnd.getHours() + hours);
-    dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
-
-    const recurrenceValues = recurringMeeting ?
-        getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes} })
-        :
-        null;
-
-        console.log('recurrenceValues', recurrenceValues)
-
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -356,7 +297,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes} })
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes } })
             :
             null;
 
@@ -377,7 +318,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         daily: moment(date).add(3, 'months').endOf('month'),
         weekly: moment(date).add(1, 'years').endOf('year'),
         monthly: moment(date).add(2, 'years').endOf('year')
-    }
+    };
 
     const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
         (day) => daysOfWeekMap[day]
@@ -880,8 +821,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                         id='date-picker-inline'
                                         disablePast={true}
                                         disabled={endDateBy !== 'endDateTime'}
-                                        maxDate={recurrenceMaxEndDate[recurrenceType]}
-                                        minDate={date}
+                                        maxDate={endDateBy === 'endDateTime' ?  recurrenceMaxEndDate[recurrenceType] : undefined}
+                                        minDate={endDateBy === 'endDateTime' ? date : undefined}
                                         label='End Date'
                                         value={endDate || date}
                                         onChange={setEndDate}
