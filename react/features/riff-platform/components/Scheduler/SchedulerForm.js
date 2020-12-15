@@ -13,7 +13,6 @@ import {
     Typography,
     Radio,
     Switch,
-    FormHelperText,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -255,12 +254,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
-    const [ daysOfWeekError, setDaysOfWeekError ] = useState('');
-
 
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
-    const isSelectedDayOfWeekValid = () => Boolean(recurrenceType === 'weekly' && getDaysOfWeekArr(daysOfWeek).length);
 
     const isFormValid = () => {
         let isValid = true;
@@ -276,10 +272,6 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         if (!isDurationValid()) {
             isValid = false;
             setDurationError('Please, pick meeting duration');
-        }
-        if(!isSelectedDayOfWeekValid()) {
-            isValid = false;
-            setDaysOfWeekError('Please, select day of the week')
         }
 
         return isValid;
@@ -683,9 +675,6 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                             [e.target.name]: e.target.checked
                                         })} />
                                     } />))}
-                                    { Boolean(daysOfWeekError) && 
-                                        <FormHelperText error={Boolean(daysOfWeekError)}>{daysOfWeekError}</FormHelperText> 
-                                    }
                             </Grid>
                         }
 
@@ -961,7 +950,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        scheduleMeeting: meeting => dispatch(schedule(meeting))
+        scheduleMeeting: meeting => dispatch(schedule(meeting));
     };
 };
 
