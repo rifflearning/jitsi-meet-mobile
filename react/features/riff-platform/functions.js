@@ -52,7 +52,33 @@ export function groupMeetingsByDays(meetings) {
 
     const groupedMeetings = {};
 
-    meetings.forEach(el => {
+    // get grouped meetings to multiple
+    const groups = {};
+    const newMeetings = meetings.filter(m => {
+        // put all groups meetings to groups
+        if (m.multipleRoomsParentId) {
+            if (groups[m.multipleRoomsParentId]) {
+                groups[m.multipleRoomsParentId].push(m);
+            } else {
+                groups[m.multipleRoomsParentId] = [ m ];
+            }
+        }
+
+        // filter out all groupped, whenre m.multipleRoomsParentId !== m._id
+        if (m.multipleRoomsParentId && m.multipleRoomsParentId !== m._id) {
+            return false;
+        }
+
+        return true;
+    });
+
+    // put all groups to meetings
+    const newMeetingsWithGroups = newMeetings.map(m => {
+        return { ...m,
+            multipleRooms: groups[m._id] || null };
+    });
+
+    newMeetingsWithGroups.forEach(el => {
         if (groupedMeetings[transformDate(el.dateStart)]) {
             groupedMeetings[transformDate(el.dateStart)].push(el);
         } else {

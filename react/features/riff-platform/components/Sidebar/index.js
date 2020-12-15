@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import GroupsList from './GroupsList';
 import MainListItems from './ListItems';
 
 export const drawerWidth = 240;
@@ -70,6 +71,7 @@ const Sidebar = ({ handleSidebarClose, isOpen }) => {
             <Divider />
             <List><MainListItems /></List>
             <Divider />
+            <List><GroupsList /></List>
         </Drawer>
     );
 };

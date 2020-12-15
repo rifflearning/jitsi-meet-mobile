@@ -6,11 +6,12 @@ import React from 'react';
 
 import MeetingRow from './MeetingRow';
 
-const MeetingsTabele = ({ meetingsList = [] }) => (
+const MeetingsTabele = ({ meetingsList = [], groupName }) => (
     <Table>
         <TableBody>
             {meetingsList.map(meeting =>
                 (<MeetingRow
+                    groupName = { groupName }
                     key = { meeting._id }
                     meeting = { meeting } />)
             )}
@@ -20,6 +21,8 @@ const MeetingsTabele = ({ meetingsList = [] }) => (
 );
 
 MeetingsTabele.propTypes = {
+    // external prop
+    groupName: PropTypes.string,
     meetingsList: PropTypes.array
 };
 

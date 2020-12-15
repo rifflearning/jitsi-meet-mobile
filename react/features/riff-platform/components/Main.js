@@ -19,11 +19,11 @@ import Footer from './Footer';
 import Join from './Join';
 import Meetings from './Meetings';
 import Profile from './Profile';
+import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Waiting from './Waiting';
-import ResetPassword from './ResetPassword';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -64,6 +64,10 @@ const Main = ({ user }) => {
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
             </Route>
+            <Route
+                path = { ROUTES.MEETINGS_HARVARD }
+                // eslint-disable-next-line react/jsx-no-bind
+                component = { () => <Meetings groupName = '5fbc1698db819207288110d2' /> } />
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
             </Route>
@@ -81,8 +85,8 @@ const Main = ({ user }) => {
                 path = { ROUTES.SIGNUP } >
                 <SignUp />
             </Route>
-            <Route path={ ROUTES.RESETPASSWORD } >
-                <ResetPassword/>
+            <Route path = { ROUTES.RESETPASSWORD } >
+                <ResetPassword />
             </Route>
             <Redirect to = { ROUTES.SIGNIN } />
         </Switch>
