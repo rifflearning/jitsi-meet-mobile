@@ -950,7 +950,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        scheduleMeeting: meeting => dispatch(schedule(meeting));
+        scheduleMeeting: meeting => dispatch(schedule(meeting))
     };
 };
 
