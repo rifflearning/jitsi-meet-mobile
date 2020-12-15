@@ -245,24 +245,22 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
     return acc;
 }, []);
 
-const getRecurringDatesWithTime = ({ dates, startDate, endDate }) => {
-    const recurrence = dates.map(date => ({
-        startDate: moment(date).toISOString(),
-        endDate: moment(date).toISOString()
-    }));
-
+const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
-    const [hEnd, mEnd] = endDate.toTimeString().split(' ')[0].split(":");
 
-    return recurrence.map(el => {
-        const newDateStart = new Date(el.startDate)
+    return dates.map(date => {
+        const newDateStart = new Date(date)
         newDateStart.setHours(hStart, mStart);
 
-        const newDateEnd = new Date(el.endDate)
-        newDateEnd.setHours(hEnd, mEnd);
+        const newDateEnd = new Date(newDateStart);
+
+        newDateEnd.setHours(newDateEnd.getHours() + duration.hours);
+        newDateEnd.setMinutes(newDateEnd.getMinutes() + duration.minutes);
+
         return {
-            startDate: moment(newDateStart).format('MM/DD/YYYY'),
-            endDate: newDateEnd.toISOString()
+            startDate: moment(newDateStart).format('MM/DD/YYYY  h:mm a'),
+          //  endDate: newDateEnd.toISOString()
+            endDate: moment(newDateEnd).format('MM/DD/YYYY  h:mm a')
         };
     });
 };
@@ -334,6 +332,18 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         return isValid;
     };
 
+    const dateEnd = new Date(date);
+
+    dateEnd.setHours(dateEnd.getHours() + hours);
+    dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
+
+    const recurrenceValues = recurringMeeting ?
+        getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes} })
+        :
+        null;
+
+        console.log('recurrenceValues', recurrenceValues)
+
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -346,7 +356,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, endDate: dateEnd })
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes} })
             :
             null;
 
