@@ -38,6 +38,21 @@ export function getMeetings() {
     };
 }
 
+export function getMeetingsByGroup(groupName) {
+    return async dispatch => {
+        dispatch(meetingsRequest());
+
+        try {
+            const res = await api.fetchMeetingsByGroup(groupName);
+
+            dispatch(meetingsSuccess(res));
+        } catch (e) {
+            console.error('Error in getMeetingsByGroup', e);
+            dispatch(meetingsFailure(e.message));
+        }
+    };
+}
+
 export function deleteMeeting(id) {
     return async dispatch => {
 
@@ -50,3 +65,26 @@ export function deleteMeeting(id) {
     };
 }
 
+export function deleteMeetingsMultipleRooms(id) {
+    return async dispatch => {
+
+        try {
+            await api.deleteMeetingsMultipleRooms(id);
+            dispatch(getMeetings());
+        } catch (e) {
+            console.error('Error in deleteMeetingsMultipleRooms', e);
+        }
+    };
+}
+
+export function deleteMeetingsRecurring(roomId) {
+    return async dispatch => {
+
+        try {
+            await api.deleteMeetingsRecurring(roomId);
+            dispatch(getMeetings());
+        } catch (e) {
+            console.error('Error in deleteMeetingsMultipleRooms', e);
+        }
+    };
+}

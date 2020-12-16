@@ -1,3 +1,4 @@
+/* global process */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-sort-props */
 
@@ -19,11 +20,11 @@ import Footer from './Footer';
 import Join from './Join';
 import Meetings from './Meetings';
 import Profile from './Profile';
+import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Waiting from './Waiting';
-import ResetPassword from './ResetPassword';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -48,6 +49,8 @@ const useStyles = makeStyles(theme => {
     };
 });
 
+const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
+
 const Main = ({ user }) => {
     const classes = useStyles();
 
@@ -64,6 +67,12 @@ const Main = ({ user }) => {
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
             </Route>
+            {negotiationsGroupId
+                && <Route
+                    path = { ROUTES.MEETINGS_HARVARD }
+                    // eslint-disable-next-line react/jsx-no-bind
+                    component = { () => <Meetings groupName = { negotiationsGroupId } /> } />
+            }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
             </Route>
@@ -81,8 +90,8 @@ const Main = ({ user }) => {
                 path = { ROUTES.SIGNUP } >
                 <SignUp />
             </Route>
-            <Route path={ ROUTES.RESETPASSWORD } >
-                <ResetPassword/>
+            <Route path = { ROUTES.RESETPASSWORD } >
+                <ResetPassword />
             </Route>
             <Redirect to = { ROUTES.SIGNIN } />
         </Switch>

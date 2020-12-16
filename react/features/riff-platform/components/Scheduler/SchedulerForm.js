@@ -75,6 +75,9 @@ const getNumberArr = (length) => Array.from(Array(length).keys(), n => n + 1);
 
 const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const minutesArray = [ 0, 15, 30, 45 ];
+
+// eslint-disable-next-line max-len
+const multipleMeetingArray = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ];
 const recurrenceIntervalArray = getNumberArr(20);
 const recurrenceTypeArray = ['daily', 'weekly', 'monthly'];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -255,6 +258,9 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
 
+    const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
+    const [ multipleRooms, setmultipleRooms ] = useState(1);
+
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
 
@@ -302,7 +308,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             allowAnonymous,
             waitForHost,
             recurrenceValues,
-            forbidNewParticipantsAfterDateEnd
+            forbidNewParticipantsAfterDateEnd,
+            multipleRooms: multipleRooms > 1 ? multipleRooms : null
         });
     };
 
@@ -863,7 +870,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             <Grid
                 container
                 spacing = { 1 }>
-                <Grid
+                {/* <Grid
                     item
                     xs = { 12 }>
                     <FormControlLabel
@@ -873,7 +880,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             checked = { allowAnonymous }
                             onChange = { e => setAllowAnonymous(e.target.checked) } />
                         } />
-                </Grid>
+                </Grid> */}
 
                 <Grid
                     item
@@ -897,6 +904,36 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                             checked = { forbidNewParticipantsAfterDateEnd }
                             onChange = { e => setForbidNewParticipantsAfterDateEnd(e.target.checked) } />
                         } />
+                </Grid>
+
+                <Grid
+                    container
+                    spacing = { 2 }>
+                    <Grid
+                        item
+                        xs = { 12 }>
+                        <FormControlLabel
+                            label = 'Multiple rooms in one meeting'
+                            control = { <Switch
+                                name = 'isMultipleRooms'
+                                checked = { isMultipleRooms }
+                                onChange = { e => setisMultipleRooms(e.target.checked) } />
+                            } />
+                    </Grid>
+                    {isMultipleRooms
+                        && <Grid item>
+                            <TextField
+                                id = 'multipleRooms'
+                                select
+                                label = 'Quantity'
+                                value = { multipleRooms }
+                                onChange = { e => setmultipleRooms(e.target.value) }>
+                                {multipleMeetingArray.map(el => (<MenuItem
+                                    key = { el }
+                                    value = { el }>{ el }</MenuItem>))}
+                            </TextField>
+                        </Grid>
+                    }
                 </Grid>
             </Grid>
 

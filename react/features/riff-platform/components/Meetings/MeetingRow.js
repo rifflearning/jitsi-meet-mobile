@@ -1,14 +1,16 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Button, makeStyles, MenuItem, TextField, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { deleteMeeting } from '../../actions/meetings';
+import { deleteMeeting, deleteMeetingsMultipleRooms, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
+
+import { ConfirmationDialogRaw } from './Dialog';
 
 const useStyles = makeStyles(() => {
     return {
@@ -26,20 +28,75 @@ const useStyles = makeStyles(() => {
     };
 });
 
-const MeetingsRow = ({ meeting = {}, removeMeeting }) => {
+
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: 300
+        }
+    }
+};
+
+const MeetingsRow = ({
+    meeting = {},
+    removeMeeting,
+    removeMeetingsMultipleRooms,
+    removeMeetingsRecurring,
+    groupName }) => {
     const classes = useStyles();
     const history = useHistory();
 
     const [ isLinkCopied, setLinkCopied ] = useState(false);
+    const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
+    const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
 
-    const handleLinkCopy = useCallback(() => {
-        navigator.clipboard.writeText(`${window.location.origin}/${meeting._id}`);
+    const handleLinkCopy = () => {
+        let id = meeting._id;
+
+        if (meeting.multipleRooms) {
+            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+
+            if (_id) {
+                id = _id;
+            }
+        }
+
+        navigator.clipboard.writeText(`${window.location.origin}/${id}`);
         setLinkCopied(true);
-    }, []);
-    const handleStartClick = useCallback(() => history.push(`${ROUTES.WAITING}/${meeting._id}`), [ history ]);
-    const handleDeleteClick = useCallback(() => removeMeeting(meeting._id), []);
+        setTimeout(() => setLinkCopied(false), 1000);
+    };
+    const handleStartClick = () => {
+        let id = meeting._id;
+
+        if (meeting.multipleRooms) {
+            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+
+            if (_id) {
+                id = _id;
+            }
+        }
+
+        return history.push(`${ROUTES.WAITING}/${id}`);
+    };
+
+    const onDialogClose = value => {
+        if (value === 'Delete all recurring meetings') {
+            return removeMeetingsRecurring(meeting.roomId);
+        } else if (value === 'Delete groupped meetings') {
+            return removeMeetingsMultipleRooms(meeting._id);
+        } else if (value === 'Delete one meeting') {
+            return removeMeeting(meeting._id);
+        }
+        setisOpenDeleteDialog(false);
+    };
+
+    const handleDeleteClick = () => setisOpenDeleteDialog(true);
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
+
+    const dialogValues = [
+        multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
+        meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
     return (
         <TableRow
@@ -53,26 +110,51 @@ const MeetingsRow = ({ meeting = {}, removeMeeting }) => {
                 </Typography>
             </TableCell>
             <TableCell>
-                <Typography
-                    component = 'p'
-                    variant = 'h6' >
-                    {meeting.name}
-                </Typography>
+
+                {meeting.multipleRooms
+                    ? <TextField
+                        id = 'room-names'
+                        select = { true }
+                        // eslint-disable-next-line react/jsx-sort-props
+                        SelectProps = {{ MenuProps }}
+                        value = { multipleRoom }
+                        // eslint-disable-next-line react/jsx-no-bind, react/jsx-sort-props
+                        onChange = { e => setmultipleRooms(e.target.value) }>
+                        {meeting.multipleRooms.map(m => (<MenuItem
+                            key = { m._id }
+                            value = { m.name }>{m.name}</MenuItem>))}
+                    </TextField>
+                    : <Typography
+                        component = 'p'
+                        variant = 'h6' >{meeting.name}</Typography>
+                }
+
             </TableCell>
             <TableCell align = 'right'>
                 <Button
                     className = { classes.meetingButton }
                     color = 'primary'
+                    // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleStartClick }
                     variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
                     color = { isLinkCopied ? 'default' : 'primary' }
+                    // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleLinkCopy }
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
-                <Button
-                    className = { classes.meetingButton }
-                    onClick = { handleDeleteClick }>Delete</Button>
+                {!groupName
+                    && <Button
+                        className = { classes.meetingButton }
+                        // eslint-disable-next-line react/jsx-no-bind
+                        onClick = { handleDeleteClick }>
+                        Delete
+                    </Button>
+                }
+                <ConfirmationDialogRaw
+                    onClose = { onDialogClose }
+                    open = { isOpenDeleteDialog }
+                    value = { dialogValues } />
             </TableCell>
         </TableRow>
     );
@@ -80,8 +162,12 @@ const MeetingsRow = ({ meeting = {}, removeMeeting }) => {
 
 
 MeetingsRow.propTypes = {
+    // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
+    groupName: PropTypes.string,
     meeting: PropTypes.object,
-    removeMeeting: PropTypes.func
+    removeMeeting: PropTypes.func,
+    removeMeetingsMultipleRooms: PropTypes.func,
+    removeMeetingsRecurring: PropTypes.func
 };
 
 const mapStateToProps = () => {
@@ -90,7 +176,9 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        removeMeeting: id => dispatch(deleteMeeting(id))
+        removeMeeting: id => dispatch(deleteMeeting(id)),
+        removeMeetingsMultipleRooms: id => dispatch(deleteMeetingsMultipleRooms(id)),
+        removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
 };
 
