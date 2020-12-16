@@ -1,3 +1,4 @@
+/* global process */
 /* eslint-disable react/jsx-sort-props */
 /* eslint-disable react/jsx-no-bind */
 
@@ -15,6 +16,8 @@ import GroupsList from './GroupsList';
 import MainListItems from './ListItems';
 
 export const drawerWidth = 240;
+
+const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
 
 const useStyles = makeStyles(theme => {
     return {
@@ -71,7 +74,9 @@ const Sidebar = ({ handleSidebarClose, isOpen }) => {
             <Divider />
             <List><MainListItems /></List>
             <Divider />
-            <List><GroupsList /></List>
+            {negotiationsGroupId
+                && <List><GroupsList /></List>
+            }
         </Drawer>
     );
 };

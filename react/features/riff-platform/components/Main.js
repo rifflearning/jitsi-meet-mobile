@@ -1,3 +1,4 @@
+/* global process */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-sort-props */
 
@@ -48,6 +49,8 @@ const useStyles = makeStyles(theme => {
     };
 });
 
+const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
+
 const Main = ({ user }) => {
     const classes = useStyles();
 
@@ -64,10 +67,12 @@ const Main = ({ user }) => {
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
             </Route>
-            <Route
-                path = { ROUTES.MEETINGS_HARVARD }
-                // eslint-disable-next-line react/jsx-no-bind
-                component = { () => <Meetings groupName = '5fbc1698db819207288110d2' /> } />
+            {negotiationsGroupId
+                && <Route
+                    path = { ROUTES.MEETINGS_HARVARD }
+                    // eslint-disable-next-line react/jsx-no-bind
+                    component = { () => <Meetings groupName = { negotiationsGroupId } /> } />
+            }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
             </Route>
