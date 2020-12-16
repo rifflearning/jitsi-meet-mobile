@@ -198,21 +198,30 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
     return acc;
 }, []);
 
-const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
-    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
+const getRecurringDatesWithTime = ({ dates, startDate, endDate }) => {
+    let recurrence = dates.map(date => ({
+        startDate: new Date(date).toISOString(),
+        endDate:  new Date(date).toISOString()
+      }));
 
-    return dates.map(date => {
-        const newDateStart = new Date(date)
+    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
+    const [hEnd, mEnd] = endDate.toTimeString().split(' ')[0].split(":");
+
+    return recurrence.map(item => {
+        console.log('item', item)
+        const newDateStart = new Date(item.startDate)
         newDateStart.setHours(hStart, mStart);
 
-        const newDateEnd = new Date(newDateStart);
+        const newDateEnd = new Date(item.endDate)
+        newDateEnd.setHours(hEnd, mEnd);
 
-        newDateEnd.setHours(newDateEnd.getHours() + duration.hours);
-        newDateEnd.setMinutes(newDateEnd.getMinutes() + duration.minutes);
+        if (startDate.getDate() < endDate.getDate()) {
+            newDateEnd.setDate(newDateEnd.getDate() + 1);
+        }
 
         return {
             startDate: newDateStart.toISOString(),
-            endDate: newDateEnd.toISOString()
+            endDate: newDateEnd.toISOString(),
         };
     });
 };
@@ -223,7 +232,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
 
     const [ name, setname ] = useState('');
     const [ description, setdescription ] = useState('');
-    const [ date, setdate ] = useState(new Date());
+    const [ date, setdate ] = useState(moment());
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
@@ -289,7 +298,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes } })
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: new Date(date), endDate: dateEnd })
             :
             null;
 
@@ -297,7 +306,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             createdBy: userId,
             name,
             description,
-            dateStart: date.getTime(),
+            dateStart: new Date(date).getTime(),
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
             waitForHost,
@@ -319,8 +328,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
         if(endDateBy === 'endDateTime') {
             const recurrence = calculateRecurringByEndDate({
-                startDate: date,
-                endDate,
+                startDate: moment.utc(date),
+                endDate: moment.utc(endDate),
                 daysInterval: recurrenceInterval,
                 occurrences: defaultOccurrences,
                 recurrenceType,
@@ -346,7 +355,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
         if(endDateBy === 'endDateTime') {
         const recurrence = calculateRecurringByEndDate({
-            startDate: date,
+            startDate: moment.utc(date),
             endDate: null,
             daysInterval: recurrenceInterval,
             occurrences: defaultOccurrences,
@@ -370,7 +379,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
      if(endDateBy !== 'endDateTime') {
         const recurrence = calculateRecurringByOccurrence({
-            startDate: date,
+            startDate: moment.utc(date),
             daysInterval: recurrenceInterval,
             occurrences: endTimes,
             recurrenceType,
@@ -493,7 +502,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     xs = { 12 }
                     sm = { 8 }
                     md = { 10 }>
-                    <MuiPickersUtilsProvider utils = { DateFnsUtils }>
+                    <MuiPickersUtilsProvider utils = { MomentUtils }>
                         <Grid
                             container
                             spacing = { 2 }>
@@ -502,7 +511,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     autoOk
                                     disableToolbar
                                     variant = 'inline'
-                                    format = 'MM/dd/yyyy'
+                                    format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
                                     disablePast={true}
