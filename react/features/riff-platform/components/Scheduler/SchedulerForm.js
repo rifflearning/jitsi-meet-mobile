@@ -198,26 +198,13 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
     return acc;
 }, []);
 
-const getRecurringDatesWithTime = ({ dates, startDate, endDate }) => {
-    let recurrence = dates.map(date => ({
-        startDate: new Date(date).toISOString(),
-        endDate:  new Date(date).toISOString()
-      }));
+const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
+    const hStart = moment(startDate).hours();
+    const mStart = moment(startDate).minutes();
 
-    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
-    const [hEnd, mEnd] = endDate.toTimeString().split(' ')[0].split(":");
-
-    return recurrence.map(item => {
-        console.log('item', item)
-        const newDateStart = new Date(item.startDate)
-        newDateStart.setHours(hStart, mStart);
-
-        const newDateEnd = new Date(item.endDate)
-        newDateEnd.setHours(hEnd, mEnd);
-
-        if (startDate.getDate() < endDate.getDate()) {
-            newDateEnd.setDate(newDateEnd.getDate() + 1);
-        }
+    return dates.map(date => {
+        const newDateStart = moment(date).local().set('hour', hStart).set('minute', mStart);
+        const newDateEnd = newDateStart.clone().add('hours', duration.hours).add('minutes', duration.minutes);
 
         return {
             startDate: newDateStart.toISOString(),
@@ -298,7 +285,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: new Date(date), endDate: dateEnd })
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: new Date(date), duration: { hours, minutes } })
             :
             null;
 
