@@ -72,6 +72,10 @@ export function groupMeetingsByDays(meetings) {
         return true;
     });
 
+    // sort groups
+    // eslint-disable-next-line no-confusing-arrow, max-len
+    Object.keys(groups).forEach(el => groups[el].sort((a, b) => Number(a.name.split('#')[1]) > Number(b.name.split('#')[1]) ? 1 : -1));
+
     // put all groups to meetings
     const newMeetingsWithGroups = newMeetings.map(m => {
         return { ...m,

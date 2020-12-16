@@ -10,6 +10,8 @@ import { deleteMeeting, deleteMeetingsMultipleRooms, deleteMeetingsRecurring } f
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
 
+import { ConfirmationDialogRaw } from './Dialog';
+
 const useStyles = makeStyles(() => {
     return {
         meetingButton: {
@@ -46,6 +48,7 @@ const MeetingsRow = ({
 
     const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
+    const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
 
     const handleLinkCopy = () => {
         let id = meeting._id;
@@ -75,23 +78,25 @@ const MeetingsRow = ({
 
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
-    // eslint-disable-next-line no-confusing-arrow
-    // const handleDeleteClick = useCallback(() => meeting.recurringParentMeetingId
-    //     ? alert(meeting.roomId)
-    //     : removeMeeting(meeting._id), [meeting]);
 
-    const handleDeleteClick = () => {
-        if (meeting.recurringParentMeetingId) {
+    const onDialogClose = value => {
+        if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        }
-        if (meeting.multipleRooms) {
+        } else if (value === 'Delete groupped meetings') {
             return removeMeetingsMultipleRooms(meeting._id);
+        } else if (value === 'Delete one meeting') {
+            return removeMeeting(meeting._id);
         }
-
-        return removeMeeting(meeting._id);
+        setisOpenDeleteDialog(false);
     };
 
+    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
+
+    const dialogValues = [
+        multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
+        meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
     return (
         <TableRow
@@ -146,6 +151,10 @@ const MeetingsRow = ({
                         Delete
                     </Button>
                 }
+                <ConfirmationDialogRaw
+                    onClose = { onDialogClose }
+                    open = { isOpenDeleteDialog }
+                    value = { dialogValues } />
             </TableCell>
         </TableRow>
     );
