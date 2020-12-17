@@ -202,20 +202,16 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
 }, []);
 
 const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
-    const [hStart, mStart] = startDate.toTimeString().split(' ')[0].split(":");
+    const hStart = moment.utc(startDate).hours();
+    const mStart = moment.utc(startDate).minutes();
 
     return dates.map(date => {
-        const newDateStart = new Date(date)
-        newDateStart.setHours(hStart, mStart);
-
-        const newDateEnd = new Date(newDateStart);
-
-        newDateEnd.setHours(newDateEnd.getHours() + duration.hours);
-        newDateEnd.setMinutes(newDateEnd.getMinutes() + duration.minutes);
+        const newDateStart = moment(date).set('hour', hStart).set('minute', mStart);
+        const newDateEnd = newDateStart.clone().add('hours', duration.hours).add('minutes', duration.minutes);
 
         return {
             startDate: newDateStart.toISOString(),
-            endDate: newDateEnd.toISOString()
+            endDate: newDateEnd.toISOString(),
         };
     });
 };
@@ -226,7 +222,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
 
     const [ name, setname ] = useState('');
     const [ description, setdescription ] = useState('');
-    const [ date, setdate ] = useState(new Date());
+    const [ date, setdate ] = useState(moment());
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
     const [ allowAnonymous, setAllowAnonymous ] = useState(false);
@@ -303,7 +299,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             createdBy: userId,
             name,
             description,
-            dateStart: date.getTime(),
+            dateStart: new Date(date).getTime(),
             dateEnd: dateEnd.getTime(),
             allowAnonymous,
             waitForHost,
@@ -326,8 +322,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
         if(endDateBy === 'endDateTime') {
             const recurrence = calculateRecurringByEndDate({
-                startDate: date,
-                endDate,
+                startDate: moment.utc(date),
+                endDate: moment.utc(endDate),
                 daysInterval: recurrenceInterval,
                 occurrences: defaultOccurrences,
                 recurrenceType,
@@ -353,7 +349,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
         if(endDateBy === 'endDateTime') {
         const recurrence = calculateRecurringByEndDate({
-            startDate: date,
+            startDate: moment.utc(date),
             endDate: null,
             daysInterval: recurrenceInterval,
             occurrences: defaultOccurrences,
@@ -377,7 +373,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     useEffect(() => {
      if(endDateBy !== 'endDateTime') {
         const recurrence = calculateRecurringByOccurrence({
-            startDate: date,
+            startDate: moment.utc(date),
             daysInterval: recurrenceInterval,
             occurrences: endTimes,
             recurrenceType,
@@ -500,7 +496,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                     xs = { 12 }
                     sm = { 8 }
                     md = { 10 }>
-                    <MuiPickersUtilsProvider utils = { DateFnsUtils }>
+                    <MuiPickersUtilsProvider utils = { MomentUtils }>
                         <Grid
                             container
                             spacing = { 2 }>
@@ -509,7 +505,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
                                     autoOk
                                     disableToolbar
                                     variant = 'inline'
-                                    format = 'MM/dd/yyyy'
+                                    format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
                                     disablePast={true}
