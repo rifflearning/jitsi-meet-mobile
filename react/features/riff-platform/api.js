@@ -47,7 +47,7 @@ class ApiService {
 
     // meetings
     fetchMeeting = name => this.fetchWithJwt(`/meetings/${name}`);
-    fetchMeetings = () => this.fetchWithJwt('/meetings');
+    fetchMeetings = listType => this.fetchWithJwt(`/meetings?listType=${listType}`);
     fetchMeetingsByGroup = groupName => this.fetchWithJwt(`/fetchMeetingsByGroup/${groupName}`);
     scheduleMeeting = meeting => this.postWithJwt('/meetings', { meeting });
     deleteMeeting = id => this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });

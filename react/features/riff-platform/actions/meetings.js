@@ -23,12 +23,12 @@ function meetingsFailure(error) {
     };
 }
 
-export function getMeetings() {
+export function getMeetings(listType) {
     return async dispatch => {
         dispatch(meetingsRequest());
 
         try {
-            const res = await api.fetchMeetings();
+            const res = await api.fetchMeetings(listType);
 
             dispatch(meetingsSuccess(res));
         } catch (e) {
