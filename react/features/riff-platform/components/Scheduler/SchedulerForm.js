@@ -199,11 +199,11 @@ const getDaysOfWeekArr = (daysOfWeek) =>  Object.keys(daysOfWeek).reduce((acc, v
 }, []);
 
 const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
-    const hStart = moment(startDate).hours();
-    const mStart = moment(startDate).minutes();
+    const hStart = moment.utc(startDate).hours();
+    const mStart = moment.utc(startDate).minutes();
 
     return dates.map(date => {
-        const newDateStart = moment(date).local().set('hour', hStart).set('minute', mStart);
+        const newDateStart = moment(date).set('hour', hStart).set('minute', mStart);
         const newDateEnd = newDateStart.clone().add('hours', duration.hours).add('minutes', duration.minutes);
 
         return {
@@ -285,7 +285,7 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
         dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
 
         const recurrenceValues = recurringMeeting ?
-            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: new Date(date), duration: { hours, minutes } })
+            getRecurringDatesWithTime({ dates: recurrenceDate, startDate: date, duration: { hours, minutes } })
             :
             null;
 
