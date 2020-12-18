@@ -38,12 +38,12 @@ export function getMeetings(listType) {
     };
 }
 
-export function getMeetingsByGroup(groupName) {
+export function getMeetingsByGroup(groupName, listType) {
     return async dispatch => {
         dispatch(meetingsRequest());
 
         try {
-            const res = await api.fetchMeetingsByGroup(groupName);
+            const res = await api.fetchMeetingsByGroup(groupName, listType);
 
             dispatch(meetingsSuccess(res));
         } catch (e) {

@@ -14,6 +14,33 @@ import StyledPaper from '../StyledPaper';
 import MeetingsTable from './MeetingsTable';
 import MeetingTabPanel from './MeetingTabPanel';
 
+// eslint-disable-next-line react-native/no-inline-styles
+const Loader = () => (<div style = {{ marginTop: '100px' }}>
+    <Grid
+        container = { true }
+        item = { true }
+        justify = 'center'
+        xs = { 12 }><CircularProgress /></Grid>
+</div>);
+
+const MeetingsList = ({groupedMeetings}) => (
+    <Grid
+        container={true}
+        spacing={3}>
+        {Object.keys(groupedMeetings).map(date =>
+        (<Grid
+            item={true}
+            key={date}
+            xs={12}>
+            <StyledPaper title={date}>
+                <MeetingsTable
+                    meetingsList={groupedMeetings[date]} />
+            </StyledPaper>
+        </Grid>)
+        )}
+    </Grid>
+);
+
 const meetingListTypeMap = {
     0: 'upcoming',
     1: 'previous'
@@ -27,42 +54,11 @@ const Meetings = ({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
 
     useEffect(() => {
         if (groupName) {
-            getMeetingsListByGroup(groupName);
+            getMeetingsListByGroup(groupName, meetingListTypeMap[selectedListTypeIndex]);
         } else {
             getMeetingsLists(meetingListTypeMap[selectedListTypeIndex]);
         }
     }, [selectedListTypeIndex]);
-
-    // eslint-disable-next-line react-native/no-inline-styles
-    const loader = (<div style = {{ marginTop: '100px' }}>
-        <Grid
-            container = { true }
-            item = { true }
-            justify = 'center'
-            xs = { 12 }><CircularProgress /></Grid>
-    </div>);
-
-    if (loading) {
-        return loader;
-    }
-
-    const MeetingsList = () => (
-        <Grid
-            container={true}
-            spacing={3}>
-            {Object.keys(groupedMeetings).map(date =>
-            (<Grid
-                item={true}
-                key={date}
-                xs={12}>
-                <StyledPaper title={date}>
-                    <MeetingsTable
-                        meetingsList={groupedMeetings[date]} />
-                </StyledPaper>
-            </Grid>)
-            )}
-        </Grid>
-    )
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
@@ -89,18 +85,20 @@ const Meetings = ({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                         Schedule meeting
                     </Button>
                 </Grid>
-                <Grid
-                    container={true}
-                    item={true}
-                    justify='space-between'
-                    xs={12}>
-                <MeetingTabPanel value={selectedListTypeIndex} index={0}>
-                    <MeetingsList />
-                </MeetingTabPanel>
-                <MeetingTabPanel value={selectedListTypeIndex} index={1}>
-                    <MeetingsList />
-                </MeetingTabPanel>
-                </Grid>
+                {loading ?
+                    <Loader /> :
+                    <Grid
+                        container={true}
+                        item={true}
+                        xs={12}>
+                        <MeetingTabPanel value={selectedListTypeIndex} index={0}>
+                            <MeetingsList groupedMeetings={groupedMeetings}/>
+                        </MeetingTabPanel>
+                        <MeetingTabPanel value={selectedListTypeIndex} index={1}>
+                            <MeetingsList groupedMeetings={groupedMeetings}/>
+                        </MeetingTabPanel>
+                    </Grid>
+                }
             </Grid>
         </Grid>
     );
@@ -125,7 +123,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getMeetingsListByGroup: groupName => dispatch(getMeetingsByGroup(groupName)),
+        getMeetingsListByGroup: (groupName, listType) => dispatch(getMeetingsByGroup(groupName, listType)),
         getMeetingsLists: (listType) => dispatch(getMeetings(listType))
     };
 };
