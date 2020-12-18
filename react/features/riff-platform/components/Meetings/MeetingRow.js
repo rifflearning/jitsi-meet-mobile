@@ -16,7 +16,10 @@ const useStyles = makeStyles(() => {
     return {
         meetingButton: {
             marginLeft: '10px',
-            visibility: 'hidden'
+            visibility: 'hidden',
+            '@media (max-width: 768px)': {
+                marginTop: '5px'
+            }
         },
         tableRow: {
             '&:hover': {

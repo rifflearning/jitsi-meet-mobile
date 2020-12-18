@@ -51,7 +51,7 @@ const MeetingsList = ({ groupedMeetings = [] }) => (
 );
 
 MeetingsList.propTypes = {
-    groupedMeetings: PropTypes.array
+    groupedMeetings: PropTypes.object
 };
 
 function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup, groupName, loading }) {
@@ -81,19 +81,26 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                     container = { true }
                     item = { true }
                     justify = 'space-between'
+                    spacing = { 1 }
                     xs = { 12 }>
-                    <Tabs
-                        onChange = { (_event, type) => setSelectedListTypeIndex(type) }
-                        value = { selectedListTypeIndex }>
-                        <Tab label = 'Upcoming' />
-                        <Tab label = 'Previous' />
-                    </Tabs>
-                    <Button
-                        color = 'primary'
-                        onClick = { handleScheduleClick }
-                        variant = 'outlined'>
+                    <Grid
+                        item = { true }>
+                        <Tabs
+                            onChange = { (_event, type) => setSelectedListTypeIndex(type) }
+                            value = { selectedListTypeIndex }>
+                            <Tab label = 'Upcoming' />
+                            <Tab label = 'Previous' />
+                        </Tabs>
+                    </Grid>
+                    <Grid
+                        item = { true }>
+                        <Button
+                            color = 'primary'
+                            onClick = { handleScheduleClick }
+                            variant = 'outlined'>
                         Schedule meeting
-                    </Button>
+                        </Button>
+                    </Grid>
                 </Grid>
                 {loading
                     ? <Loader />
