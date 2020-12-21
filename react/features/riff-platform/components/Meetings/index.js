@@ -36,7 +36,6 @@ const Loader = () => (<div style = {{ marginTop: '100px' }}>
         xs = { 12 }><CircularProgress /></Grid>
 </div>);
 
-
 const MeetingsList = ({ groupedMeetings = [] }) => (
     <Grid
         container = { true }
@@ -81,6 +80,8 @@ function Meetings({
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
+    const noMeetingDataText = `There are no ${meetingsListType} meetings. To schedule a new meeting click SCHEDULE A MEETING`;
+
     return (
         <Grid
             container = { true }
@@ -110,7 +111,7 @@ function Meetings({
                             color = 'primary'
                             onClick = { handleScheduleClick }
                             variant = 'outlined'>
-                        Schedule meeting
+                        Schedule a meeting
                         </Button>
                     </Grid>
                 </Grid>
@@ -119,16 +120,17 @@ function Meetings({
                     : <Grid
                         container = { true }
                         item = { true }
+                        justify = 'center'
                         xs = { 12 }>
                         <MeetingTabPanel
                             index = { 0 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
                         </MeetingTabPanel>
                         <MeetingTabPanel
                             index = { 1 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
                         </MeetingTabPanel>
                     </Grid>}
             </Grid>
