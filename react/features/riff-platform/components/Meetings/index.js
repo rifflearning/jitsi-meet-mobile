@@ -32,7 +32,6 @@ const Loader = () => (<div style = {{ marginTop: '100px' }}>
         xs = { 12 }><CircularProgress /></Grid>
 </div>);
 
-
 const MeetingsList = ({ groupedMeetings = [] }) => (
     <Grid
         container = { true }
@@ -69,6 +68,8 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
     }, [ selectedListTypeIndex ]);
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
+
+    const noMeetingDataText = `The user doesn't have any ${meetingListTypeMap[selectedListTypeIndex]} meetings. To schedule a new meeting click SCHEDULE A MEETING`;
 
     return (
         <Grid
@@ -110,16 +111,17 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                     : <Grid
                         container = { true }
                         item = { true }
+                        justify = 'center'
                         xs = { 12 }>
                         <MeetingTabPanel
                             index = { 0 }
                             value = { selectedListTypeIndex }>
-                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
                         </MeetingTabPanel>
                         <MeetingTabPanel
                             index = { 1 }
                             value = { selectedListTypeIndex }>
-                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
                         </MeetingTabPanel>
                     </Grid>}
             </Grid>
