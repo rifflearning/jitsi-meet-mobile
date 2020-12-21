@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-bind */
+
 import { Button, makeStyles, MenuItem, TextField, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -52,6 +54,7 @@ const MeetingsRow = ({
     const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
+    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     const handleLinkCopy = () => {
         let id = meeting._id;
@@ -82,7 +85,12 @@ const MeetingsRow = ({
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
 
-    const onDialogClose = value => {
+
+    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+
+    const handleEditClick = () => setIsOpenEditDialog(true);
+
+    const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
         } else if (value === 'Delete groupped meetings') {
@@ -92,14 +100,20 @@ const MeetingsRow = ({
         }
         setisOpenDeleteDialog(false);
     };
-
-    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+    
+    const onEditDialogClose = value => {
+        setIsOpenEditDialog(false);
+    };
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
-    const dialogValues = [
+    const dialogDeleteValues = [
         multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
+
+    const dialogEditValues = [
+        multipleRoom ? 'Edit groupped meetings' : 'Edit one meeting',
+        meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
     return (
         <TableRow
@@ -142,6 +156,12 @@ const MeetingsRow = ({
                     variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
+                    color = 'primary'
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onClick = { handleEditClick }
+                    variant = 'contained'>Edit</Button>
+                <Button
+                    className = { classes.meetingButton }
                     color = { isLinkCopied ? 'default' : 'primary' }
                     // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleLinkCopy }
@@ -155,9 +175,15 @@ const MeetingsRow = ({
                     </Button>
                 }
                 <ConfirmationDialogRaw
-                    onClose = { onDialogClose }
+                    onClose = { onDeleteDialogClose }
                     open = { isOpenDeleteDialog }
-                    value = { dialogValues } />
+                    title = 'Delete meeting?'
+                    value = { dialogDeleteValues } />
+                <ConfirmationDialogRaw
+                    onClose = { onEditDialogClose }
+                    open = { isOpenEditDialog }
+                    title = 'Edit meeting'
+                    value = { dialogEditValues } />
             </TableCell>
         </TableRow>
     );
