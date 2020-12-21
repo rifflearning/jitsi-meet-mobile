@@ -1,6 +1,12 @@
+/* eslint-disable require-jsdoc */
+/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/jsx-no-bind */
+
 import { Button, CircularProgress, Grid } from '@material-ui/core';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { connect } from '../../../base/redux';
@@ -9,32 +15,58 @@ import * as ROUTES from '../../constants/routes';
 import { groupMeetingsByDays } from '../../functions';
 import StyledPaper from '../StyledPaper';
 
+import MeetingTabPanel from './MeetingTabPanel';
 import MeetingsTable from './MeetingsTable';
 
-const Meetings = ({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup, groupName, loading }) => {
+const meetingListTypeMap = {
+    0: 'upcoming',
+    1: 'previous'
+};
+
+// eslint-disable-next-line react-native/no-inline-styles
+const Loader = () => (<div style = {{ marginTop: '100px' }}>
+    <Grid
+        container = { true }
+        item = { true }
+        justify = 'center'
+        xs = { 12 }><CircularProgress /></Grid>
+</div>);
+
+
+const MeetingsList = ({ groupedMeetings = [] }) => (
+    <Grid
+        container = { true }
+        spacing = { 3 }>
+        {Object.keys(groupedMeetings).map(date => (<Grid
+            item = { true }
+            key = { date }
+            xs = { 12 }>
+            <StyledPaper title = { date }>
+                <MeetingsTable
+                    meetingsList = { groupedMeetings[date] } />
+            </StyledPaper>
+        </Grid>)
+        )}
+    </Grid>
+);
+
+MeetingsList.propTypes = {
+    groupedMeetings: PropTypes.object
+};
+
+function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup, groupName, loading }) {
+    const [ selectedListTypeIndex, setSelectedListTypeIndex ] = useState(0);
+
     const history = useHistory();
     const handleScheduleClick = useCallback(() => history.push(ROUTES.SCHEDULE), [ history ]);
 
     useEffect(() => {
         if (groupName) {
-            getMeetingsListByGroup(groupName);
+            getMeetingsListByGroup(groupName, meetingListTypeMap[selectedListTypeIndex]);
         } else {
-            getMeetingsLists();
+            getMeetingsLists(meetingListTypeMap[selectedListTypeIndex]);
         }
-    }, []);
-
-    // eslint-disable-next-line react-native/no-inline-styles
-    const loader = (<div style = {{ marginTop: '100px' }}>
-        <Grid
-            container = { true }
-            item = { true }
-            justify = 'center'
-            xs = { 12 }><CircularProgress /></Grid>
-    </div>);
-
-    if (loading) {
-        return loader;
-    }
+    }, [ selectedListTypeIndex ]);
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
@@ -43,32 +75,54 @@ const Meetings = ({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
             container = { true }
             spacing = { 3 }>
             <Grid
-                container = { true }
                 item = { true }
-                justify = 'flex-end'
                 xs = { 12 }>
-                <Button
-                    color = 'primary'
-                    onClick = { handleScheduleClick }
-                    variant = 'outlined'>
-                    Schedule meeting
-                </Button>
-            </Grid>
-            {Object.keys(groupedMeetings).map(date =>
-                (<Grid
+                <Grid
+                    container = { true }
                     item = { true }
-                    key = { date }
+                    justify = 'space-between'
+                    spacing = { 1 }
                     xs = { 12 }>
-                    <StyledPaper title = { date }>
-                        <MeetingsTable
-                            groupName = { groupName }
-                            meetingsList = { groupedMeetings[date] } />
-                    </StyledPaper>
-                </Grid>)
-            )}
+                    <Grid
+                        item = { true }>
+                        <Tabs
+                            onChange = { (_event, type) => setSelectedListTypeIndex(type) }
+                            value = { selectedListTypeIndex }>
+                            <Tab label = 'Upcoming' />
+                            <Tab label = 'Previous' />
+                        </Tabs>
+                    </Grid>
+                    <Grid
+                        item = { true }>
+                        <Button
+                            color = 'primary'
+                            onClick = { handleScheduleClick }
+                            variant = 'outlined'>
+                        Schedule meeting
+                        </Button>
+                    </Grid>
+                </Grid>
+                {loading
+                    ? <Loader />
+                    : <Grid
+                        container = { true }
+                        item = { true }
+                        xs = { 12 }>
+                        <MeetingTabPanel
+                            index = { 0 }
+                            value = { selectedListTypeIndex }>
+                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                        </MeetingTabPanel>
+                        <MeetingTabPanel
+                            index = { 1 }
+                            value = { selectedListTypeIndex }>
+                            <MeetingsList groupedMeetings = { groupedMeetings } />
+                        </MeetingTabPanel>
+                    </Grid>}
+            </Grid>
         </Grid>
     );
-};
+}
 
 Meetings.propTypes = {
     getMeetingsListByGroup: PropTypes.func,
@@ -89,8 +143,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getMeetingsLists: () => dispatch(getMeetings()),
-        getMeetingsListByGroup: groupName => dispatch(getMeetingsByGroup(groupName))
+        getMeetingsListByGroup: (groupName, listType) => dispatch(getMeetingsByGroup(groupName, listType)),
+        getMeetingsLists: listType => dispatch(getMeetings(listType))
     };
 };
 

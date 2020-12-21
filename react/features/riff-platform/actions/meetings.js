@@ -23,12 +23,12 @@ function meetingsFailure(error) {
     };
 }
 
-export function getMeetings() {
+export function getMeetings(listType) {
     return async dispatch => {
         dispatch(meetingsRequest());
 
         try {
-            const res = await api.fetchMeetings();
+            const res = await api.fetchMeetings(listType);
 
             dispatch(meetingsSuccess(res));
         } catch (e) {
@@ -38,12 +38,12 @@ export function getMeetings() {
     };
 }
 
-export function getMeetingsByGroup(groupName) {
+export function getMeetingsByGroup(groupName, listType) {
     return async dispatch => {
         dispatch(meetingsRequest());
 
         try {
-            const res = await api.fetchMeetingsByGroup(groupName);
+            const res = await api.fetchMeetingsByGroup(groupName, listType);
 
             dispatch(meetingsSuccess(res));
         } catch (e) {
