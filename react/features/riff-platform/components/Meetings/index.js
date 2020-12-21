@@ -2,7 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/jsx-no-bind */
 
-import { Button, CircularProgress, Grid } from '@material-ui/core';
+import { Button, CircularProgress, Grid, Box } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import PropTypes from 'prop-types';
@@ -78,22 +78,25 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                 item = { true }
                 xs = { 12 }>
                 <Grid
+                    alignItems = 'center'
                     container = { true }
                     item = { true }
                     justify = 'space-between'
-                    spacing = { 1 }
                     xs = { 12 }>
                     <Grid
                         item = { true }>
-                        <Tabs
-                            onChange = { (_event, type) => setSelectedListTypeIndex(type) }
-                            value = { selectedListTypeIndex }>
-                            <Tab label = 'Upcoming' />
-                            <Tab label = 'Previous' />
-                        </Tabs>
+                        <Box pb = { 1 }>
+                            <Tabs
+                                onChange = { (_event, type) => setSelectedListTypeIndex(type) }
+                                value = { selectedListTypeIndex }>
+                                <Tab label = 'Upcoming' />
+                                <Tab label = 'Previous' />
+                            </Tabs>
+                        </Box>
                     </Grid>
                     <Grid
-                        item = { true }>
+                        item = { true }
+                        pt = { 2 }>
                         <Button
                             color = 'primary'
                             onClick = { handleScheduleClick }

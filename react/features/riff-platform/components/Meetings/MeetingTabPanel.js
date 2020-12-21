@@ -11,7 +11,7 @@ function MeetingTabPanel({ children, value, index }) {
             hidden = { value !== index }
             id = { `meeting-tabpanel-${index}` }>
             {value === index && (
-                <Box p = { 3 }>
+                <Box pt = { 2 }>
                     {children}
                 </Box>
             )}
