@@ -94,9 +94,7 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                             </Tabs>
                         </Box>
                     </Grid>
-                    <Grid
-                        item = { true }
-                        pt = { 2 }>
+                    <Grid item = { true }>
                         <Button
                             color = 'primary'
                             onClick = { handleScheduleClick }
