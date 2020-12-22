@@ -88,3 +88,10 @@ export function deleteMeetingsRecurring(roomId) {
         }
     };
 }
+
+export function setMeetingsListType(listType) {
+    return {
+        type: actionTypes.SET_MEETINGS_LIST_TYPE,
+        listType
+    };
+}

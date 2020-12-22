@@ -6,11 +6,11 @@ import { Button, CircularProgress, Grid, Box } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router';
 
 import { connect } from '../../../base/redux';
-import { getMeetings, getMeetingsByGroup } from '../../actions/meetings';
+import { getMeetings, getMeetingsByGroup, setMeetingsListType } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { groupMeetingsByDays } from '../../functions';
 import StyledPaper from '../StyledPaper';
@@ -19,9 +19,13 @@ import MeetingTabPanel from './MeetingTabPanel';
 import MeetingsTable from './MeetingsTable';
 
 const meetingListTypeMap = {
-    0: 'upcoming',
-    1: 'previous'
+    upcoming: 0,
+    previous: 1
 };
+
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
 
 // eslint-disable-next-line react-native/no-inline-styles
 const Loader = () => (<div style = {{ marginTop: '100px' }}>
@@ -54,19 +58,26 @@ MeetingsList.propTypes = {
     groupedMeetings: PropTypes.object
 };
 
-function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup, groupName, loading }) {
-    const [ selectedListTypeIndex, setSelectedListTypeIndex ] = useState(0);
+function Meetings({
+    meetingsLists = [],
+    getMeetingsLists,
+    getMeetingsListByGroup,
+    groupName,
+    loading,
+    meetingsListType,
+    updateMeetingsListType
+}) {
 
     const history = useHistory();
     const handleScheduleClick = useCallback(() => history.push(ROUTES.SCHEDULE), [ history ]);
 
     useEffect(() => {
         if (groupName) {
-            getMeetingsListByGroup(groupName, meetingListTypeMap[selectedListTypeIndex]);
+            getMeetingsListByGroup(groupName, meetingsListType);
         } else {
-            getMeetingsLists(meetingListTypeMap[selectedListTypeIndex]);
+            getMeetingsLists(meetingsListType);
         }
-    }, [ selectedListTypeIndex ]);
+    }, [ meetingsListType ]);
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
@@ -87,8 +98,8 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                         item = { true }>
                         <Box pb = { 1 }>
                             <Tabs
-                                onChange = { (_event, type) => setSelectedListTypeIndex(type) }
-                                value = { selectedListTypeIndex }>
+                                onChange = { (_event, type) => updateMeetingsListType(getKeyByValue(meetingListTypeMap, type)) }
+                                value = { meetingListTypeMap[meetingsListType] }>
                                 <Tab label = 'Upcoming' />
                                 <Tab label = 'Previous' />
                             </Tabs>
@@ -111,12 +122,12 @@ function Meetings({ meetingsLists = [], getMeetingsLists, getMeetingsListByGroup
                         xs = { 12 }>
                         <MeetingTabPanel
                             index = { 0 }
-                            value = { selectedListTypeIndex }>
+                            value = { meetingListTypeMap[meetingsListType] }>
                             <MeetingsList groupedMeetings = { groupedMeetings } />
                         </MeetingTabPanel>
                         <MeetingTabPanel
                             index = { 1 }
-                            value = { selectedListTypeIndex }>
+                            value = { meetingListTypeMap[meetingsListType] }>
                             <MeetingsList groupedMeetings = { groupedMeetings } />
                         </MeetingTabPanel>
                     </Grid>}
@@ -132,20 +143,24 @@ Meetings.propTypes = {
     // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
     groupName: PropTypes.string,
     loading: PropTypes.bool,
-    meetingsLists: PropTypes.array
+    meetingsListType: PropTypes.string,
+    meetingsLists: PropTypes.array,
+    updateMeetingsListType: PropTypes.func
 };
 
 const mapStateToProps = state => {
     return {
         meetingsLists: state['features/riff-platform'].meetings.meetingsLists,
-        loading: state['features/riff-platform'].meetings.loading
+        loading: state['features/riff-platform'].meetings.loading,
+        meetingsListType: state['features/riff-platform'].meetings.listType
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         getMeetingsListByGroup: (groupName, listType) => dispatch(getMeetingsByGroup(groupName, listType)),
-        getMeetingsLists: listType => dispatch(getMeetings(listType))
+        getMeetingsLists: listType => dispatch(getMeetings(listType)),
+        updateMeetingsListType: listType => dispatch(setMeetingsListType(listType))
     };
 };
 
