@@ -50,7 +50,7 @@ const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists }) =>
                 item = { true }
                 xs = { 12 }>
                 <StyledPaper title = 'Meetings for today:'>
-                    {groupedMeetings.Today?.length > 0
+                    {groupedMeetings.Today?.length
                         ? <MeetingsTable
                             meetingsList = { groupedMeetings.Today } />
                         : noMeetingDataText

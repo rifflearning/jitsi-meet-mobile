@@ -83,6 +83,10 @@ function Meetings({
     // eslint-disable-next-line max-len
     const noMeetingDataText = `There are no ${meetingsListType} meetings. To schedule a new meeting click SCHEDULE A MEETING`;
 
+    const meetingsTabContent = Object.keys(groupedMeetings).length
+        ? <MeetingsList groupedMeetings = { groupedMeetings } />
+        : noMeetingDataText;
+
     return (
         <Grid
             container = { true }
@@ -127,16 +131,12 @@ function Meetings({
                         <MeetingTabPanel
                             index = { 0 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            { Object.keys(groupedMeetings).length > 0
-                                ? <MeetingsList groupedMeetings = { groupedMeetings } />
-                                : noMeetingDataText}
+                            { meetingsTabContent }
                         </MeetingTabPanel>
                         <MeetingTabPanel
                             index = { 1 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            { Object.keys(groupedMeetings).length > 0
-                                ? <MeetingsList groupedMeetings = { groupedMeetings } />
-                                : noMeetingDataText}
+                            { meetingsTabContent }
                         </MeetingTabPanel>
                     </Grid>}
             </Grid>
