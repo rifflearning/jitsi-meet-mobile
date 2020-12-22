@@ -80,6 +80,7 @@ function Meetings({
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
+    // eslint-disable-next-line max-len
     const noMeetingDataText = `There are no ${meetingsListType} meetings. To schedule a new meeting click SCHEDULE A MEETING`;
 
     return (
@@ -99,7 +100,8 @@ function Meetings({
                         item = { true }>
                         <Box pb = { 1 }>
                             <Tabs
-                                onChange = { (_event, type) => updateMeetingsListType(getKeyByValue(meetingListTypeMap, type)) }
+                                onChange = { (_event, type) =>
+                                    updateMeetingsListType(getKeyByValue(meetingListTypeMap, type)) }
                                 value = { meetingListTypeMap[meetingsListType] }>
                                 <Tab label = 'Upcoming' />
                                 <Tab label = 'Previous' />
@@ -125,12 +127,16 @@ function Meetings({
                         <MeetingTabPanel
                             index = { 0 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
+                            { Object.keys(groupedMeetings).length > 0
+                                ? <MeetingsList groupedMeetings = { groupedMeetings } />
+                                : noMeetingDataText}
                         </MeetingTabPanel>
                         <MeetingTabPanel
                             index = { 1 }
                             value = { meetingListTypeMap[meetingsListType] }>
-                            { Object.keys(groupedMeetings).length > 0 ? <MeetingsList groupedMeetings = { groupedMeetings } /> : noMeetingDataText}
+                            { Object.keys(groupedMeetings).length > 0
+                                ? <MeetingsList groupedMeetings = { groupedMeetings } />
+                                : noMeetingDataText}
                         </MeetingTabPanel>
                     </Grid>}
             </Grid>
