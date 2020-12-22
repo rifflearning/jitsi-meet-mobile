@@ -17,6 +17,9 @@ const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists }) =>
 
     const groupedMeetings = groupMeetingsByDays(meetingsLists);
 
+    // eslint-disable-next-line max-len
+    const noMeetingDataText = 'The user doesn`t have any upcoming meetings today. To schedule a new meeting click SCHEDULE A MEETING';
+
     return (
         <Grid
             container = { true }
@@ -47,8 +50,11 @@ const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists }) =>
                 item = { true }
                 xs = { 12 }>
                 <StyledPaper title = 'Meetings for today:'>
-                    <MeetingsTable
-                        meetingsList = { groupedMeetings.Today } />
+                    {groupedMeetings.Today?.length
+                        ? <MeetingsTable
+                            meetingsList = { groupedMeetings.Today } />
+                        : noMeetingDataText
+                    }
                 </StyledPaper>
             </Grid>
         </Grid>
@@ -72,7 +78,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         doLogout: obj => dispatch(logout(obj)),
-        getMeetingsLists: () => dispatch(getMeetings())
+        getMeetingsLists: () => dispatch(getMeetings('upcoming'))
     };
 };
 

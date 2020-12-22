@@ -9,7 +9,9 @@ function MeetingTabPanel({ children, value, index }) {
         <div
             aria-labelledby = { `meeting-tab-${index}` }
             hidden = { value !== index }
-            id = { `meeting-tabpanel-${index}` }>
+            id = { `meeting-tabpanel-${index}` }
+            // eslint-disable-next-line react-native/no-inline-styles
+            style = {{ width: '100%' }}>
             {value === index && (
                 <Box pt = { 2 }>
                     {children}
