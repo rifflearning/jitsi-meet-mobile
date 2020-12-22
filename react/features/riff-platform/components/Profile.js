@@ -72,7 +72,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         doLogout: obj => dispatch(logout(obj)),
-        getMeetingsLists: () => dispatch(getMeetings())
+        getMeetingsLists: () => dispatch(getMeetings('upcoming'))
     };
 };
 
