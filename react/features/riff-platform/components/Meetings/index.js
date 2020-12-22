@@ -18,6 +18,7 @@ import StyledPaper from '../StyledPaper';
 import MeetingTabPanel from './MeetingTabPanel';
 import MeetingsTable from './MeetingsTable';
 
+
 const meetingListTypeMap = {
     0: 'upcoming',
     1: 'previous'

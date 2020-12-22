@@ -19,6 +19,7 @@ import * as ROUTES from '../constants/routes';
 import Footer from './Footer';
 import Join from './Join';
 import Meetings from './Meetings';
+import EditMeeting from './Meetings/EditMeeting';
 import Profile from './Profile';
 import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';
@@ -66,6 +67,9 @@ const Main = ({ user }) => {
                 path = { ROUTES.DASHBOARD } />
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
+            </Route>
+            <Route path = { `${ROUTES.MEETING}/:meetingId/edit` } >
+                <EditMeeting />
             </Route>
             {negotiationsGroupId
                 && <Route

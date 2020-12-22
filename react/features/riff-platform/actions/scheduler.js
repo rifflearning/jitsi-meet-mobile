@@ -37,6 +37,20 @@ export function schedule(meeting) {
     };
 }
 
+export function updateSchedule(id, meeting) {
+    return async dispatch => {
+        dispatch(schedulerRequest());
+
+        try {
+            const res = await api.updateMeeting(id, meeting);
+
+            dispatch(schedulerSuccess(res));
+        } catch (e) {
+            dispatch(schedulerFailure(e.message));
+        }
+    };
+}
+
 export function schedulerReset() {
     return {
         type: actionTypes.SCHEDULER_RESET

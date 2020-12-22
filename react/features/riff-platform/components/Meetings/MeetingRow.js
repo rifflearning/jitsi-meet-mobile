@@ -100,8 +100,14 @@ const MeetingsRow = ({
         }
         setisOpenDeleteDialog(false);
     };
-    
+
     const onEditDialogClose = value => {
+        const id = meeting._id;
+
+        if (value === 'Edit one meeting') {
+            return history.push(`${ROUTES.MEETING}/${id}/edit`);
+        }
+
         setIsOpenEditDialog(false);
     };
 

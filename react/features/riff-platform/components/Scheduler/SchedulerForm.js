@@ -25,9 +25,11 @@ import React, { useEffect, useState } from 'react';
 import MomentUtils from "@date-io/moment";
 import moment from 'moment';
 import 'moment-recur';
+import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { schedule } from '../../actions/scheduler';
+import { getMeeting } from '../../actions/meeting';
+import { schedule, updateSchedule } from '../../actions/scheduler';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -217,7 +219,7 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
 };
 
 
-const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
+const SchedulerForm = ({ userId, loading, error, scheduleMeeting, isEditing, fetchMeeting, meeting, updateScheduleMeeting, }) => {
     const classes = useStyles();
 
     const [ name, setname ] = useState('');
@@ -257,6 +259,24 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
     const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
     const [ multipleRooms, setmultipleRooms ] = useState(1);
 
+    const { meetingId } = useParams();
+
+    useEffect(() => {
+        if (isEditing) {
+            fetchMeeting(meetingId);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (meeting && isEditing) {
+            setname(meeting.name);
+            setdescription(meeting.description);
+            setdate(meeting.dateStart);
+            setForbidNewParticipantsAfterDateEnd(meeting.forbidNewParticipantsAfterDateEnd);
+            setWaitForHost(meeting.waitForHost)
+        }
+    }, [ meeting ]);
+
     const isnameValid = () => Boolean(name.length);
     const isDurationValid = () => Boolean(hours || minutes);
 
@@ -295,7 +315,8 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             :
             null;
 
-        scheduleMeeting({
+            return !isEditing 
+            ? scheduleMeeting({
             createdBy: userId,
             name,
             description,
@@ -306,7 +327,19 @@ const SchedulerForm = ({ userId, loading, error, scheduleMeeting }) => {
             recurrenceValues,
             forbidNewParticipantsAfterDateEnd,
             multipleRooms: multipleRooms > 1 ? multipleRooms : null
-        });
+        })
+        : updateScheduleMeeting(meetingId, {
+            name,
+            description,
+            dateStart: new Date(date).getTime(),
+            dateEnd: dateEnd.getTime(),
+            allowAnonymous,
+            waitForHost,
+            recurrenceValues,
+            forbidNewParticipantsAfterDateEnd,
+            multipleRooms: multipleRooms > 1 ? multipleRooms : null
+            }
+            )
     };
 
     const recurrenceMaxEndDate = {
@@ -969,7 +1002,11 @@ SchedulerForm.propTypes = {
     error: PropTypes.string,
     loading: PropTypes.bool,
     scheduleMeeting: PropTypes.func,
-    userId: PropTypes.string
+    userId: PropTypes.string,
+    isEditing: PropTypes.bool,
+    updateScheduleMeeting: PropTypes.func,
+    fetchMeeting: PropTypes.func,
+    meeting: PropTypes.any
 };
 
 const mapStateToProps = state => {
@@ -977,13 +1014,15 @@ const mapStateToProps = state => {
         userId: state['features/riff-platform'].signIn.user?.uid,
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
-        meeting: state['features/riff-platform'].scheduler.meeting
+        meeting: state['features/riff-platform'].meeting.meeting
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        scheduleMeeting: meeting => dispatch(schedule(meeting))
+        scheduleMeeting: meeting => dispatch(schedule(meeting)),
+        fetchMeeting: id => dispatch(getMeeting(id)),
+        updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting))
     };
 };
 
