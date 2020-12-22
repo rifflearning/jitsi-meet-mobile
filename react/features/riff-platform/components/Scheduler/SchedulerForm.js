@@ -874,7 +874,9 @@ const SchedulerForm = ({
                                         id = 'date-picker-inline'
                                         disablePast = { true }
                                         disabled = { endDateBy !== 'endDateTime' }
-                                        maxDate = { endDateBy === 'endDateTime' ? recurrenceMaxEndDate[recurrenceType] : undefined }
+                                        maxDate = { endDateBy === 'endDateTime'
+                                            ? recurrenceMaxEndDate[recurrenceType]
+                                            : undefined }
                                         minDate = { endDateBy === 'endDateTime' ? date : undefined }
                                         label = 'End Date'
                                         value = { endDate || date }

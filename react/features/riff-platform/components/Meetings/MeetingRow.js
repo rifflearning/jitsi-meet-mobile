@@ -162,23 +162,27 @@ const MeetingsRow = ({
                     variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
-                    color = 'primary'
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onClick = { handleEditClick }
-                    variant = 'contained'>Edit</Button>
-                <Button
-                    className = { classes.meetingButton }
                     color = { isLinkCopied ? 'default' : 'primary' }
                     // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleLinkCopy }
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
-                    && <Button
-                        className = { classes.meetingButton }
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick = { handleDeleteClick }>
+                    && <>
+                        <Button
+                            className = { classes.meetingButton }
+                            color = 'default'
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onClick = { handleEditClick }
+                            variant = 'outlined'>
+                        Edit
+                        </Button>
+                        <Button
+                            className = { classes.meetingButton }
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onClick = { handleDeleteClick }>
                         Delete
-                    </Button>
+                        </Button>
+                   </>
                 }
                 <ConfirmationDialogRaw
                     onClose = { onDeleteDialogClose }
@@ -197,7 +201,7 @@ const MeetingsRow = ({
 
 
 MeetingsRow.propTypes = {
-    // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
+    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,

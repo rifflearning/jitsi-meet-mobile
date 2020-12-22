@@ -4,41 +4,30 @@
 
 import { Grid } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { connect } from '../../../base/redux';
-import { schedulerReset } from '../../actions/scheduler';
-import ScheduleSuccess from '../Scheduler/ScheduleSuccess';
 import SchedulerForm from '../Scheduler/SchedulerForm';
 import StyledPaper from '../StyledPaper';
 
-const EditMeeting = ({ scheduledMeeting, resetScheduledMeeting }) => {
-    useEffect(() => {
-        resetScheduledMeeting();
-    }, []);
-
-    return (
+const EditMeeting = ({ scheduledMeeting }) => (
+    <Grid
+        container = { true }
+        spacing = { 3 }>
         <Grid
-            container = { true }
-            spacing = { 3 }>
-            <Grid
-                item = { true }
-                xs = { 12 }>
-                <StyledPaper title = 'Edit a meeting'>
-                    {scheduledMeeting
-                        ? <ScheduleSuccess
-                            resetScheduledMeeting = { resetScheduledMeeting }
-                            scheduledMeeting = { scheduledMeeting } />
-                        : <SchedulerForm isEditing = { true } />
-                    }
-                </StyledPaper>
-            </Grid>
+            item = { true }
+            xs = { 12 }>
+            <StyledPaper title = 'Edit a meeting'>
+                {scheduledMeeting
+                    ? `Meeting ${scheduledMeeting.name} updated!`
+                    : <SchedulerForm isEditing = { true } />
+                }
+            </StyledPaper>
         </Grid>
-    );
-};
+    </Grid>
+);
 
 EditMeeting.propTypes = {
-    resetScheduledMeeting: PropTypes.func,
     scheduledMeeting: PropTypes.object
 };
 
@@ -47,11 +36,8 @@ const mapStateToProps = state => {
         scheduledMeeting: state['features/riff-platform'].scheduler.meeting
     };
 };
-
 const mapDispatchToProps = dispatch => {
-    return {
-        resetScheduledMeeting: () => dispatch(schedulerReset())
-    };
+    return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditMeeting);
