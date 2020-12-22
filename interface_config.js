@@ -169,7 +169,7 @@ var interfaceConfig = {
      * If indicated some of the error dialogs may point to the support URL for
      * help.
      */
-    SUPPORT_URL: 'https://www.riffanalytics.ai/contact-us/',
+    SUPPORT_URL: 'https://riffanalytics.ai/contact/',
 
     TOOLBAR_ALWAYS_VISIBLE: false,
 
