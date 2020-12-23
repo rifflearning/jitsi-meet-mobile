@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-native/no-color-literals */
 /* eslint-disable require-jsdoc */
 
 import Box from '@material-ui/core/Box';
@@ -10,8 +12,8 @@ function MeetingTabPanel({ children, value, index }) {
             aria-labelledby = { `meeting-tab-${index}` }
             hidden = { value !== index }
             id = { `meeting-tabpanel-${index}` }
-            // eslint-disable-next-line react-native/no-inline-styles
-            style = {{ width: '100%' }}>
+            style = {{ color: '#ffffff',
+                width: '100%' }}>
             {value === index && (
                 <Box pt = { 2 }>
                     {children}

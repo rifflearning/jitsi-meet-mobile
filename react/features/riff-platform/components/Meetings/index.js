@@ -2,7 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/jsx-no-bind */
 
-import { Button, CircularProgress, Grid, Box } from '@material-ui/core';
+import { Button, CircularProgress, Grid, Box, makeStyles } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import PropTypes from 'prop-types';
@@ -17,6 +17,14 @@ import StyledPaper from '../StyledPaper';
 
 import MeetingTabPanel from './MeetingTabPanel';
 import MeetingsTable from './MeetingsTable';
+
+const useStyles = makeStyles(() => {
+    return {
+        tab: {
+            color: '#ffffff'
+        }
+    };
+});
 
 const meetingListTypeMap = {
     upcoming: 0,
@@ -71,6 +79,7 @@ function Meetings({
     updateMeetingsListType
 }) {
 
+    const classes = useStyles();
     const history = useHistory();
     const handleScheduleClick = useCallback(() => history.push(ROUTES.SCHEDULE), [ history ]);
 
@@ -113,8 +122,12 @@ function Meetings({
                                 onChange = { (_event, type) =>
                                     updateMeetingsListType(getKeyByValue(meetingListTypeMap, type)) }
                                 value = { meetingListTypeMap[meetingsListType] }>
-                                <Tab label = 'Upcoming' />
-                                <Tab label = 'Previous' />
+                                <Tab
+                                    className = { classes.tab }
+                                    label = 'Upcoming' />
+                                <Tab
+                                    className = { classes.tab }
+                                    label = 'Previous' />
                             </Tabs>
                         </Box>
                     </Grid>
