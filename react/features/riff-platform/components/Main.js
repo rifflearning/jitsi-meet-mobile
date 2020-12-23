@@ -68,7 +68,7 @@ const Main = ({ user }) => {
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
             </Route>
-            <Route path = { `${ROUTES.MEETING}/:meetingId/edit` } >
+            <Route path = { `${ROUTES.MEETING}/:id/edit` } >
                 <EditMeeting />
             </Route>
             {negotiationsGroupId

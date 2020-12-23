@@ -28,6 +28,7 @@ import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
 import { getMeeting } from '../../actions/meeting';
+import { getMeetingsRecurring } from '../../actions/meetings';
 import { schedule, updateSchedule } from '../../actions/scheduler';
 
 import {
@@ -232,7 +233,9 @@ const SchedulerForm = ({
     scheduleMeeting,
     isEditing,
     fetchMeeting,
+    fetchMeetingsRecurring,
     meeting,
+    meetingsRecurring,
     updateScheduleMeeting
 }) => {
     const classes = useStyles();
@@ -274,13 +277,25 @@ const SchedulerForm = ({
     const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
     const [ multipleRooms, setmultipleRooms ] = useState(1);
 
-    const { meetingId } = useParams();
+    const { id } = useParams();
+
+    const defineEditMode = () => {
+        const params = new URLSearchParams(location.search);
+
+        return params.get('mode');
+    };
 
     useEffect(() => {
+        const editMode = defineEditMode();
+
         if (isEditing) {
-            fetchMeeting(meetingId);
+            editMode === 'all'
+                ? fetchMeetingsRecurring(id)
+                : fetchMeeting(id);
         }
     }, []);
+
+     console.log('meetings--', meetingsRecurring)
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -346,7 +361,7 @@ const SchedulerForm = ({
                 multipleRooms: multipleRooms > 1 ? multipleRooms : null
             });
         } else if (isEditing) {
-            return updateScheduleMeeting(meetingId, {
+            return updateScheduleMeeting(id, {
                 name,
                 description,
                 dateStart: new Date(date).getTime(),
@@ -1033,9 +1048,11 @@ const SchedulerForm = ({
 SchedulerForm.propTypes = {
     error: PropTypes.string,
     fetchMeeting: PropTypes.func,
+    fetchMeetingsRecurring: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
+    meetingsRecurring: PropTypes.array,
     scheduleMeeting: PropTypes.func,
     updateScheduleMeeting: PropTypes.func,
     userId: PropTypes.string
@@ -1046,7 +1063,8 @@ const mapStateToProps = state => {
         userId: state['features/riff-platform'].signIn.user?.uid,
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
-        meeting: state['features/riff-platform'].meeting.meeting
+        meeting: state['features/riff-platform'].meeting.meeting,
+        meetingsRecurring: state['features/riff-platform'].meeting.meetings
     };
 };
 
@@ -1054,7 +1072,8 @@ const mapDispatchToProps = dispatch => {
     return {
         scheduleMeeting: meeting => dispatch(schedule(meeting)),
         fetchMeeting: id => dispatch(getMeeting(id)),
-        updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting))
+        updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
+        fetchMeetingsRecurring: roomId => dispatch(getMeetingsRecurring(roomId, 'upcoming'))
     };
 };
 

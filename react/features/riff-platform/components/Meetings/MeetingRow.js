@@ -102,10 +102,10 @@ const MeetingsRow = ({
     };
 
     const onEditDialogClose = value => {
-        const id = meeting._id;
-
         if (value === 'Edit one meeting') {
-            return history.push(`${ROUTES.MEETING}/${id}/edit`);
+            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit`);
+        } else if (value === 'Edit all recurring meetings') {
+            return history.push(`${ROUTES.MEETING}/${meeting.roomId}/edit?mode=all`);
         }
 
         setIsOpenEditDialog(false);

@@ -53,6 +53,21 @@ export function getMeetingsByGroup(groupName, listType) {
     };
 }
 
+export function getMeetingsRecurring(roomId, listType) {
+    return async dispatch => {
+        dispatch(meetingsRequest());
+
+        try {
+            const res = await api.fetchMeetingsRecurring(roomId, listType);
+
+            dispatch(meetingsSuccess(res));
+        } catch (e) {
+            console.error('Error in getMeetingsRecurring', e);
+            dispatch(meetingsFailure(e.message));
+        }
+    };
+}
+
 export function deleteMeeting(id) {
     return async dispatch => {
 
