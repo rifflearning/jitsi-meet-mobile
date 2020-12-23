@@ -36,7 +36,7 @@ const Loader = () => (<div style = {{ marginTop: '100px' }}>
         xs = { 12 }><CircularProgress /></Grid>
 </div>);
 
-const MeetingsList = ({ groupedMeetings = [] }) => (
+const MeetingsList = ({ groupedMeetings = [], groupName }) => (
     <Grid
         container = { true }
         spacing = { 3 }>
@@ -46,6 +46,7 @@ const MeetingsList = ({ groupedMeetings = [] }) => (
             xs = { 12 }>
             <StyledPaper title = { date }>
                 <MeetingsTable
+                    groupName = { groupName }
                     meetingsList = { groupedMeetings[date] } />
             </StyledPaper>
         </Grid>)
@@ -54,6 +55,9 @@ const MeetingsList = ({ groupedMeetings = [] }) => (
 );
 
 MeetingsList.propTypes = {
+    groupName: PropTypes.string,
+
+    // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
     groupedMeetings: PropTypes.object
 };
 
@@ -84,7 +88,9 @@ function Meetings({
     const noMeetingDataText = `There are no ${meetingsListType} meetings. To schedule a new meeting click SCHEDULE A MEETING`;
 
     const meetingsTabContent = Object.keys(groupedMeetings).length
-        ? <MeetingsList groupedMeetings = { groupedMeetings } />
+        ? (<MeetingsList
+            groupName = { groupName }
+            groupedMeetings = { groupedMeetings } />)
         : noMeetingDataText;
 
     return (
