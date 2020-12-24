@@ -85,7 +85,6 @@ const MeetingsRow = ({
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
 
-
     const handleDeleteClick = () => setisOpenDeleteDialog(true);
 
     const handleEditClick = () => setIsOpenEditDialog(true);
@@ -100,12 +99,19 @@ const MeetingsRow = ({
         }
         setisOpenDeleteDialog(false);
     };
+    console.log('meeting row', meeting)
+    console.log('multipleRoom', multipleRoom)
 
     const onEditDialogClose = value => {
-        if (value === 'Edit one meeting') {
+        if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
             return history.push(`${ROUTES.MEETING}/${meeting._id}/edit`);
         } else if (value === 'Edit all recurring meetings') {
-            return history.push(`${ROUTES.MEETING}/${meeting.roomId}/edit?mode=all`);
+            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=all`);
+        } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
+            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=one`);
+        } else if (value === 'Edit groupped meetings' && !meeting.recurringParentMeetingId) {
+            const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+            return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
         }
 
         setIsOpenEditDialog(false);

@@ -55,7 +55,9 @@ class ApiService {
     deleteMeetingsMultipleRooms = id => this.fetchWithJwt(`/meetingsMultipleRooms/${id}`, { method: 'delete' });
     deleteMeetingsRecurring = roomId => this.fetchWithJwt(`/meetingsRecurring/${roomId}`, { method: 'delete' });
     updateMeeting = (id, meeting) => this.putWithJwt(`/meetings/${id}`, { meeting });
-    updateMeetingRecurring = (roomId, meeting) => this.putWithJwt(`/meetingsRecurring/${roomId}`, { meeting });
+    updateMeetingsRecurring = (roomId, meeting) => this.putWithJwt(`/meetingsRecurring/${roomId}`, { meeting });
+    updateMeetingsMultipleRooms = (id, meeting) => this.putWithJwt(`/meetingsMultipleRooms/${id}`, { meeting });
+
 
     joinMeeting = id => this.postWithJwt(`/meetings/${id}/join`);
 

@@ -51,6 +51,34 @@ export function updateSchedule(id, meeting) {
     };
 }
 
+export function updateScheduleRecurring(roomId, meeting) {
+    return async dispatch => {
+        dispatch(schedulerRequest());
+
+        try {
+            const res = await api.updateMeetingsRecurring(roomId, meeting);
+
+            dispatch(schedulerSuccess(res));
+        } catch (e) {
+            dispatch(schedulerFailure(e.message));
+        }
+    };
+}
+
+export function updateScheduleMultipleRooms(id, meeting) {
+    return async dispatch => {
+        dispatch(schedulerRequest());
+
+        try {
+            const res = await api.updateMeetingsMultipleRooms(id, meeting);
+
+            dispatch(schedulerSuccess(res));
+        } catch (e) {
+            dispatch(schedulerFailure(e.message));
+        }
+    };
+}
+
 export function schedulerReset() {
     return {
         type: actionTypes.SCHEDULER_RESET

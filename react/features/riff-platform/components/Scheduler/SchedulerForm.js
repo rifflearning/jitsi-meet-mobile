@@ -28,8 +28,7 @@ import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
 import { getMeeting } from '../../actions/meeting';
-import { getMeetingsRecurring } from '../../actions/meetings';
-import { schedule, updateSchedule } from '../../actions/scheduler';
+import { schedule, updateSchedule, updateScheduleRecurring, updateScheduleMultipleRooms } from '../../actions/scheduler';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -233,10 +232,10 @@ const SchedulerForm = ({
     scheduleMeeting,
     isEditing,
     fetchMeeting,
-    fetchMeetingsRecurring,
     meeting,
-    meetingsRecurring,
-    updateScheduleMeeting
+    updateScheduleMeetingsRecurring,
+    updateScheduleMeeting,
+    updateScheduleMeetingsMultipleRooms
 }) => {
     const classes = useStyles();
 
@@ -286,16 +285,10 @@ const SchedulerForm = ({
     };
 
     useEffect(() => {
-        const editMode = defineEditMode();
-
         if (isEditing) {
-            editMode === 'all'
-                ? fetchMeetingsRecurring(id)
-                : fetchMeeting(id);
+            fetchMeeting(id);
         }
     }, []);
-
-     console.log('meetings--', meetingsRecurring)
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -329,6 +322,12 @@ const SchedulerForm = ({
         return isValid;
     };
 
+    const isEditAllMeetingsRecurring = defineEditMode() === 'all';
+    const isEditOneOccurrence = defineEditMode() === 'one';
+    const isEditGrouppedMeetings = defineEditMode() === 'group';
+
+    console.log('meeting start', meeting);
+
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -361,6 +360,30 @@ const SchedulerForm = ({
                 multipleRooms: multipleRooms > 1 ? multipleRooms : null
             });
         } else if (isEditing) {
+            if (isEditAllMeetingsRecurring) {
+                return updateScheduleMeetingsRecurring(meeting.roomId, {
+                    name,
+                    description,
+                    dateStart: new Date(date).getTime(),
+                    dateEnd: dateEnd.getTime(),
+                    allowAnonymous,
+                    waitForHost,
+                    forbidNewParticipantsAfterDateEnd
+                });
+            } else if (isEditOneOccurrence) {
+                return updateScheduleMeeting(id, {
+                    description,
+                    allowAnonymous,
+                    waitForHost
+                });
+            } else if (isEditGrouppedMeetings) {
+                return updateScheduleMeetingsMultipleRooms(meeting.multipleRoomsParentId, {
+                    description,
+                    allowAnonymous,
+                    waitForHost
+                });
+            }
+
             return updateScheduleMeeting(id, {
                 name,
                 description,
@@ -372,6 +395,7 @@ const SchedulerForm = ({
                 forbidNewParticipantsAfterDateEnd,
                 multipleRooms: multipleRooms > 1 ? multipleRooms : null
             });
+
         }
     };
 
@@ -531,7 +555,8 @@ const SchedulerForm = ({
                         value = { name }
                         onChange = { e => setname(e.target.value) }
                         error = { Boolean(nameError) }
-                        helperText = { nameError } />
+                        helperText = { nameError }
+                        disabled = { isEditOneOccurrence || isEditGrouppedMeetings } />
                 </Grid>
                 <Grid
                     item
@@ -663,7 +688,8 @@ const SchedulerForm = ({
                         control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
-                            onChange = { e => setRecurringMeeting(e.target.checked) } />
+                            onChange = { e => setRecurringMeeting(e.target.checked) }
+                            disabled = { isEditOneOccurrence || isEditAllMeetingsRecurring } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -1048,13 +1074,13 @@ const SchedulerForm = ({
 SchedulerForm.propTypes = {
     error: PropTypes.string,
     fetchMeeting: PropTypes.func,
-    fetchMeetingsRecurring: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
-    meetingsRecurring: PropTypes.array,
     scheduleMeeting: PropTypes.func,
     updateScheduleMeeting: PropTypes.func,
+    updateScheduleMeetingsMultipleRooms: PropTypes.func,
+    updateScheduleMeetingsRecurring: PropTypes.func,
     userId: PropTypes.string
 };
 
@@ -1063,8 +1089,7 @@ const mapStateToProps = state => {
         userId: state['features/riff-platform'].signIn.user?.uid,
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
-        meeting: state['features/riff-platform'].meeting.meeting,
-        meetingsRecurring: state['features/riff-platform'].meeting.meetings
+        meeting: state['features/riff-platform'].meeting.meeting
     };
 };
 
@@ -1073,7 +1098,8 @@ const mapDispatchToProps = dispatch => {
         scheduleMeeting: meeting => dispatch(schedule(meeting)),
         fetchMeeting: id => dispatch(getMeeting(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
-        fetchMeetingsRecurring: roomId => dispatch(getMeetingsRecurring(roomId, 'upcoming'))
+        updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
+        updateScheduleMeetingsMultipleRooms: (id, meeting) => dispatch(updateScheduleMultipleRooms(id, meeting))
     };
 };
 
