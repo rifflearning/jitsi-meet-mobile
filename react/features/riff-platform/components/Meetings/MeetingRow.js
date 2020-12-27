@@ -99,8 +99,6 @@ const MeetingsRow = ({
         }
         setisOpenDeleteDialog(false);
     };
-    console.log('meeting row', meeting)
-    console.log('multipleRoom', multipleRoom)
 
     const onEditDialogClose = value => {
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
@@ -111,6 +109,7 @@ const MeetingsRow = ({
             return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=one`);
         } else if (value === 'Edit groupped meetings' && !meeting.recurringParentMeetingId) {
             const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+
             return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
         }
 

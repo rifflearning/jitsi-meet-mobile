@@ -68,10 +68,9 @@ export function updateScheduleRecurring(roomId, meeting) {
 export function updateScheduleMultipleRooms(id, meeting) {
     return async dispatch => {
         dispatch(schedulerRequest());
-
         try {
             const res = await api.updateMeetingsMultipleRooms(id, meeting);
-
+            
             dispatch(schedulerSuccess(res));
         } catch (e) {
             dispatch(schedulerFailure(e.message));

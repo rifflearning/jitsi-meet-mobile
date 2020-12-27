@@ -4,30 +4,37 @@
 
 import { Grid } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { connect } from '../../../base/redux';
+import { schedulerReset } from '../../actions/scheduler';
 import SchedulerForm from '../Scheduler/SchedulerForm';
 import StyledPaper from '../StyledPaper';
 
-const EditMeeting = ({ scheduledMeeting }) => (
-    <Grid
-        container = { true }
-        spacing = { 3 }>
+
+const EditMeeting = ({ scheduledMeeting, resetScheduleMeeting }) => {
+    useEffect(() => () => resetScheduleMeeting(), []);
+
+    return (
         <Grid
-            item = { true }
-            xs = { 12 }>
-            <StyledPaper title = 'Edit a meeting'>
-                {scheduledMeeting
-                    ? `Meeting ${scheduledMeeting.name} updated!`
-                    : <SchedulerForm isEditing = { true } />
-                }
-            </StyledPaper>
+            container = { true }
+            spacing = { 3 }>
+            <Grid
+                item = { true }
+                xs = { 12 }>
+                <StyledPaper title = 'Edit a meeting'>
+                    {scheduledMeeting
+                        ? `Meeting ${scheduledMeeting.name} updated!`
+                        : <SchedulerForm isEditing = { true } />
+                    }
+                </StyledPaper>
+            </Grid>
         </Grid>
-    </Grid>
-);
+    );
+};
 
 EditMeeting.propTypes = {
+    resetScheduleMeeting: PropTypes.func,
     scheduledMeeting: PropTypes.object
 };
 
@@ -37,7 +44,9 @@ const mapStateToProps = state => {
     };
 };
 const mapDispatchToProps = dispatch => {
-    return {};
+    return {
+        resetScheduleMeeting: () => dispatch(schedulerReset())
+    };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditMeeting);

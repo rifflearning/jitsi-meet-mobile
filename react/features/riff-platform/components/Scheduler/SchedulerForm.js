@@ -14,7 +14,7 @@ import {
     Radio,
     Switch
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { duration, makeStyles } from '@material-ui/core/styles';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
@@ -26,7 +26,7 @@ import React, { useEffect, useState } from 'react';
 import 'moment-recur';
 import { useParams } from 'react-router-dom';
 
-import { connect } from '../../../base/redux';
+import { connect, set } from '../../../base/redux';
 import { getMeeting } from '../../actions/meeting';
 import { schedule, updateSchedule, updateScheduleRecurring, updateScheduleMultipleRooms } from '../../actions/scheduler';
 
@@ -244,7 +244,7 @@ const SchedulerForm = ({
     const [ date, setdate ] = useState(moment());
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
-    const [ allowAnonymous, setAllowAnonymous ] = useState(false);
+    const [ allowAnonymous ] = useState(false);
     const [ recurringMeeting, setRecurringMeeting ] = useState(false);
     const [ recurrenceType, setRecurrenceType ] = useState('daily');
     const [ recurrenceInterval, setRecurrenceInterval ] = useState(1);
@@ -292,6 +292,15 @@ const SchedulerForm = ({
 
     useEffect(() => {
         if (meeting && isEditing) {
+            const meetingDuration = moment
+            .duration(moment(meeting.dateEnd)
+            .diff(moment(meeting.dateStart)));
+
+            const durationH = meetingDuration.asHours();
+            const durationM = meetingDuration.asMinutes() - (60 * durationH);
+
+            setHours(durationH);
+            setMinutes(durationM);
             setname(meeting.name);
             setdescription(meeting.description);
             setdate(meeting.dateStart);
@@ -325,8 +334,6 @@ const SchedulerForm = ({
     const isEditAllMeetingsRecurring = defineEditMode() === 'all';
     const isEditOneOccurrence = defineEditMode() === 'one';
     const isEditGrouppedMeetings = defineEditMode() === 'group';
-
-    console.log('meeting start', meeting);
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -364,8 +371,6 @@ const SchedulerForm = ({
                 return updateScheduleMeetingsRecurring(meeting.roomId, {
                     name,
                     description,
-                    dateStart: new Date(date).getTime(),
-                    dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd
@@ -374,13 +379,17 @@ const SchedulerForm = ({
                 return updateScheduleMeeting(id, {
                     description,
                     allowAnonymous,
-                    waitForHost
+                    waitForHost,
+                    forbidNewParticipantsAfterDateEnd
                 });
             } else if (isEditGrouppedMeetings) {
                 return updateScheduleMeetingsMultipleRooms(meeting.multipleRoomsParentId, {
                     description,
+                    startDate: new Date(date).getTime(),
+                    dateEnd: dateEnd.getTime(),
                     allowAnonymous,
-                    waitForHost
+                    waitForHost,
+                    forbidNewParticipantsAfterDateEnd
                 });
             }
 
@@ -612,7 +621,9 @@ const SchedulerForm = ({
                                     onChange = { setdate }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
-                                    }} />
+                                    }}
+                                    disabled = { isEditOneOccurrence
+                                    || isEditAllMeetingsRecurring } />
                             </Grid>
                             <Grid item>
                                 <KeyboardTimePicker
@@ -624,7 +635,9 @@ const SchedulerForm = ({
                                     onChange = { setdate }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change time'
-                                    }} />
+                                    }}
+                                    disabled = { isEditOneOccurrence
+                                        || isEditAllMeetingsRecurring } />
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
@@ -653,7 +666,9 @@ const SchedulerForm = ({
                             label = 'Hours'
                             value = { hours }
                             onChange = { e => setHours(e.target.value) }
-                            error = { Boolean(durationError) }>
+                            error = { Boolean(durationError) }
+                            disabled = { isEditOneOccurrence
+                                || isEditAllMeetingsRecurring } >
                             {hoursArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -667,7 +682,9 @@ const SchedulerForm = ({
                             value = { minutes }
                             onChange = { e => setMinutes(e.target.value) }
                             error = { Boolean(durationError) }
-                            helperText = { durationError }>
+                            helperText = { durationError }
+                            disabled = { isEditOneOccurrence
+                                || isEditAllMeetingsRecurring } >
                             {minutesArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -689,7 +706,7 @@ const SchedulerForm = ({
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
                             onChange = { e => setRecurringMeeting(e.target.checked) }
-                            disabled = { isEditOneOccurrence || isEditAllMeetingsRecurring } />
+                            disabled = { isEditing } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -1019,7 +1036,8 @@ const SchedulerForm = ({
                             control = { <Switch
                                 name = 'isMultipleRooms'
                                 checked = { isMultipleRooms }
-                                onChange = { e => setisMultipleRooms(e.target.checked) } />
+                                onChange = { e => setisMultipleRooms(e.target.checked) }
+                                disabled = { isEditing } />
                             } />
                     </Grid>
                     {isMultipleRooms
