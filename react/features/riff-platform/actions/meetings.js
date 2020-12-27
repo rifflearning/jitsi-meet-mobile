@@ -69,11 +69,14 @@ export function getMeetingsRecurring(roomId, listType) {
 }
 
 export function deleteMeeting(id) {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+
+        const state = getState();
+        const meetingsListType = state['features/riff-platform'].meetings.listType;
 
         try {
             await api.deleteMeeting(id);
-            dispatch(getMeetings());
+            dispatch(getMeetings(meetingsListType));
         } catch (e) {
             console.error('Error in deleteMeeting', e);
         }
@@ -81,11 +84,14 @@ export function deleteMeeting(id) {
 }
 
 export function deleteMeetingsMultipleRooms(id) {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+
+        const state = getState();
+        const meetingsListType = state['features/riff-platform'].meetings.listType;
 
         try {
             await api.deleteMeetingsMultipleRooms(id);
-            dispatch(getMeetings());
+            dispatch(getMeetings(meetingsListType));
         } catch (e) {
             console.error('Error in deleteMeetingsMultipleRooms', e);
         }
@@ -93,13 +99,23 @@ export function deleteMeetingsMultipleRooms(id) {
 }
 
 export function deleteMeetingsRecurring(roomId) {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+
+        const state = getState();
+        const meetingsListType = state['features/riff-platform'].meetings.listType;
 
         try {
             await api.deleteMeetingsRecurring(roomId);
-            dispatch(getMeetings());
+            dispatch(getMeetings(meetingsListType));
         } catch (e) {
             console.error('Error in deleteMeetingsMultipleRooms', e);
         }
+    };
+}
+
+export function setMeetingsListType(listType) {
+    return {
+        type: actionTypes.SET_MEETINGS_LIST_TYPE,
+        listType
     };
 }
