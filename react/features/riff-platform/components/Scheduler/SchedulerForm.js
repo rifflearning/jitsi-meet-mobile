@@ -14,7 +14,7 @@ import {
     Radio,
     Switch
 } from '@material-ui/core';
-import { duration, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
@@ -26,9 +26,13 @@ import React, { useEffect, useState } from 'react';
 import 'moment-recur';
 import { useParams } from 'react-router-dom';
 
-import { connect, set } from '../../../base/redux';
+import { connect } from '../../../base/redux';
 import { getMeeting } from '../../actions/meeting';
-import { schedule, updateSchedule, updateScheduleRecurring, updateScheduleMultipleRooms } from '../../actions/scheduler';
+import { schedule,
+    updateSchedule,
+    updateScheduleRecurring,
+    updateScheduleMultipleRooms
+} from '../../actions/scheduler';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -291,6 +295,7 @@ const SchedulerForm = ({
     }, []);
 
     useEffect(() => {
+        console.log('meetings', meeting);
         if (meeting && isEditing) {
             const meetingDuration = moment
             .duration(moment(meeting.dateEnd)
@@ -298,6 +303,9 @@ const SchedulerForm = ({
 
             const durationH = meetingDuration.asHours();
             const durationM = meetingDuration.asMinutes() - (60 * durationH);
+
+            console.log('duration', { durationH,
+                durationM });
 
             setHours(durationH);
             setMinutes(durationM);
@@ -385,7 +393,7 @@ const SchedulerForm = ({
             } else if (isEditGrouppedMeetings) {
                 return updateScheduleMeetingsMultipleRooms(meeting.multipleRoomsParentId, {
                     description,
-                    startDate: new Date(date).getTime(),
+                    dateStart: new Date(date).getTime(),
                     dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
