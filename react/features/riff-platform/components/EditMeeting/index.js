@@ -3,6 +3,7 @@
 /* eslint-disable react/jsx-no-bind */
 
 import { Grid } from '@material-ui/core';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
@@ -19,6 +20,25 @@ const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) =>
         return () => resetUpdatedScheduleMeeting();
     }, []);
 
+    const defineEditMode = () => {
+        const params = new URLSearchParams(location.search);
+
+        return params.get('mode');
+    };
+
+    const successDesc = type => {
+        const meetingName = updatedSheduledMeeting?.name;
+        const formattedMeetingDateStart = moment(updatedSheduledMeeting?.dateStart).format('MMM DD, YYYY');
+        const descMap = {
+            all: `All recurring meetings ${meetingName} updated!`,
+            one: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`,
+            group: `All grouped meetings ${meetingName.slice(0, -2)} updated!`,
+            default: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`
+        };
+
+        return descMap[type] || descMap.default;
+    };
+
     return (
         <Grid
             container = { true }
@@ -28,7 +48,7 @@ const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) =>
                 xs = { 12 }>
                 <StyledPaper title = 'Edit a meeting'>
                     {updatedSheduledMeeting
-                        ? `Meeting ${updatedSheduledMeeting.name} updated!`
+                        ? successDesc(defineEditMode())
                         : <SchedulerForm isEditing = { true } />
                     }
                 </StyledPaper>

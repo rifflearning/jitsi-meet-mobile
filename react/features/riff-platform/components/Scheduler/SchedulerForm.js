@@ -400,6 +400,8 @@ const SchedulerForm = ({
             return updateScheduleMeeting(id, {
                 name,
                 description,
+                dateStart: new Date(date).getTime(),
+                dateEnd: dateEnd.getTime(),
                 allowAnonymous,
                 waitForHost,
                 forbidNewParticipantsAfterDateEnd
