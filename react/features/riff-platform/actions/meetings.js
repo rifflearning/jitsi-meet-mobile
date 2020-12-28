@@ -29,7 +29,7 @@ export function getMeetings(listType) {
 
         try {
             const res = await api.fetchMeetings(listType);
-            
+
             dispatch(meetingsSuccess(res));
         } catch (e) {
             console.error('Error in getMeetings', e);
@@ -48,21 +48,6 @@ export function getMeetingsByGroup(groupName, listType) {
             dispatch(meetingsSuccess(res));
         } catch (e) {
             console.error('Error in getMeetingsByGroup', e);
-            dispatch(meetingsFailure(e.message));
-        }
-    };
-}
-
-export function getMeetingsRecurring(roomId, listType) {
-    return async dispatch => {
-        dispatch(meetingsRequest());
-
-        try {
-            const res = await api.fetchMeetingsRecurring(roomId, listType);
-
-            dispatch(meetingsSuccess(res));
-        } catch (e) {
-            console.error('Error in getMeetingsRecurring', e);
             dispatch(meetingsFailure(e.message));
         }
     };
