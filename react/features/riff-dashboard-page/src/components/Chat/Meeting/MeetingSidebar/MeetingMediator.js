@@ -165,7 +165,7 @@ const mapStateToProps = state => ({
         }
         return maybeExtractIdFromDisplayName(p.name).firebaseId;
     }),
-    webRtcRoom: state['features/riff-platform'].meeting.meeting.name
+    webRtcRoom: state['features/riff-platform'].meeting.meeting?.name
 });
 
 const ConnectedMeetingMediator = connect(mapStateToProps)(MeetingMediator);
