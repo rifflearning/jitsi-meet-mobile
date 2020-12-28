@@ -714,7 +714,9 @@ const SchedulerForm = ({
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
                             onChange = { e => setRecurringMeeting(e.target.checked) }
-                            disabled = { isEditing } />
+                            disabled = { isEditOneOccurrence
+                                || isEditAllMeetingsRecurring
+                                || isEditGrouppedMeetings } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -1045,7 +1047,9 @@ const SchedulerForm = ({
                                 name = 'isMultipleRooms'
                                 checked = { isMultipleRooms }
                                 onChange = { e => setisMultipleRooms(e.target.checked) }
-                                disabled = { isEditing } />
+                                disabled = { isEditOneOccurrence
+                                    || isEditAllMeetingsRecurring
+                                    || isEditGrouppedMeetings } />
                             } />
                     </Grid>
                     {isMultipleRooms
