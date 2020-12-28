@@ -16,10 +16,10 @@ import { connect } from '../../base/redux';
 import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as ROUTES from '../constants/routes';
 
+import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
 import Meetings from './Meetings';
-import EditMeeting from './Meetings/EditMeeting';
 import Profile from './Profile';
 import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';

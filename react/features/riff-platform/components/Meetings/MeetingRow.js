@@ -47,7 +47,8 @@ const MeetingsRow = ({
     removeMeeting,
     removeMeetingsMultipleRooms,
     removeMeetingsRecurring,
-    groupName }) => {
+    groupName,
+    meetingsListType }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -101,13 +102,15 @@ const MeetingsRow = ({
     };
 
     const onEditDialogClose = value => {
+        const url = `${ROUTES.MEETING}/${meeting._id}/edit`;
+
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
-            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit`);
+            return history.push(url);
         } else if (value === 'Edit all recurring meetings') {
-            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=all`);
+            return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=one`);
-        } else if (value === 'Edit groupped meetings' && !meeting.recurringParentMeetingId) {
+            return history.push(`${url}?mode=one`);
+        } else if (value === 'Edit groupped meetings') {
             const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
 
             return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
@@ -173,7 +176,8 @@ const MeetingsRow = ({
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
                     && <>
-                        <Button
+                        { meetingsListType === 'upcoming'
+                        && <Button
                             className = { classes.meetingButton }
                             color = 'default'
                             // eslint-disable-next-line react/jsx-no-bind
@@ -181,6 +185,7 @@ const MeetingsRow = ({
                             variant = 'outlined'>
                         Edit
                         </Button>
+                        }
                         <Button
                             className = { classes.meetingButton }
                             // eslint-disable-next-line react/jsx-no-bind
@@ -209,13 +214,16 @@ MeetingsRow.propTypes = {
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
+    meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
     removeMeetingsMultipleRooms: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = state => {
+    return {
+        meetingsListType: state['features/riff-platform'].meetings.listType
+    };
 };
 
 const mapDispatchToProps = dispatch => {

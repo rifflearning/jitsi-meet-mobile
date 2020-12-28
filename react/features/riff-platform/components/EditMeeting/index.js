@@ -7,13 +7,17 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
 import { connect } from '../../../base/redux';
-import { schedulerReset } from '../../actions/scheduler';
+import { updateSchedulerReset } from '../../actions/scheduler';
 import SchedulerForm from '../Scheduler/SchedulerForm';
 import StyledPaper from '../StyledPaper';
 
 
-const EditMeeting = ({ scheduledMeeting, resetScheduleMeeting }) => {
-    useEffect(() => () => resetScheduleMeeting(), []);
+const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) => {
+    useEffect(() => {
+        resetUpdatedScheduleMeeting();
+
+        return () => resetUpdatedScheduleMeeting();
+    }, []);
 
     return (
         <Grid
@@ -23,8 +27,8 @@ const EditMeeting = ({ scheduledMeeting, resetScheduleMeeting }) => {
                 item = { true }
                 xs = { 12 }>
                 <StyledPaper title = 'Edit a meeting'>
-                    {scheduledMeeting
-                        ? `Meeting ${scheduledMeeting.name} updated!`
+                    {updatedSheduledMeeting
+                        ? `Meeting ${updatedSheduledMeeting.name} updated!`
                         : <SchedulerForm isEditing = { true } />
                     }
                 </StyledPaper>
@@ -34,18 +38,18 @@ const EditMeeting = ({ scheduledMeeting, resetScheduleMeeting }) => {
 };
 
 EditMeeting.propTypes = {
-    resetScheduleMeeting: PropTypes.func,
-    scheduledMeeting: PropTypes.object
+    resetUpdatedScheduleMeeting: PropTypes.func,
+    updatedSheduledMeeting: PropTypes.object
 };
 
 const mapStateToProps = state => {
     return {
-        scheduledMeeting: state['features/riff-platform'].scheduler.meeting
+        updatedSheduledMeeting: state['features/riff-platform'].scheduler.updatedMeeting
     };
 };
 const mapDispatchToProps = dispatch => {
     return {
-        resetScheduleMeeting: () => dispatch(schedulerReset())
+        resetUpdatedScheduleMeeting: () => dispatch(updateSchedulerReset())
     };
 };
 

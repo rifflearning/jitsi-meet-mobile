@@ -239,7 +239,9 @@ const SchedulerForm = ({
     meeting,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
-    updateScheduleMeetingsMultipleRooms
+    updateScheduleMeetingsMultipleRooms,
+    updateError,
+    updateLoading
 }) => {
     const classes = useStyles();
 
@@ -295,7 +297,6 @@ const SchedulerForm = ({
     }, []);
 
     useEffect(() => {
-        console.log('meetings', meeting);
         if (meeting && isEditing) {
             const meetingDuration = moment
             .duration(moment(meeting.dateEnd)
@@ -303,9 +304,6 @@ const SchedulerForm = ({
 
             const durationH = meetingDuration.asHours();
             const durationM = meetingDuration.asMinutes() - (60 * durationH);
-
-            console.log('duration', { durationH,
-                durationM });
 
             setHours(durationH);
             setMinutes(durationM);
@@ -386,6 +384,8 @@ const SchedulerForm = ({
             } else if (isEditOneOccurrence) {
                 return updateScheduleMeeting(id, {
                     description,
+                    dateStart: new Date(date).getTime(),
+                    dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd
@@ -573,7 +573,9 @@ const SchedulerForm = ({
                         onChange = { e => setname(e.target.value) }
                         error = { Boolean(nameError) }
                         helperText = { nameError }
-                        disabled = { isEditOneOccurrence || isEditGrouppedMeetings } />
+
+                        // disabled when edit one occurrence or meeting has multiple rooms
+                        disabled = { isEditOneOccurrence || (isEditing && Boolean(meeting?.multipleRoomsParentId)) } />
                 </Grid>
                 <Grid
                     item
@@ -630,8 +632,7 @@ const SchedulerForm = ({
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
                                     }}
-                                    disabled = { isEditOneOccurrence
-                                    || isEditAllMeetingsRecurring } />
+                                    disabled = { isEditAllMeetingsRecurring } />
                             </Grid>
                             <Grid item>
                                 <KeyboardTimePicker
@@ -644,8 +645,7 @@ const SchedulerForm = ({
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change time'
                                     }}
-                                    disabled = { isEditOneOccurrence
-                                        || isEditAllMeetingsRecurring } />
+                                    disabled = { isEditAllMeetingsRecurring } />
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
@@ -675,8 +675,7 @@ const SchedulerForm = ({
                             value = { hours }
                             onChange = { e => setHours(e.target.value) }
                             error = { Boolean(durationError) }
-                            disabled = { isEditOneOccurrence
-                                || isEditAllMeetingsRecurring } >
+                            disabled = { isEditAllMeetingsRecurring } >
                             {hoursArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -691,8 +690,7 @@ const SchedulerForm = ({
                             onChange = { e => setMinutes(e.target.value) }
                             error = { Boolean(durationError) }
                             helperText = { durationError }
-                            disabled = { isEditOneOccurrence
-                                || isEditAllMeetingsRecurring } >
+                            disabled = { isEditAllMeetingsRecurring } >
                             {minutesArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -1081,7 +1079,7 @@ const SchedulerForm = ({
                         variant = 'contained'
                         color = 'primary'
                         className = { classes.submit }
-                        disabled = { loading }>
+                        disabled = { loading || updateLoading }>
             Save
                     </Button>
                 </Grid>
@@ -1094,7 +1092,7 @@ const SchedulerForm = ({
                     </Button>
                 </Grid>
                 <Typography color = 'error'>
-                    {error}
+                    {error || (isEditing && updateError)}
                 </Typography>
             </Grid>
         </form>
@@ -1108,6 +1106,8 @@ SchedulerForm.propTypes = {
     loading: PropTypes.bool,
     meeting: PropTypes.any,
     scheduleMeeting: PropTypes.func,
+    updateError: PropTypes.string,
+    updateLoading: PropTypes.bool,
     updateScheduleMeeting: PropTypes.func,
     updateScheduleMeetingsMultipleRooms: PropTypes.func,
     updateScheduleMeetingsRecurring: PropTypes.func,
@@ -1119,7 +1119,9 @@ const mapStateToProps = state => {
         userId: state['features/riff-platform'].signIn.user?.uid,
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
-        meeting: state['features/riff-platform'].meeting.meeting
+        meeting: state['features/riff-platform'].meeting.meeting,
+        updateError: state['features/riff-platform'].scheduler.updateError,
+        updateLoading: state['features/riff-platform'].scheduler.updateLoading
     };
 };
 

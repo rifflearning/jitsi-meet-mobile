@@ -29,7 +29,7 @@ export function getMeetings(listType) {
 
         try {
             const res = await api.fetchMeetings(listType);
-
+            
             dispatch(meetingsSuccess(res));
         } catch (e) {
             console.error('Error in getMeetings', e);

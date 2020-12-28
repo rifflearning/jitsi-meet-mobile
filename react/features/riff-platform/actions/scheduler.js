@@ -37,43 +37,69 @@ export function schedule(meeting) {
     };
 }
 
+function updateSchedulerRequest() {
+    return {
+        type: actionTypes.UPDATE_SCHEDULER_REQUEST
+    };
+}
+
+function updateSchedulerSuccess(meeting) {
+    return {
+        type: actionTypes.UPDATE_SCHEDULER_SUCCESS,
+        meeting
+    };
+}
+
+function updateSchedulerFailure(error) {
+    return {
+        type: actionTypes.UPDATE_SCHEDULER_FAILURE,
+        error
+    };
+}
+
+
 export function updateSchedule(id, meeting) {
     return async dispatch => {
-        dispatch(schedulerRequest());
+        dispatch(updateSchedulerRequest());
 
         try {
             const res = await api.updateMeeting(id, meeting);
 
-            dispatch(schedulerSuccess(res));
+            dispatch(updateSchedulerSuccess(res));
         } catch (e) {
-            dispatch(schedulerFailure(e.message));
+            dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
 
 export function updateScheduleRecurring(roomId, meeting) {
-    return async dispatch => {
-        dispatch(schedulerRequest());
+    return async (dispatch, getState) => {
+        dispatch(updateSchedulerRequest());
+        const state = getState();
+        const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            const res = await api.updateMeetingsRecurring(roomId, meeting);
+            await api.updateMeetingsRecurring(roomId, meeting);
 
-            dispatch(schedulerSuccess(res));
+            dispatch(updateSchedulerSuccess(currentMeeting));
         } catch (e) {
-            dispatch(schedulerFailure(e.message));
+            dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
 
 export function updateScheduleMultipleRooms(id, meeting) {
-    return async dispatch => {
-        dispatch(schedulerRequest());
+    return async (dispatch, getState) => {
+        dispatch(updateSchedulerRequest());
+        const state = getState();
+        const currentMeeting = state['features/riff-platform'].meeting.meeting;
+
         try {
-            const res = await api.updateMeetingsMultipleRooms(id, meeting);
-            
-            dispatch(schedulerSuccess(res));
+            await api.updateMeetingsMultipleRooms(id, meeting);
+
+            dispatch(updateSchedulerSuccess(currentMeeting));
         } catch (e) {
-            dispatch(schedulerFailure(e.message));
+            dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
@@ -81,5 +107,11 @@ export function updateScheduleMultipleRooms(id, meeting) {
 export function schedulerReset() {
     return {
         type: actionTypes.SCHEDULER_RESET
+    };
+}
+
+export function updateSchedulerReset() {
+    return {
+        type: actionTypes.UPDATE_SCHEDULER_RESET
     };
 }
