@@ -23,6 +23,8 @@ const useStyles = makeStyles(() => {
         },
         tableRow: {
             '&:hover': {
+                boxShadow: '-1px 10px 5px -6px rgba(46,45,46,1)',
+                cursor: 'pointer',
                 '& $meetingButton': {
                     visibility: 'visible'
                 }
@@ -53,7 +55,8 @@ const MeetingsRow = ({
     const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
 
-    const handleLinkCopy = () => {
+    const handleLinkCopy = e => {
+        e.stopPropagation();
         let id = meeting._id;
 
         if (meeting.multipleRooms) {
@@ -68,7 +71,8 @@ const MeetingsRow = ({
         setLinkCopied(true);
         setTimeout(() => setLinkCopied(false), 1000);
     };
-    const handleStartClick = () => {
+    const handleStartClick = e => {
+        e.stopPropagation();
         let id = meeting._id;
 
         if (meeting.multipleRooms) {
@@ -82,7 +86,8 @@ const MeetingsRow = ({
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
 
-    const onDialogClose = value => {
+    const onDialogClose = (e, value) => {
+        e.stopPropagation();
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
         } else if (value === 'Delete groupped meetings') {
@@ -93,7 +98,10 @@ const MeetingsRow = ({
         setisOpenDeleteDialog(false);
     };
 
-    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+    const handleDeleteClick = e => {
+        e.stopPropagation();
+        setisOpenDeleteDialog(true);
+    };
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
@@ -101,10 +109,27 @@ const MeetingsRow = ({
         multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
+
+    const handleMeetingItemClick = e => {
+        e.preventDefault();
+        let id = meeting._id;
+
+        if (meeting.multipleRooms) {
+            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+
+            if (_id) {
+                id = _id;
+            }
+        }
+        history.push(`${ROUTES.MEETING}/${id}`);
+    };
+
     return (
         <TableRow
             className = { classes.tableRow }
-            key = { meeting._id }>
+            key = { meeting._id }
+            // eslint-disable-next-line react/jsx-no-bind
+            onClick = { handleMeetingItemClick }>
             <TableCell>
                 <Typography
                     component = 'p'
@@ -122,7 +147,10 @@ const MeetingsRow = ({
                         SelectProps = {{ MenuProps }}
                         value = { multipleRoom }
                         // eslint-disable-next-line react/jsx-no-bind, react/jsx-sort-props
-                        onChange = { e => setmultipleRooms(e.target.value) }>
+                        onChange = { e => {
+                            e.stopPropagation();
+                            setmultipleRooms(e.target.value);
+                        } }>
                         {meeting.multipleRooms.map(m => (<MenuItem
                             key = { m._id }
                             value = { m.name }>{m.name}</MenuItem>))}
@@ -155,6 +183,7 @@ const MeetingsRow = ({
                     </Button>
                 }
                 <ConfirmationDialogRaw
+                    // eslint-disable-next-line react/jsx-no-bind
                     onClose = { onDialogClose }
                     open = { isOpenDeleteDialog }
                     value = { dialogValues } />

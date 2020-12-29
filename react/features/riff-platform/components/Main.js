@@ -25,6 +25,7 @@ import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Waiting from './Waiting';
+import Meeting from './Meeting';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -75,6 +76,9 @@ const Main = ({ user }) => {
             }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
+            </Route>
+            <Route path = { `${ROUTES.MEETING}/:meetingId` }>
+                <Meeting />
             </Route>
             <Redirect to = { ROUTES.PROFILE } />
         </Switch>
