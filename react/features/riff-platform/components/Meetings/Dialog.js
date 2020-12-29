@@ -15,7 +15,7 @@ import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 export function ConfirmationDialogRaw(props) {
-  const { onClose, value: valueProp, open, ...other } = props;
+  const { title, onClose, value: valueProp, open, ...other } = props;
   const [value, setValue] = React.useState();
   const radioGroupRef = React.useRef(null);
 
@@ -56,7 +56,7 @@ export function ConfirmationDialogRaw(props) {
       {...other}
     >
       <DialogTitle id="confirmation-dialog-title" >
-        <span style={{ color: 'white' }}>Delete meeting?</span>
+        <span style={{ color: 'white' }}>{title}</span>
       </DialogTitle>
       <DialogContent dividers>
         <RadioGroup

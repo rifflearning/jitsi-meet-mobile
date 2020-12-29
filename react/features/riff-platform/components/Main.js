@@ -16,8 +16,10 @@ import { connect } from '../../base/redux';
 import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as ROUTES from '../constants/routes';
 
+import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
+import Meeting from './Meeting';
 import Meetings from './Meetings';
 import Profile from './Profile';
 import ResetPassword from './ResetPassword';
@@ -25,7 +27,6 @@ import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Waiting from './Waiting';
-import Meeting from './Meeting';
 
 const useStyles = makeStyles(theme => {
     return {
@@ -67,6 +68,9 @@ const Main = ({ user }) => {
                 path = { ROUTES.DASHBOARD } />
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
+            </Route>
+            <Route path = { `${ROUTES.MEETING}/:id/edit` } >
+                <EditMeeting />
             </Route>
             {negotiationsGroupId
                 && <Route
