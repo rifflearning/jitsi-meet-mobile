@@ -16,6 +16,7 @@ import { connect } from '../../base/redux';
 import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as ROUTES from '../constants/routes';
 
+import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
 import Meetings from './Meetings';
@@ -66,6 +67,9 @@ const Main = ({ user }) => {
                 path = { ROUTES.DASHBOARD } />
             <Route path = { ROUTES.MEETINGS } >
                 <Meetings />
+            </Route>
+            <Route path = { `${ROUTES.MEETING}/:id/edit` } >
+                <EditMeeting />
             </Route>
             {negotiationsGroupId
                 && <Route

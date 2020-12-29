@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-bind */
+
 import { Button, makeStyles, MenuItem, TextField, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -45,13 +47,15 @@ const MeetingsRow = ({
     removeMeeting,
     removeMeetingsMultipleRooms,
     removeMeetingsRecurring,
-    groupName }) => {
+    groupName,
+    meetingsListType }) => {
     const classes = useStyles();
     const history = useHistory();
 
     const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
+    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     const handleLinkCopy = () => {
         let id = meeting._id;
@@ -82,7 +86,11 @@ const MeetingsRow = ({
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
 
-    const onDialogClose = value => {
+    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+
+    const handleEditClick = () => setIsOpenEditDialog(true);
+
+    const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
         } else if (value === 'Delete groupped meetings') {
@@ -93,13 +101,33 @@ const MeetingsRow = ({
         setisOpenDeleteDialog(false);
     };
 
-    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+    const onEditDialogClose = value => {
+        const url = `${ROUTES.MEETING}/${meeting._id}/edit`;
+
+        if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
+            return history.push(url);
+        } else if (value === 'Edit all recurring meetings') {
+            return history.push(`${url}?mode=all`);
+        } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
+            return history.push(`${url}?mode=one`);
+        } else if (value === 'Edit groupped meetings') {
+            const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+
+            return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
+        }
+
+        setIsOpenEditDialog(false);
+    };
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
-    const dialogValues = [
+    const dialogDeleteValues = [
         multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
+
+    const dialogEditValues = [
+        multipleRoom ? 'Edit groupped meetings' : 'Edit one meeting',
+        meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
     return (
         <TableRow
@@ -147,17 +175,35 @@ const MeetingsRow = ({
                     onClick = { handleLinkCopy }
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
-                    && <Button
-                        className = { classes.meetingButton }
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick = { handleDeleteClick }>
+                    && <>
+                        { meetingsListType === 'upcoming'
+                        && <Button
+                            className = { classes.meetingButton }
+                            color = 'default'
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onClick = { handleEditClick }
+                            variant = 'outlined'>
+                        Edit
+                        </Button>
+                        }
+                        <Button
+                            className = { classes.meetingButton }
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onClick = { handleDeleteClick }>
                         Delete
-                    </Button>
+                        </Button>
+                   </>
                 }
                 <ConfirmationDialogRaw
-                    onClose = { onDialogClose }
+                    onClose = { onDeleteDialogClose }
                     open = { isOpenDeleteDialog }
-                    value = { dialogValues } />
+                    title = 'Delete meeting?'
+                    value = { dialogDeleteValues } />
+                <ConfirmationDialogRaw
+                    onClose = { onEditDialogClose }
+                    open = { isOpenEditDialog }
+                    title = 'Edit meeting'
+                    value = { dialogEditValues } />
             </TableCell>
         </TableRow>
     );
@@ -165,16 +211,19 @@ const MeetingsRow = ({
 
 
 MeetingsRow.propTypes = {
-    // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
+    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
+    meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
     removeMeetingsMultipleRooms: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = state => {
+    return {
+        meetingsListType: state['features/riff-platform'].meetings.listType
+    };
 };
 
 const mapDispatchToProps = dispatch => {
