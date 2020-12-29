@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => {
         },
         tableRow: {
             '&:hover': {
-                boxShadow: '-1px 10px 5px -6px rgba(46,45,46,1)',
+                boxShadow: '0 3px 9px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.18)',
                 cursor: 'pointer',
                 '& $meetingButton': {
                     visibility: 'visible'
@@ -51,26 +51,9 @@ const MeetingsRow = ({
     const classes = useStyles();
     const history = useHistory();
 
-    const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
 
-    const handleLinkCopy = e => {
-        e.stopPropagation();
-        let id = meeting._id;
-
-        if (meeting.multipleRooms) {
-            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
-
-            if (_id) {
-                id = _id;
-            }
-        }
-
-        navigator.clipboard.writeText(`${window.location.origin}/${id}`);
-        setLinkCopied(true);
-        setTimeout(() => setLinkCopied(false), 1000);
-    };
     const handleStartClick = e => {
         e.stopPropagation();
         let id = meeting._id;
@@ -168,12 +151,6 @@ const MeetingsRow = ({
                     // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleStartClick }
                     variant = 'contained'>Start</Button>
-                <Button
-                    className = { classes.meetingButton }
-                    color = { isLinkCopied ? 'default' : 'primary' }
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onClick = { handleLinkCopy }
-                    variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
                     && <Button
                         className = { classes.meetingButton }
