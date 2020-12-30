@@ -1,5 +1,6 @@
 /* eslint-disable require-jsdoc */
 
+import { deleteMeeting, deleteMeetingsRecurring } from '../actions/meetings';
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
 
@@ -63,9 +64,9 @@ export function updateSchedule(id, meeting) {
         dispatch(updateSchedulerRequest());
 
         try {
-            const res = await api.updateMeeting(id, meeting);
-
-            dispatch(updateSchedulerSuccess(res));
+            dispatch(deleteMeeting(id));
+            dispatch(schedule(meeting));
+            dispatch(updateSchedulerSuccess(meeting));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
@@ -79,8 +80,8 @@ export function updateScheduleRecurring(roomId, meeting) {
         const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            await api.updateMeetingsRecurring(roomId, meeting);
-
+            dispatch(deleteMeetingsRecurring(roomId));
+            dispatch(schedule(meeting));
             dispatch(updateSchedulerSuccess(currentMeeting));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));

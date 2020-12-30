@@ -445,11 +445,17 @@ const SchedulerForm = ({
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
                 return updateScheduleMeetingsRecurring(meeting.roomId, {
+                    createdBy: userId,
                     name,
                     description,
+                    dateStart: new Date(date).getTime(),
+                    dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
-                    forbidNewParticipantsAfterDateEnd
+                    recurrenceValues,
+                    recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
+                    forbidNewParticipantsAfterDateEnd,
+                    multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
                 });
             } else if (isEditOneOccurrence) {
                 return updateScheduleMeeting(id, {
@@ -458,23 +464,20 @@ const SchedulerForm = ({
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd
                 });
-            } else if (isEditGrouppedMeetings) {
-                return updateScheduleMeetingsMultipleRooms(meeting.multipleRoomsParentId, {
-                    description,
-                    allowAnonymous,
-                    waitForHost,
-                    forbidNewParticipantsAfterDateEnd
-                });
             }
 
-            return updateScheduleMeeting(id, {
+            return updateScheduleMeeting(meeting._id, {
+                createdBy: userId,
                 name,
                 description,
                 dateStart: new Date(date).getTime(),
                 dateEnd: dateEnd.getTime(),
                 allowAnonymous,
                 waitForHost,
-                forbidNewParticipantsAfterDateEnd
+                recurrenceValues,
+                recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
+                forbidNewParticipantsAfterDateEnd,
+                multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
             });
 
         }
