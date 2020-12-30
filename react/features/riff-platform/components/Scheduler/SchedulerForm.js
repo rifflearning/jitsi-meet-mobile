@@ -209,6 +209,12 @@ const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) =
     return acc;
 }, []);
 
+const getDaysOfWeekObj = daysOfWeekArr => daysOfWeekArr.reduce((acc, v) => {
+    acc[v] = true;
+
+    return acc;
+}, {});
+
 const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     const hStart = moment.utc(startDate).hours();
     const mStart = moment.utc(startDate).minutes();
@@ -310,6 +316,40 @@ const SchedulerForm = ({
             setdate(meeting.dateStart);
             setForbidNewParticipantsAfterDateEnd(meeting.forbidNewParticipantsAfterDateEnd);
             setWaitForHost(meeting.waitForHost);
+
+            if (meeting.multipleRoomsQuantity) {
+                setisMultipleRooms(true);
+                setmultipleRooms(meeting.multipleRoomsQuantity);
+            }
+
+            if (meeting.recurrenceOptions?.type) {
+                setRecurringMeeting(true);
+                setRecurrenceType(meeting.recurrenceOptions.type);
+                if (meeting.recurrenceOptions.endDate) {
+                    setEndDateBy('endDateTime');
+                    setEndDate(meeting.recurrenceOptions.endDate);
+                } else {
+                    setEndDateBy('endTimes');
+                    setEndTimes(meeting.recurrenceOptions.endTimes);
+                }
+
+                if (meeting.recurrenceOptions.type === 'daily') {
+                    setRecurrenceInterval(meeting.recurrenceOptions.dailyInterval);
+                } else if (meeting.recurrenceOptions.type === 'weekly') {
+                    setDaysOfWeek({ ...daysOfWeek,
+                        ...getDaysOfWeekObj(meeting.recurrenceOptions.daysOfWeek) });
+                } else if (meeting.recurrenceOptions.type === 'monthly') {
+                    if (meeting.recurrenceOptions.monthlyByDay) {
+                        setMonthlyBy('monthlyByDay');
+                        setMonthlyByDay(meeting.recurrenceOptions.monthlyByDay);
+                    } else if (meeting.recurrenceOptions.monthlyByPosition
+                        && meeting.recurrenceOptions.monthlyByWeekDay) {
+                        setMonthlyBy('monthlyByWeekDay');
+                        setMonthlyByPosition(meeting.recurrenceOptions.monthlyByPosition);
+                        setMonthlyByWeekDay(meeting.recurrenceOptions.monthlyByWeekDay);
+                    }
+                }
+            }
         }
     }, [ meeting ]);
 
@@ -339,6 +379,10 @@ const SchedulerForm = ({
     const isEditOneOccurrence = defineEditMode() === 'one';
     const isEditGrouppedMeetings = defineEditMode() === 'group';
 
+    const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
+        day => daysOfWeekMap[day]
+    );
+
     const handleSubmit = e => {
         e.preventDefault();
         if (!isFormValid()) {
@@ -357,6 +401,33 @@ const SchedulerForm = ({
                     minutes } })
             : null;
 
+        const getRecurrenceOptions = () => {
+            const recurrenceOptions = {
+                type: recurrenceType
+            };
+
+            if (endDateBy === 'endDateTime') {
+                recurrenceOptions.endDate = endDate;
+            } else {
+                recurrenceOptions.endTimes = endTimes;
+            }
+
+            if (recurrenceType === 'daily') {
+                recurrenceOptions.dailyInterval = recurrenceInterval;
+            } else if (recurrenceType === 'weekly') {
+                recurrenceOptions.daysOfWeek = getDaysOfWeekArr(daysOfWeek);
+            } else if (recurrenceType === 'monthly') {
+                if (monthlyBy === 'monthlyByDay') {
+                    recurrenceOptions.monthlyByDay = monthlyByDay;
+                } else {
+                    recurrenceOptions.monthlyByPosition = monthlyByPosition;
+                    recurrenceOptions.monthlyByWeekDay = monthlyByWeekDay;
+                }
+            }
+
+            return recurrenceOptions;
+        };
+
         if (!isEditing) {
             return scheduleMeeting({
                 createdBy: userId,
@@ -367,6 +438,7 @@ const SchedulerForm = ({
                 allowAnonymous,
                 waitForHost,
                 recurrenceValues,
+                recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
                 forbidNewParticipantsAfterDateEnd,
                 multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
             });
@@ -416,10 +488,6 @@ const SchedulerForm = ({
         monthly: moment(date).add(2, 'years')
 .endOf('year')
     };
-
-    const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
-        day => daysOfWeekMap[day]
-    );
 
     useEffect(() => {
         if (endDateBy === 'endDateTime') {
@@ -623,10 +691,7 @@ const SchedulerForm = ({
                                     onChange = { setdate }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
-                                    }}
-                                    disabled = { isEditAllMeetingsRecurring
-                                    || isEditGrouppedMeetings
-                                    || isEditOneOccurrence } />
+                                    }} />
                             </Grid>
                             <Grid item>
                                 <KeyboardTimePicker
@@ -638,10 +703,7 @@ const SchedulerForm = ({
                                     onChange = { setdate }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change time'
-                                    }}
-                                    disabled = { isEditAllMeetingsRecurring
-                                        || isEditGrouppedMeetings
-                                        || isEditOneOccurrence } />
+                                    }} />
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
@@ -670,10 +732,7 @@ const SchedulerForm = ({
                             label = 'Hours'
                             value = { hours }
                             onChange = { e => setHours(e.target.value) }
-                            error = { Boolean(durationError) }
-                            disabled = { isEditAllMeetingsRecurring
-                                || isEditGrouppedMeetings
-                                || isEditOneOccurrence } >
+                            error = { Boolean(durationError) } >
                             {hoursArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -687,10 +746,7 @@ const SchedulerForm = ({
                             value = { minutes }
                             onChange = { e => setMinutes(e.target.value) }
                             error = { Boolean(durationError) }
-                            helperText = { durationError }
-                            disabled = { isEditAllMeetingsRecurring
-                                || isEditGrouppedMeetings
-                                || isEditOneOccurrence } >
+                            helperText = { durationError } >
                             {minutesArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -711,8 +767,7 @@ const SchedulerForm = ({
                         control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
-                            onChange = { e => setRecurringMeeting(e.target.checked) }
-                            disabled = { isEditing } />
+                            onChange = { e => setRecurringMeeting(e.target.checked) } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -1042,8 +1097,7 @@ const SchedulerForm = ({
                             control = { <Switch
                                 name = 'isMultipleRooms'
                                 checked = { isMultipleRooms }
-                                onChange = { e => setisMultipleRooms(e.target.checked) }
-                                disabled = { isEditing } />
+                                onChange = { e => setisMultipleRooms(e.target.checked) } />
                             } />
                     </Grid>
                     {isMultipleRooms
