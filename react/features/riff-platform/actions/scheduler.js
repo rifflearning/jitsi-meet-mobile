@@ -1,5 +1,4 @@
 /* eslint-disable require-jsdoc */
-import { deleteMeeting, deleteMeetingsRecurring } from '../actions/meetings';
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
 import { checkMeetingSingleOccurrenceDate } from '../functions';
@@ -64,9 +63,10 @@ export function updateSchedule(id, meeting) {
         dispatch(updateSchedulerRequest());
 
         try {
-            dispatch(deleteMeeting(id));
-            dispatch(schedule(meeting));
-            dispatch(updateSchedulerSuccess(meeting));
+            await api.deleteMeeting(id);
+            const res = await api.scheduleMeeting(meeting);
+
+            dispatch(schedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
@@ -74,15 +74,14 @@ export function updateSchedule(id, meeting) {
 }
 
 export function updateScheduleRecurring(roomId, meeting) {
-    return async (dispatch, getState) => {
+    return async dispatch => {
         dispatch(updateSchedulerRequest());
-        const state = getState();
-        const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            dispatch(deleteMeetingsRecurring(roomId));
-            dispatch(schedule(meeting));
-            dispatch(updateSchedulerSuccess(currentMeeting));
+            await api.deleteMeetingsRecurring(roomId);
+            const res = await api.scheduleMeeting(meeting);
+
+            dispatch(schedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
