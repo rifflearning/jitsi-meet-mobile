@@ -53,35 +53,20 @@ const MeetingsRow = ({
     const history = useHistory();
 
     const [ isLinkCopied, setLinkCopied ] = useState(false);
-    const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
+    const [ multipleRoom, setmultipleRooms ] = useState(1);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     const handleLinkCopy = () => {
-        let id = meeting._id;
+        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+        const description = meeting.description ? ` ${meeting.description}` : '';
 
-        if (meeting.multipleRooms) {
-            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
-
-            if (_id) {
-                id = _id;
-            }
-        }
-
-        navigator.clipboard.writeText(`${window.location.origin}/${id}`);
+        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
         setLinkCopied(true);
         setTimeout(() => setLinkCopied(false), 1000);
     };
     const handleStartClick = () => {
-        let id = meeting._id;
-
-        if (meeting.multipleRooms) {
-            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
-
-            if (_id) {
-                id = _id;
-            }
-        }
+        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
 
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
@@ -93,9 +78,7 @@ const MeetingsRow = ({
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete groupped meetings') {
-            return removeMeetingsMultipleRooms(meeting._id);
-        } else if (value === 'Delete one meeting') {
+        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
@@ -121,13 +104,15 @@ const MeetingsRow = ({
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
-    const dialogDeleteValues = [
-        multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
+    const dialogDeleteValues = [ 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
-    const dialogEditValues = [
-        multipleRoom ? 'Edit groupped meetings' : 'Edit one meeting',
+    const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
+
+    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
+
+    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
 
     return (
         <TableRow
@@ -142,7 +127,7 @@ const MeetingsRow = ({
             </TableCell>
             <TableCell>
 
-                {meeting.multipleRooms
+                {meeting.multipleRoomsQuantity
                     ? <TextField
                         id = 'room-names'
                         select = { true }
@@ -151,9 +136,11 @@ const MeetingsRow = ({
                         value = { multipleRoom }
                         // eslint-disable-next-line react/jsx-no-bind, react/jsx-sort-props
                         onChange = { e => setmultipleRooms(e.target.value) }>
-                        {meeting.multipleRooms.map(m => (<MenuItem
-                            key = { m._id }
-                            value = { m.name }>{m.name}</MenuItem>))}
+                        {roomsNumbersArr.map(el => (<MenuItem
+                            key = { el }
+                            value = { el }>
+                            {meeting.name}-{el}
+                        </MenuItem>))}
                     </TextField>
                     : <Typography
                         component = 'p'

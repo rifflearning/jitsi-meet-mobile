@@ -82,7 +82,7 @@ const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const minutesArray = [ 0, 15, 30, 45 ];
 
 // eslint-disable-next-line max-len
-const multipleMeetingArray = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ];
+const multipleMeetingArray = getNumberArr(99);
 const recurrenceIntervalArray = getNumberArr(20);
 const recurrenceTypeArray = [ 'daily', 'weekly', 'monthly' ];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
@@ -280,7 +280,7 @@ const SchedulerForm = ({
     const [ durationError, setDurationError ] = useState('');
 
     const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
-    const [ multipleRooms, setmultipleRooms ] = useState(1);
+    const [ multipleRooms, setmultipleRooms ] = useState(2);
 
     const { id } = useParams();
 
@@ -370,7 +370,7 @@ const SchedulerForm = ({
                 waitForHost,
                 recurrenceValues,
                 forbidNewParticipantsAfterDateEnd,
-                multipleRooms: multipleRooms > 1 ? multipleRooms : null
+                multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
             });
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
