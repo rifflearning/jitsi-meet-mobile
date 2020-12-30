@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-sort-props */
-
 import MomentUtils from '@date-io/moment';
 import {
     Button,
@@ -15,6 +14,7 @@ import {
     Switch
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
@@ -31,7 +31,7 @@ import { getMeeting } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
-    updateScheduleMultipleRooms
+    updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 
 import {
@@ -64,6 +64,9 @@ const useStyles = makeStyles(theme => {
         },
         submit: {
             margin: theme.spacing(3, 0, 2)
+        },
+        formAlert: {
+            border: 'none'
         }
     };
 });
@@ -243,7 +246,7 @@ const SchedulerForm = ({
     meeting,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
-    updateScheduleMeetingsMultipleRooms,
+    updateScheduleMeetingRecurringSingleOccurrence,
     updateError,
     updateLoading
 }) => {
@@ -377,7 +380,6 @@ const SchedulerForm = ({
 
     const isEditAllMeetingsRecurring = defineEditMode() === 'all';
     const isEditOneOccurrence = defineEditMode() === 'one';
-    const isEditGrouppedMeetings = defineEditMode() === 'group';
 
     const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
         day => daysOfWeekMap[day]
@@ -427,58 +429,39 @@ const SchedulerForm = ({
 
             return recurrenceOptions;
         };
+        const meetingData = {
+            createdBy: userId,
+            name,
+            description,
+            dateStart: new Date(date).getTime(),
+            dateEnd: dateEnd.getTime(),
+            allowAnonymous,
+            waitForHost,
+            recurrenceValues,
+            recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
+            forbidNewParticipantsAfterDateEnd,
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
+        };
 
         if (!isEditing) {
-            return scheduleMeeting({
-                createdBy: userId,
-                name,
-                description,
-                dateStart: new Date(date).getTime(),
-                dateEnd: dateEnd.getTime(),
-                allowAnonymous,
-                waitForHost,
-                recurrenceValues,
-                recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
-                forbidNewParticipantsAfterDateEnd,
-                multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
-            });
+            return scheduleMeeting(meetingData);
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
-                return updateScheduleMeetingsRecurring(meeting.roomId, {
-                    createdBy: userId,
+                return updateScheduleMeetingsRecurring(meeting.roomId, meetingData);
+            } else if (isEditOneOccurrence) {
+                return updateScheduleMeetingRecurringSingleOccurrence(id, meeting.roomId, {
                     name,
                     description,
                     dateStart: new Date(date).getTime(),
                     dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
-                    recurrenceValues,
-                    recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
                     forbidNewParticipantsAfterDateEnd,
                     multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
                 });
-            } else if (isEditOneOccurrence) {
-                return updateScheduleMeeting(id, {
-                    description,
-                    allowAnonymous,
-                    waitForHost,
-                    forbidNewParticipantsAfterDateEnd
-                });
             }
 
-            return updateScheduleMeeting(meeting._id, {
-                createdBy: userId,
-                name,
-                description,
-                dateStart: new Date(date).getTime(),
-                dateEnd: dateEnd.getTime(),
-                allowAnonymous,
-                waitForHost,
-                recurrenceValues,
-                recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
-                forbidNewParticipantsAfterDateEnd,
-                multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
-            });
+            return updateScheduleMeeting(meeting._id, ...meetingData);
 
         }
     };
@@ -770,7 +753,8 @@ const SchedulerForm = ({
                         control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
-                            onChange = { e => setRecurringMeeting(e.target.checked) } />
+                            onChange = { e => setRecurringMeeting(e.target.checked) }
+                            disabled = { isEditOneOccurrence } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -781,7 +765,7 @@ const SchedulerForm = ({
                 </Grid>
                 }
             </Grid>
-            {recurringMeeting
+            {recurringMeeting && !isEditOneOccurrence
                 && <Grid
                     container
                     alignItems = 'center'
@@ -1144,10 +1128,11 @@ const SchedulerForm = ({
             Cancel
                     </Button>
                 </Grid>
-                <Typography color = 'error'>
-                    {error || (isEditing && updateError)}
-                </Typography>
             </Grid>
+            {(error || updateError) && <Alert
+            className = {classes.formAlert}
+                severity = 'error'
+                variant = 'outlined'>{ error || (isEditing && updateError)}</Alert> }
         </form>
     );
 };
@@ -1162,7 +1147,7 @@ SchedulerForm.propTypes = {
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
     updateScheduleMeeting: PropTypes.func,
-    updateScheduleMeetingsMultipleRooms: PropTypes.func,
+    updateScheduleMeetingRecurringSingleOccurrence: PropTypes.func,
     updateScheduleMeetingsRecurring: PropTypes.func,
     userId: PropTypes.string
 };
@@ -1184,7 +1169,7 @@ const mapDispatchToProps = dispatch => {
         fetchMeeting: id => dispatch(getMeeting(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
         updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
-        updateScheduleMeetingsMultipleRooms: (id, meeting) => dispatch(updateScheduleMultipleRooms(id, meeting))
+        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) => dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
     };
 };
 

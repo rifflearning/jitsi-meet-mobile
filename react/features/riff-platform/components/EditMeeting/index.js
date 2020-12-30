@@ -32,7 +32,6 @@ const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) =>
         const descMap = {
             all: `All recurring meetings ${meetingName} updated!`,
             one: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`,
-            group: `All grouped meetings ${meetingName.slice(0, -2)} updated!`,
             default: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`
         };
 

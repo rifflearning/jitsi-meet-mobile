@@ -1,8 +1,8 @@
 /* eslint-disable require-jsdoc */
-
 import { deleteMeeting, deleteMeetingsRecurring } from '../actions/meetings';
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
+import { checkMeetingSingleOccurrenceDate } from '../functions';
 
 function schedulerRequest() {
     return {
@@ -89,16 +89,24 @@ export function updateScheduleRecurring(roomId, meeting) {
     };
 }
 
-export function updateScheduleMultipleRooms(id, meeting) {
-    return async (dispatch, getState) => {
+export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting) {
+    return async dispatch => {
         dispatch(updateSchedulerRequest());
-        const state = getState();
-        const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            await api.updateMeetingsMultipleRooms(id, meeting);
+            const meetings = await api.fetchMeetingsRecurring(roomId, 'upcoming');
+            const isMeetingDateValid = checkMeetingSingleOccurrenceDate({ meetingId: id,
+                meeting,
+                meetingsRecurring: meetings });
 
-            dispatch(updateSchedulerSuccess(currentMeeting));
+            if (isMeetingDateValid) {
+
+                const res = await api.updateMeeting(id, meeting);
+
+                dispatch(updateSchedulerSuccess(res));
+            } else {
+                dispatch(updateSchedulerFailure('This occurrence has conflicts with an existing occurrence.'));
+            }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
