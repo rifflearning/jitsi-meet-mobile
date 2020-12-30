@@ -449,7 +449,7 @@ const SchedulerForm = ({
             if (isEditAllMeetingsRecurring) {
                 return updateScheduleMeetingsRecurring(meeting.roomId, meetingData);
             } else if (isEditOneOccurrence) {
-                return updateScheduleMeetingRecurringSingleOccurrence(id, meeting.roomId, {
+                return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
                     description,
                     dateStart: new Date(date).getTime(),
@@ -1130,7 +1130,7 @@ const SchedulerForm = ({
                 </Grid>
             </Grid>
             {(error || updateError) && <Alert
-            className = {classes.formAlert}
+                className = { classes.formAlert }
                 severity = 'error'
                 variant = 'outlined'>{ error || (isEditing && updateError)}</Alert> }
         </form>

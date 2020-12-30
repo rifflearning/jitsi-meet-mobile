@@ -66,7 +66,7 @@ export function updateSchedule(id, meeting) {
             await api.deleteMeeting(id);
             const res = await api.scheduleMeeting(meeting);
 
-            dispatch(schedulerSuccess(res));
+            dispatch(updateSchedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
@@ -80,8 +80,8 @@ export function updateScheduleRecurring(roomId, meeting) {
         try {
             await api.deleteMeetingsRecurring(roomId);
             const res = await api.scheduleMeeting(meeting);
-
-            dispatch(schedulerSuccess(res));
+            
+            dispatch(updateSchedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
