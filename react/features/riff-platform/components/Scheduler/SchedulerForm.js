@@ -80,9 +80,7 @@ const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
 
 const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const minutesArray = [ 0, 15, 30, 45 ];
-
-// eslint-disable-next-line max-len
-const multipleMeetingArray = getNumberArr(99);
+const multipleMeetingArray = getNumberArr(99).slice(1);
 const recurrenceIntervalArray = getNumberArr(20);
 const recurrenceTypeArray = [ 'daily', 'weekly', 'monthly' ];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
