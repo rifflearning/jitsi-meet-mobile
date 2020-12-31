@@ -58,7 +58,7 @@ const MeetingsRow = ({
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     const handleLinkCopy = () => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
         // onclick Copy button copy meeting link + description, Beth's request
         const description = meeting.description ? ` ${meeting.description}` : '';
@@ -68,7 +68,7 @@ const MeetingsRow = ({
         setTimeout(() => setLinkCopied(false), 1000);
     };
     const handleStartClick = () => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
         return history.push(`${ROUTES.WAITING}/${id}`);
     };

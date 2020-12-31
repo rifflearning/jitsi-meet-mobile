@@ -16,10 +16,10 @@ const ScheduleSuccess = ({ scheduledMeeting, resetScheduledMeeting }) => {
     const [ open, setOpen ] = useState(false);
 
     const handleClose = () => setOpen(false);
-    const handleStartClick = () => history.push(`${ROUTES.WAITING}/${scheduledMeeting._id}`);
+    const handleStartClick = () => history.push(`${ROUTES.WAITING}/${scheduledMeeting.roomId}`);
 
     const handleLinkCopy = () => {
-        navigator.clipboard.writeText(`${window.location.origin}/${scheduledMeeting._id}`);
+        navigator.clipboard.writeText(`${window.location.origin}/${scheduledMeeting.roomId}`);
         setOpen(true);
     };
 
@@ -30,7 +30,7 @@ const ScheduleSuccess = ({ scheduledMeeting, resetScheduledMeeting }) => {
             <p
                 ref = { linkRef }
                 style = { style }>
-                {window.location.origin}/{scheduledMeeting._id}
+                {window.location.origin}/{scheduledMeeting.roomId}
             </p>
             <br />
             <div>

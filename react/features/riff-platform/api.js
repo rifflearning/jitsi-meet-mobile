@@ -47,6 +47,7 @@ class ApiService {
 
     // meetings
     fetchMeeting = name => this.fetchWithJwt(`/meetings/${name}`);
+    fetchMeetingByRoomId = roomId => this.fetchWithJwt(`/meetingByRoomId/${roomId}`);
     fetchMeetings = listType => this.fetchWithJwt(`/meetings?listType=${listType}`);
     fetchMeetingsByGroup = (groupName, listType) => this.fetchWithJwt(`/fetchMeetingsByGroup/${groupName}?listType=${listType}`);
     fetchMeetingsRecurring = (roomId, listType) => this.fetchWithJwt(`/fetchMeetingsRecurring/${roomId}?listType=${listType}`);
