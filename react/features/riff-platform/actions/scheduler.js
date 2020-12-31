@@ -80,7 +80,7 @@ export function updateScheduleRecurring(roomId, meeting) {
         try {
             await api.deleteMeetingsRecurring(roomId);
             const res = await api.scheduleMeeting(meeting);
-            
+
             dispatch(updateSchedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));

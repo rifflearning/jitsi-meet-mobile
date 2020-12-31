@@ -87,7 +87,7 @@ const MeetingsRow = ({
     };
 
     const onEditDialogClose = value => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
         const url = `${ROUTES.MEETING}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
@@ -95,7 +95,7 @@ const MeetingsRow = ({
         } else if (value === 'Edit all recurring meetings') {
             return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            return history.push(`${url}?mode=one`);
+            return history.push(`${ROUTES.MEETING}/${meeting._id}/edit?mode=one`);
         }
         setIsOpenEditDialog(false);
     };

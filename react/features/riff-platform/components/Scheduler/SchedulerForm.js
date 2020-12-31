@@ -447,7 +447,9 @@ const SchedulerForm = ({
             return scheduleMeeting(meetingData);
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
-                return updateScheduleMeetingsRecurring(meeting.roomId, meetingData);
+                return updateScheduleMeetingsRecurring(meeting.roomId,
+                    { roomId: meeting.roomId,
+                        ...meetingData });
             } else if (isEditOneOccurrence) {
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
@@ -461,7 +463,8 @@ const SchedulerForm = ({
                 });
             }
 
-            return updateScheduleMeeting(meeting._id, ...meetingData);
+            return updateScheduleMeeting(meeting._id, { roomId: meeting.roomId,
+                ...meetingData });
 
         }
     };
