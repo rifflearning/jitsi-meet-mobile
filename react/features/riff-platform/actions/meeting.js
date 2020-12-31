@@ -32,7 +32,8 @@ export function getMeeting(meetingId) {
         let meeting = null;
 
         try {
-            const res = await api.fetchMeeting(meetingId);
+            // const res = await api.fetchMeeting(meetingId);
+            const res = await api.fetchMeetingByRoomId(meetingId);
 
             if (res) {
                 meeting = res;
