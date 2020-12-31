@@ -290,6 +290,8 @@ const SchedulerForm = ({
     const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
     const [ multipleRooms, setmultipleRooms ] = useState(2);
 
+    const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
+
     const { id } = useParams();
 
     const defineEditMode = () => {
@@ -338,7 +340,7 @@ const SchedulerForm = ({
                 setRecurrenceType(meeting.recurrenceOptions.type);
                 if (meeting.recurrenceOptions.endDate) {
                     setEndDateBy('endDateTime');
-                    setEndDate(meeting.recurrenceOptions.endDate);
+                    setEndDate(moment(meeting.recurrenceOptions.endDate));
                 } else {
                     setEndDateBy('endTimes');
                     setEndTimes(meeting.recurrenceOptions.endTimes);
@@ -512,7 +514,7 @@ const SchedulerForm = ({
     ]);
 
     useEffect(() => {
-        if (endDateBy === 'endDateTime') {
+        if (endDateBy === 'endDateTime' && changesMadeByUserActions && !isEditOneOccurrence) {
             const recurrence = calculateRecurringByEndDate({
                 startDate: moment.utc(date),
                 endDate: null,
@@ -628,8 +630,8 @@ const SchedulerForm = ({
                         error = { Boolean(nameError) }
                         helperText = { nameError }
 
-                        // disabled when edit one occurrence or meeting has multiple rooms
-                        disabled = { isEditOneOccurrence || (isEditing && Boolean(meeting?.multipleRoomsParentId)) } />
+                        // disabled when edit single meeting occurrence
+                        disabled = { isEditOneOccurrence } />
                 </Grid>
                 <Grid
                     item
@@ -682,7 +684,10 @@ const SchedulerForm = ({
                                     disablePast = { true }
                                     label = 'Date'
                                     value = { date }
-                                    onChange = { setdate }
+                                    onChange = { d => {
+                                        setChangesMadeByUserActions(true);
+                                        setdate(d);
+                                    } }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
                                     }} />
@@ -797,7 +802,10 @@ const SchedulerForm = ({
                             id = 'recurrence-type'
                             select
                             value = { recurrenceType }
-                            onChange = { e => setRecurrenceType(e.target.value) }>
+                            onChange = { e => {
+                                setChangesMadeByUserActions(true);
+                                setRecurrenceType(e.target.value);
+                            } }>
                             {recurrenceTypeArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{recurrenceTypeMap[el]}</MenuItem>))}
@@ -828,7 +836,10 @@ const SchedulerForm = ({
                                     SelectProps = {{ MenuProps }}
                                     label = { repeatIntervalMap[recurrenceType].label }
                                     value = { recurrenceInterval }
-                                    onChange = { e => setRecurrenceInterval(e.target.value) }>
+                                    onChange = { e => {
+                                        setChangesMadeByUserActions(true);
+                                        setRecurrenceInterval(e.target.value);
+                                    } }>
                                     {repeatIntervalMap.daily.interval.map(el => (<MenuItem
                                         key = { el }
                                         value = { el }>{el}</MenuItem>))}
@@ -974,7 +985,10 @@ const SchedulerForm = ({
                                         name = 'endDate'
                                         value = 'endDateTime'
                                         checked = { endDateBy === 'endDateTime' }
-                                        onChange = { e => setEndDateBy(e.target.value) } />
+                                        onChange = { e => {
+                                            setChangesMadeByUserActions(true);
+                                            setEndDateBy(e.target.value);
+                                        } } />
                                     } />
                             </Grid>
                             <Grid item>
