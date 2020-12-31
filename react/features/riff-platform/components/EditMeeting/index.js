@@ -35,7 +35,6 @@ const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting, rese
         const formattedMeetingDateStart = moment(updatedSheduledMeeting?.dateStart).format('MMM DD, YYYY');
         const descMap = {
             all: `All recurring meetings ${meetingName} updated!`,
-            one: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`,
             default: `Meeting ${meetingName} for date ${formattedMeetingDateStart} updated!`
         };
 

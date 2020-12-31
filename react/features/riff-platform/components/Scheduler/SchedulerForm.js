@@ -1179,7 +1179,8 @@ const mapDispatchToProps = dispatch => {
         fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
         updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
-        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) => dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
+        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) =>
+            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
     };
 };
 
