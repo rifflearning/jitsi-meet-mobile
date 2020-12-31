@@ -315,51 +315,58 @@ const SchedulerForm = ({
 
     useEffect(() => {
         if (meeting && isEditing) {
+
+            setname(meeting.name);
+
+            const meetingData = isEditAllMeetingsRecurring ? meeting.recurrenceOptions?.defaultOptions : meeting;
+
+            setdescription(meetingData.description);
+            setForbidNewParticipantsAfterDateEnd(meetingData.forbidNewParticipantsAfterDateEnd);
+            setWaitForHost(meetingData.waitForHost);
+
+            if (meetingData.multipleRoomsQuantity) {
+                setisMultipleRooms(true);
+                setmultipleRooms(meetingData.multipleRoomsQuantity);
+            }
+
             const meetingDuration = moment
-            .duration(moment(meeting.dateEnd)
-            .diff(moment(meeting.dateStart)));
+            .duration(moment(meetingData.dateEnd)
+            .diff(moment(meetingData.dateStart)));
 
             const durationH = meetingDuration.asHours();
             const durationM = meetingDuration.asMinutes() - (60 * durationH);
 
             setHours(durationH);
             setMinutes(durationM);
-            setname(meeting.name);
-            setdescription(meeting.description);
-            setdate(meeting.dateStart);
-            setForbidNewParticipantsAfterDateEnd(meeting.forbidNewParticipantsAfterDateEnd);
-            setWaitForHost(meeting.waitForHost);
+            setdate(meetingData.dateStart);
 
-            if (meeting.multipleRoomsQuantity) {
-                setisMultipleRooms(true);
-                setmultipleRooms(meeting.multipleRoomsQuantity);
-            }
+            const meetingRecurrenceOptions = meeting.recurrenceOptions?.options;
 
-            if (meeting.recurrenceOptions?.type) {
+            if (meetingRecurrenceOptions?.recurrenceType) {
                 setRecurringMeeting(true);
-                setRecurrenceType(meeting.recurrenceOptions.type);
-                if (meeting.recurrenceOptions.endDate) {
+                setRecurrenceType(meetingRecurrenceOptions.recurrenceType);
+                if (meetingRecurrenceOptions.dateEnd) {
                     setEndDateBy('endDateTime');
-                    setEndDate(moment(meeting.recurrenceOptions.endDate));
+                    setEndDate(meetingRecurrenceOptions.dateEnd);
                 } else {
                     setEndDateBy('endTimes');
-                    setEndTimes(meeting.recurrenceOptions.endTimes);
+                    setEndTimes(meetingRecurrenceOptions.timesEnd);
                 }
 
-                if (meeting.recurrenceOptions.type === 'daily') {
-                    setRecurrenceInterval(meeting.recurrenceOptions.dailyInterval);
-                } else if (meeting.recurrenceOptions.type === 'weekly') {
+                if (meetingRecurrenceOptions.recurrenceType === 'daily') {
+                    setRecurrenceInterval(meetingRecurrenceOptions.dailyInterval);
+                } else if (meetingRecurrenceOptions.recurrenceType === 'weekly') {
                     setDaysOfWeek({ ...daysOfWeek,
-                        ...getDaysOfWeekObj(meeting.recurrenceOptions.daysOfWeek) });
-                } else if (meeting.recurrenceOptions.type === 'monthly') {
-                    if (meeting.recurrenceOptions.monthlyByDay) {
+                        ...getDaysOfWeekObj(meetingRecurrenceOptions.daysOfWeek) });
+                } else if (meetingRecurrenceOptions.recurrenceType === 'monthly') {
+                    if (meetingRecurrenceOptions.monthlyByDay) {
                         setMonthlyBy('monthlyByDay');
-                        setMonthlyByDay(meeting.recurrenceOptions.monthlyByDay);
-                    } else if (meeting.recurrenceOptions.monthlyByPosition
-                        && meeting.recurrenceOptions.monthlyByWeekDay) {
+                        setMonthlyByDay(meetingRecurrenceOptions.monthlyByDay);
+                    } else if (meetingRecurrenceOptions.monthlyByPosition
+                        && meetingRecurrenceOptions.monthlyByWeekDay) {
                         setMonthlyBy('monthlyByWeekDay');
-                        setMonthlyByPosition(meeting.recurrenceOptions.monthlyByPosition);
-                        setMonthlyByWeekDay(meeting.recurrenceOptions.monthlyByWeekDay);
+                        setMonthlyByPosition(meetingRecurrenceOptions.monthlyByPosition);
+                        setMonthlyByWeekDay(meetingRecurrenceOptions.monthlyByWeekDay);
                     }
                 }
             }
@@ -412,13 +419,13 @@ const SchedulerForm = ({
 
         const getRecurrenceOptions = () => {
             const recurrenceOptions = {
-                type: recurrenceType
+                recurrenceType
             };
 
             if (endDateBy === 'endDateTime') {
-                recurrenceOptions.endDate = endDate;
+                recurrenceOptions.dateEnd = endDate;
             } else {
-                recurrenceOptions.endTimes = endTimes;
+                recurrenceOptions.timesEnd = endTimes;
             }
 
             if (recurrenceType === 'daily') {
@@ -436,6 +443,17 @@ const SchedulerForm = ({
 
             return recurrenceOptions;
         };
+
+        const defaultOptions = {
+            dateStart: date,
+            dateEnd,
+            description,
+            allowAnonymous,
+            waitForHost,
+            forbidNewParticipantsAfterDateEnd,
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
+        };
+
         const meetingData = {
             createdBy: userId,
             name,
@@ -445,7 +463,10 @@ const SchedulerForm = ({
             allowAnonymous,
             waitForHost,
             recurrenceValues,
-            recurrenceOptions: recurringMeeting ? getRecurrenceOptions() : null,
+            recurrenceOptions: recurringMeeting ? {
+                defaultOptions,
+                options: getRecurrenceOptions()
+            } : null,
             forbidNewParticipantsAfterDateEnd,
             multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
         };
@@ -514,7 +535,11 @@ const SchedulerForm = ({
     ]);
 
     useEffect(() => {
-        if (endDateBy === 'endDateTime' && changesMadeByUserActions && !isEditOneOccurrence) {
+        const isUpdateEndDate = isEditAllMeetingsRecurring || isEditOneOccurrence
+            ? changesMadeByUserActions && !isEditOneOccurrence
+            : true;
+
+        if (endDateBy === 'endDateTime' && isUpdateEndDate) {
             const recurrence = calculateRecurringByEndDate({
                 startDate: moment.utc(date),
                 endDate: null,
@@ -681,7 +706,7 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    disablePast = { true }
+                                    minDate = { isEditing ? date : moment() }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {
@@ -766,7 +791,10 @@ const SchedulerForm = ({
                         control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
-                            onChange = { e => setRecurringMeeting(e.target.checked) }
+                            onChange = { e => {
+                                setChangesMadeByUserActions(true);
+                                setRecurringMeeting(e.target.checked);
+                            } }
                             disabled = { isEditOneOccurrence } />
                         } />
                 </Grid>
@@ -1000,7 +1028,6 @@ const SchedulerForm = ({
                                         format = 'MM/DD/YYYY'
                                         margin = 'normal'
                                         id = 'date-picker-inline'
-                                        disablePast = { true }
                                         disabled = { endDateBy !== 'endDateTime' }
                                         maxDate = { endDateBy === 'endDateTime'
                                             ? recurrenceMaxEndDate[recurrenceType]
