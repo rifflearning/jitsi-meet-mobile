@@ -27,7 +27,7 @@ import 'moment-recur';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeeting } from '../../actions/meeting';
+import { getMeeting, getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
@@ -243,6 +243,7 @@ const SchedulerForm = ({
     scheduleMeeting,
     isEditing,
     fetchMeeting,
+    fetchMeetingById,
     meeting,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
@@ -297,11 +298,18 @@ const SchedulerForm = ({
         return params.get('mode');
     };
 
+    const isEditAllMeetingsRecurring = defineEditMode() === 'all';
+    const isEditOneOccurrence = defineEditMode() === 'one';
+
     useEffect(() => {
         if (isEditing) {
-            fetchMeeting(id);
+            if (isEditOneOccurrence) {
+                fetchMeetingById(id);
+            } else {
+                fetchMeeting(id);
+            }
         }
-    }, []);
+    }, [ id ]);
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -377,9 +385,6 @@ const SchedulerForm = ({
 
         return isValid;
     };
-
-    const isEditAllMeetingsRecurring = defineEditMode() === 'all';
-    const isEditOneOccurrence = defineEditMode() === 'one';
 
     const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
         day => daysOfWeekMap[day]
@@ -1143,6 +1148,7 @@ const SchedulerForm = ({
 SchedulerForm.propTypes = {
     error: PropTypes.string,
     fetchMeeting: PropTypes.func,
+    fetchMeetingById: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
@@ -1170,6 +1176,7 @@ const mapDispatchToProps = dispatch => {
     return {
         scheduleMeeting: meeting => dispatch(schedule(meeting)),
         fetchMeeting: id => dispatch(getMeeting(id)),
+        fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
         updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
         updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) => dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))

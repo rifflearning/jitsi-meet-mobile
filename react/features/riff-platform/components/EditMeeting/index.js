@@ -8,16 +8,20 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
 import { connect } from '../../../base/redux';
+import { meetingReset } from '../../actions/meeting';
 import { updateSchedulerReset } from '../../actions/scheduler';
 import SchedulerForm from '../Scheduler/SchedulerForm';
 import StyledPaper from '../StyledPaper';
 
 
-const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) => {
+const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting, resetMeeting }) => {
     useEffect(() => {
         resetUpdatedScheduleMeeting();
 
-        return () => resetUpdatedScheduleMeeting();
+        return () => {
+            resetUpdatedScheduleMeeting();
+            resetMeeting();
+        };
     }, []);
 
     const defineEditMode = () => {
@@ -57,6 +61,7 @@ const EditMeeting = ({ updatedSheduledMeeting, resetUpdatedScheduleMeeting }) =>
 };
 
 EditMeeting.propTypes = {
+    resetMeeting: PropTypes.func,
     resetUpdatedScheduleMeeting: PropTypes.func,
     updatedSheduledMeeting: PropTypes.object
 };
@@ -68,7 +73,8 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
     return {
-        resetUpdatedScheduleMeeting: () => dispatch(updateSchedulerReset())
+        resetUpdatedScheduleMeeting: () => dispatch(updateSchedulerReset()),
+        resetMeeting: () => dispatch(meetingReset())
     };
 };
 

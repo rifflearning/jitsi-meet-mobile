@@ -8,6 +8,8 @@ export default (state = {}, action) => {
         return { meeting: action.meeting };
     case actionTypes.MEETING_FAILURE:
         return { error: action.error };
+    case actionTypes.MEETING_RESET:
+        return {};
 
     default:
         return state;
