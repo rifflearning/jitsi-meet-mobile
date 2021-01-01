@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import * as ROUTES from './constants/routes';
 
 // Save room name before redirecting to signIn page, so we could redirect back to meeting after login.
@@ -123,4 +125,28 @@ export function msToTime(milliseconds) {
  */
 export function isRiffPlatformCurrentPath() {
     return window.location.pathname.split('/')[1] === ROUTES.BASENAME.slice(1) || window.location.pathname === '/';
+}
+
+/**
+ * Check if the meeting has a different time from other recurrences.
+ *
+ * @param {Array} meetingsRecurring - Array of meetings recurring from db.
+ * @param {Object} meeting - Current meeting recurring.
+ * @param {string} meetingId - Current meetingId.
+ * @returns {boolean} - True if the meeting has a different time from other recurrences.
+ */
+export function checkMeetingSingleOccurrenceDate({ meetingId, meeting, meetingsRecurring }) {
+    const checkRecurrence = meetingsRecurring.filter(m => {
+        const dateStart = moment(m.dateStart).subtract(1, 'hour');
+        const dateEnd = moment(m.dateEnd).add(1, 'hour');
+
+        if ((moment(meeting.dateStart).isBetween(dateStart, dateEnd, undefined, '[]')
+        || moment(meeting.dateEnd).isBetween(dateStart, dateEnd, undefined, '[]')) && m._id !== meetingId) {
+            return true;
+        }
+
+        return false;
+    });
+
+    return !checkRecurrence.length;
 }

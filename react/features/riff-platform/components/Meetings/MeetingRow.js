@@ -87,20 +87,18 @@ const MeetingsRow = ({
     };
 
     const onEditDialogClose = value => {
-        const url = `${ROUTES.MEETING}/${meeting._id}/edit`;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
+        const url = `${ROUTES.MEETING}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
             return history.push(url);
         } else if (value === 'Edit all recurring meetings') {
             return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            return history.push(`${url}?mode=one`);
-        } else if (value === 'Edit groupped meetings') {
-            const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+            const meetingId = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
 
-            return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
+            return history.push(`${ROUTES.MEETING}/${meetingId}/edit?mode=one`);
         }
-
         setIsOpenEditDialog(false);
     };
 

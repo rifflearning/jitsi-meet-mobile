@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
-
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
+import { checkMeetingSingleOccurrenceDate } from '../functions';
 
 function schedulerRequest() {
     return {
@@ -63,7 +63,8 @@ export function updateSchedule(id, meeting) {
         dispatch(updateSchedulerRequest());
 
         try {
-            const res = await api.updateMeeting(id, meeting);
+            await api.deleteMeeting(id);
+            const res = await api.scheduleMeeting(meeting);
 
             dispatch(updateSchedulerSuccess(res));
         } catch (e) {
@@ -73,31 +74,38 @@ export function updateSchedule(id, meeting) {
 }
 
 export function updateScheduleRecurring(roomId, meeting) {
-    return async (dispatch, getState) => {
+    return async dispatch => {
         dispatch(updateSchedulerRequest());
-        const state = getState();
-        const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            await api.updateMeetingsRecurring(roomId, meeting);
+            await api.deleteMeetingsRecurring(roomId);
+            const res = await api.scheduleMeeting(meeting);
 
-            dispatch(updateSchedulerSuccess(currentMeeting));
+            dispatch(updateSchedulerSuccess(res));
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
 
-export function updateScheduleMultipleRooms(id, meeting) {
-    return async (dispatch, getState) => {
+export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting) {
+    return async dispatch => {
         dispatch(updateSchedulerRequest());
-        const state = getState();
-        const currentMeeting = state['features/riff-platform'].meeting.meeting;
 
         try {
-            await api.updateMeetingsMultipleRooms(id, meeting);
+            const meetings = await api.fetchMeetingsRecurring(roomId, 'upcoming');
+            const isMeetingDateValid = checkMeetingSingleOccurrenceDate({ meetingId: id,
+                meeting,
+                meetingsRecurring: meetings });
 
-            dispatch(updateSchedulerSuccess(currentMeeting));
+            if (isMeetingDateValid) {
+
+                const res = await api.updateMeeting(id, meeting);
+
+                dispatch(updateSchedulerSuccess(res));
+            } else {
+                dispatch(updateSchedulerFailure('This occurrence has conflicts with an existing occurrence.'));
+            }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }

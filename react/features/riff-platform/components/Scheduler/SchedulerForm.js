@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-sort-props */
-
 import MomentUtils from '@date-io/moment';
 import {
     Button,
@@ -15,6 +14,7 @@ import {
     Switch
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
@@ -27,11 +27,11 @@ import 'moment-recur';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeeting } from '../../actions/meeting';
+import { getMeeting, getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
-    updateScheduleMultipleRooms
+    updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 
 import {
@@ -64,6 +64,9 @@ const useStyles = makeStyles(theme => {
         },
         submit: {
             margin: theme.spacing(3, 0, 2)
+        },
+        formAlert: {
+            border: 'none'
         }
     };
 });
@@ -209,6 +212,12 @@ const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) =
     return acc;
 }, []);
 
+const getDaysOfWeekObj = daysOfWeekArr => daysOfWeekArr.reduce((acc, v) => {
+    acc[v] = true;
+
+    return acc;
+}, {});
+
 const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     const hStart = moment.utc(startDate).hours();
     const mStart = moment.utc(startDate).minutes();
@@ -234,10 +243,11 @@ const SchedulerForm = ({
     scheduleMeeting,
     isEditing,
     fetchMeeting,
+    fetchMeetingById,
     meeting,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
-    updateScheduleMeetingsMultipleRooms,
+    updateScheduleMeetingRecurringSingleOccurrence,
     updateError,
     updateLoading
 }) => {
@@ -280,6 +290,8 @@ const SchedulerForm = ({
     const [ isMultipleRooms, setisMultipleRooms ] = useState(false);
     const [ multipleRooms, setmultipleRooms ] = useState(2);
 
+    const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
+
     const { id } = useParams();
 
     const defineEditMode = () => {
@@ -288,28 +300,76 @@ const SchedulerForm = ({
         return params.get('mode');
     };
 
+    const isEditAllMeetingsRecurring = defineEditMode() === 'all';
+    const isEditOneOccurrence = defineEditMode() === 'one';
+
     useEffect(() => {
         if (isEditing) {
-            fetchMeeting(id);
+            if (isEditOneOccurrence) {
+                fetchMeetingById(id);
+            } else {
+                fetchMeeting(id);
+            }
         }
-    }, []);
+    }, [ id ]);
 
     useEffect(() => {
         if (meeting && isEditing) {
+
+            setname(meeting.name);
+
+            const meetingData = isEditAllMeetingsRecurring ? meeting.recurrenceOptions?.defaultOptions : meeting;
+
+            setdescription(meetingData.description);
+            setForbidNewParticipantsAfterDateEnd(meetingData.forbidNewParticipantsAfterDateEnd);
+            setWaitForHost(meetingData.waitForHost);
+
+            if (meetingData.multipleRoomsQuantity) {
+                setisMultipleRooms(true);
+                setmultipleRooms(meetingData.multipleRoomsQuantity);
+            }
+
             const meetingDuration = moment
-            .duration(moment(meeting.dateEnd)
-            .diff(moment(meeting.dateStart)));
+            .duration(moment(meetingData.dateEnd)
+            .diff(moment(meetingData.dateStart)));
 
             const durationH = meetingDuration.asHours();
             const durationM = meetingDuration.asMinutes() - (60 * durationH);
 
             setHours(durationH);
             setMinutes(durationM);
-            setname(meeting.name);
-            setdescription(meeting.description);
-            setdate(meeting.dateStart);
-            setForbidNewParticipantsAfterDateEnd(meeting.forbidNewParticipantsAfterDateEnd);
-            setWaitForHost(meeting.waitForHost);
+            setdate(meetingData.dateStart);
+
+            const meetingRecurrenceOptions = meeting.recurrenceOptions?.options;
+
+            if (meetingRecurrenceOptions?.recurrenceType) {
+                setRecurringMeeting(true);
+                setRecurrenceType(meetingRecurrenceOptions.recurrenceType);
+                if (meetingRecurrenceOptions.dateEnd) {
+                    setEndDateBy('endDateTime');
+                    setEndDate(meetingRecurrenceOptions.dateEnd);
+                } else {
+                    setEndDateBy('endTimes');
+                    setEndTimes(meetingRecurrenceOptions.timesEnd);
+                }
+
+                if (meetingRecurrenceOptions.recurrenceType === 'daily') {
+                    setRecurrenceInterval(meetingRecurrenceOptions.dailyInterval);
+                } else if (meetingRecurrenceOptions.recurrenceType === 'weekly') {
+                    setDaysOfWeek({ ...daysOfWeek,
+                        ...getDaysOfWeekObj(meetingRecurrenceOptions.daysOfWeek) });
+                } else if (meetingRecurrenceOptions.recurrenceType === 'monthly') {
+                    if (meetingRecurrenceOptions.monthlyByDay) {
+                        setMonthlyBy('monthlyByDay');
+                        setMonthlyByDay(meetingRecurrenceOptions.monthlyByDay);
+                    } else if (meetingRecurrenceOptions.monthlyByPosition
+                        && meetingRecurrenceOptions.monthlyByWeekDay) {
+                        setMonthlyBy('monthlyByWeekDay');
+                        setMonthlyByPosition(meetingRecurrenceOptions.monthlyByPosition);
+                        setMonthlyByWeekDay(meetingRecurrenceOptions.monthlyByWeekDay);
+                    }
+                }
+            }
         }
     }, [ meeting ]);
 
@@ -335,9 +395,9 @@ const SchedulerForm = ({
         return isValid;
     };
 
-    const isEditAllMeetingsRecurring = defineEditMode() === 'all';
-    const isEditOneOccurrence = defineEditMode() === 'one';
-    const isEditGrouppedMeetings = defineEditMode() === 'group';
+    const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
+        day => daysOfWeekMap[day]
+    );
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -357,53 +417,82 @@ const SchedulerForm = ({
                     minutes } })
             : null;
 
+        const getRecurrenceOptions = () => {
+            const recurrenceOptions = {
+                recurrenceType
+            };
+
+            if (endDateBy === 'endDateTime') {
+                recurrenceOptions.dateEnd = endDate;
+            } else {
+                recurrenceOptions.timesEnd = endTimes;
+            }
+
+            if (recurrenceType === 'daily') {
+                recurrenceOptions.dailyInterval = recurrenceInterval;
+            } else if (recurrenceType === 'weekly') {
+                recurrenceOptions.daysOfWeek = getDaysOfWeekArr(daysOfWeek);
+            } else if (recurrenceType === 'monthly') {
+                if (monthlyBy === 'monthlyByDay') {
+                    recurrenceOptions.monthlyByDay = monthlyByDay;
+                } else {
+                    recurrenceOptions.monthlyByPosition = monthlyByPosition;
+                    recurrenceOptions.monthlyByWeekDay = monthlyByWeekDay;
+                }
+            }
+
+            return recurrenceOptions;
+        };
+
+        const defaultOptions = {
+            dateStart: date,
+            dateEnd,
+            description,
+            allowAnonymous,
+            waitForHost,
+            forbidNewParticipantsAfterDateEnd,
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
+        };
+
+        const meetingData = {
+            createdBy: userId,
+            name,
+            description,
+            dateStart: new Date(date).getTime(),
+            dateEnd: dateEnd.getTime(),
+            allowAnonymous,
+            waitForHost,
+            recurrenceValues,
+            recurrenceOptions: recurringMeeting ? {
+                defaultOptions,
+                options: getRecurrenceOptions()
+            } : null,
+            forbidNewParticipantsAfterDateEnd,
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
+        };
+
         if (!isEditing) {
-            return scheduleMeeting({
-                createdBy: userId,
-                name,
-                description,
-                dateStart: new Date(date).getTime(),
-                dateEnd: dateEnd.getTime(),
-                allowAnonymous,
-                waitForHost,
-                recurrenceValues,
-                forbidNewParticipantsAfterDateEnd,
-                multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
-            });
+            return scheduleMeeting(meetingData);
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
-                return updateScheduleMeetingsRecurring(meeting.roomId, {
+                return updateScheduleMeetingsRecurring(meeting.roomId,
+                    { roomId: meeting.roomId,
+                        ...meetingData });
+            } else if (isEditOneOccurrence) {
+                return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
                     description,
+                    dateStart: new Date(date).getTime(),
+                    dateEnd: dateEnd.getTime(),
                     allowAnonymous,
                     waitForHost,
-                    forbidNewParticipantsAfterDateEnd
-                });
-            } else if (isEditOneOccurrence) {
-                return updateScheduleMeeting(id, {
-                    description,
-                    allowAnonymous,
-                    waitForHost,
-                    forbidNewParticipantsAfterDateEnd
-                });
-            } else if (isEditGrouppedMeetings) {
-                return updateScheduleMeetingsMultipleRooms(meeting.multipleRoomsParentId, {
-                    description,
-                    allowAnonymous,
-                    waitForHost,
-                    forbidNewParticipantsAfterDateEnd
+                    forbidNewParticipantsAfterDateEnd,
+                    multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
                 });
             }
 
-            return updateScheduleMeeting(id, {
-                name,
-                description,
-                dateStart: new Date(date).getTime(),
-                dateEnd: dateEnd.getTime(),
-                allowAnonymous,
-                waitForHost,
-                forbidNewParticipantsAfterDateEnd
-            });
+            return updateScheduleMeeting(meeting._id, { roomId: meeting.roomId,
+                ...meetingData });
 
         }
     };
@@ -416,10 +505,6 @@ const SchedulerForm = ({
         monthly: moment(date).add(2, 'years')
 .endOf('year')
     };
-
-    const selectedNumberDaysOfWeek = getDaysOfWeekArr(daysOfWeek).map(
-        day => daysOfWeekMap[day]
-    );
 
     useEffect(() => {
         if (endDateBy === 'endDateTime') {
@@ -450,7 +535,11 @@ const SchedulerForm = ({
     ]);
 
     useEffect(() => {
-        if (endDateBy === 'endDateTime') {
+        const isUpdateEndDate = isEditAllMeetingsRecurring || isEditOneOccurrence
+            ? changesMadeByUserActions && !isEditOneOccurrence
+            : true;
+
+        if (endDateBy === 'endDateTime' && isUpdateEndDate) {
             const recurrence = calculateRecurringByEndDate({
                 startDate: moment.utc(date),
                 endDate: null,
@@ -566,8 +655,8 @@ const SchedulerForm = ({
                         error = { Boolean(nameError) }
                         helperText = { nameError }
 
-                        // disabled when edit one occurrence or meeting has multiple rooms
-                        disabled = { isEditOneOccurrence || (isEditing && Boolean(meeting?.multipleRoomsParentId)) } />
+                        // disabled when edit single meeting occurrence
+                        disabled = { isEditOneOccurrence } />
                 </Grid>
                 <Grid
                     item
@@ -617,16 +706,16 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    disablePast = { true }
+                                    minDate = { isEditing ? date : moment() }
                                     label = 'Date'
                                     value = { date }
-                                    onChange = { setdate }
+                                    onChange = { d => {
+                                        setChangesMadeByUserActions(true);
+                                        setdate(d);
+                                    } }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
-                                    }}
-                                    disabled = { isEditAllMeetingsRecurring
-                                    || isEditGrouppedMeetings
-                                    || isEditOneOccurrence } />
+                                    }} />
                             </Grid>
                             <Grid item>
                                 <KeyboardTimePicker
@@ -638,10 +727,7 @@ const SchedulerForm = ({
                                     onChange = { setdate }
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change time'
-                                    }}
-                                    disabled = { isEditAllMeetingsRecurring
-                                        || isEditGrouppedMeetings
-                                        || isEditOneOccurrence } />
+                                    }} />
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
@@ -670,10 +756,7 @@ const SchedulerForm = ({
                             label = 'Hours'
                             value = { hours }
                             onChange = { e => setHours(e.target.value) }
-                            error = { Boolean(durationError) }
-                            disabled = { isEditAllMeetingsRecurring
-                                || isEditGrouppedMeetings
-                                || isEditOneOccurrence } >
+                            error = { Boolean(durationError) } >
                             {hoursArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -687,10 +770,7 @@ const SchedulerForm = ({
                             value = { minutes }
                             onChange = { e => setMinutes(e.target.value) }
                             error = { Boolean(durationError) }
-                            helperText = { durationError }
-                            disabled = { isEditAllMeetingsRecurring
-                                || isEditGrouppedMeetings
-                                || isEditOneOccurrence } >
+                            helperText = { durationError } >
                             {minutesArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
@@ -711,8 +791,11 @@ const SchedulerForm = ({
                         control = { <Switch
                             name = 'recurringMeeting'
                             checked = { recurringMeeting }
-                            onChange = { e => setRecurringMeeting(e.target.checked) }
-                            disabled = { isEditing } />
+                            onChange = { e => {
+                                setChangesMadeByUserActions(true);
+                                setRecurringMeeting(e.target.checked);
+                            } }
+                            disabled = { isEditOneOccurrence } />
                         } />
                 </Grid>
                 {recurringMeeting && <Grid
@@ -723,7 +806,7 @@ const SchedulerForm = ({
                 </Grid>
                 }
             </Grid>
-            {recurringMeeting
+            {recurringMeeting && !isEditOneOccurrence
                 && <Grid
                     container
                     alignItems = 'center'
@@ -747,7 +830,10 @@ const SchedulerForm = ({
                             id = 'recurrence-type'
                             select
                             value = { recurrenceType }
-                            onChange = { e => setRecurrenceType(e.target.value) }>
+                            onChange = { e => {
+                                setChangesMadeByUserActions(true);
+                                setRecurrenceType(e.target.value);
+                            } }>
                             {recurrenceTypeArray.map(el => (<MenuItem
                                 key = { el }
                                 value = { el }>{recurrenceTypeMap[el]}</MenuItem>))}
@@ -778,7 +864,10 @@ const SchedulerForm = ({
                                     SelectProps = {{ MenuProps }}
                                     label = { repeatIntervalMap[recurrenceType].label }
                                     value = { recurrenceInterval }
-                                    onChange = { e => setRecurrenceInterval(e.target.value) }>
+                                    onChange = { e => {
+                                        setChangesMadeByUserActions(true);
+                                        setRecurrenceInterval(e.target.value);
+                                    } }>
                                     {repeatIntervalMap.daily.interval.map(el => (<MenuItem
                                         key = { el }
                                         value = { el }>{el}</MenuItem>))}
@@ -924,7 +1013,10 @@ const SchedulerForm = ({
                                         name = 'endDate'
                                         value = 'endDateTime'
                                         checked = { endDateBy === 'endDateTime' }
-                                        onChange = { e => setEndDateBy(e.target.value) } />
+                                        onChange = { e => {
+                                            setChangesMadeByUserActions(true);
+                                            setEndDateBy(e.target.value);
+                                        } } />
                                     } />
                             </Grid>
                             <Grid item>
@@ -936,7 +1028,6 @@ const SchedulerForm = ({
                                         format = 'MM/DD/YYYY'
                                         margin = 'normal'
                                         id = 'date-picker-inline'
-                                        disablePast = { true }
                                         disabled = { endDateBy !== 'endDateTime' }
                                         maxDate = { endDateBy === 'endDateTime'
                                             ? recurrenceMaxEndDate[recurrenceType]
@@ -1042,8 +1133,7 @@ const SchedulerForm = ({
                             control = { <Switch
                                 name = 'isMultipleRooms'
                                 checked = { isMultipleRooms }
-                                onChange = { e => setisMultipleRooms(e.target.checked) }
-                                disabled = { isEditing } />
+                                onChange = { e => setisMultipleRooms(e.target.checked) } />
                             } />
                     </Grid>
                     {isMultipleRooms
@@ -1087,10 +1177,11 @@ const SchedulerForm = ({
             Cancel
                     </Button>
                 </Grid>
-                <Typography color = 'error'>
-                    {error || (isEditing && updateError)}
-                </Typography>
             </Grid>
+            {(error || updateError) && <Alert
+                className = { classes.formAlert }
+                severity = 'error'
+                variant = 'outlined'>{ error || (isEditing && updateError)}</Alert> }
         </form>
     );
 };
@@ -1098,6 +1189,7 @@ const SchedulerForm = ({
 SchedulerForm.propTypes = {
     error: PropTypes.string,
     fetchMeeting: PropTypes.func,
+    fetchMeetingById: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
@@ -1105,7 +1197,7 @@ SchedulerForm.propTypes = {
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
     updateScheduleMeeting: PropTypes.func,
-    updateScheduleMeetingsMultipleRooms: PropTypes.func,
+    updateScheduleMeetingRecurringSingleOccurrence: PropTypes.func,
     updateScheduleMeetingsRecurring: PropTypes.func,
     userId: PropTypes.string
 };
@@ -1125,9 +1217,11 @@ const mapDispatchToProps = dispatch => {
     return {
         scheduleMeeting: meeting => dispatch(schedule(meeting)),
         fetchMeeting: id => dispatch(getMeeting(id)),
+        fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
         updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
-        updateScheduleMeetingsMultipleRooms: (id, meeting) => dispatch(updateScheduleMultipleRooms(id, meeting))
+        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) =>
+            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
     };
 };
 
