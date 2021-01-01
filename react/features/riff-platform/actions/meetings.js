@@ -68,21 +68,6 @@ export function deleteMeeting(id) {
     };
 }
 
-export function deleteMeetingsMultipleRooms(id) {
-    return async (dispatch, getState) => {
-
-        const state = getState();
-        const meetingsListType = state['features/riff-platform'].meetings.listType;
-
-        try {
-            await api.deleteMeetingsMultipleRooms(id);
-            dispatch(getMeetings(meetingsListType));
-        } catch (e) {
-            console.error('Error in deleteMeetingsMultipleRooms', e);
-        }
-    };
-}
-
 export function deleteMeetingsRecurring(roomId) {
     return async (dispatch, getState) => {
 
@@ -93,7 +78,7 @@ export function deleteMeetingsRecurring(roomId) {
             await api.deleteMeetingsRecurring(roomId);
             dispatch(getMeetings(meetingsListType));
         } catch (e) {
-            console.error('Error in deleteMeetingsMultipleRooms', e);
+            console.error('Error in deleteMeetingsRecurring', e);
         }
     };
 }

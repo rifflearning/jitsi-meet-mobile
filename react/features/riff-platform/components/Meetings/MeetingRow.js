@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { deleteMeeting, deleteMeetingsMultipleRooms, deleteMeetingsRecurring } from '../../actions/meetings';
+import { deleteMeeting, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
 
@@ -45,7 +45,6 @@ const MenuProps = {
 const MeetingsRow = ({
     meeting = {},
     removeMeeting,
-    removeMeetingsMultipleRooms,
     removeMeetingsRecurring,
     groupName,
     meetingsListType }) => {
@@ -203,7 +202,6 @@ MeetingsRow.propTypes = {
     meeting: PropTypes.object,
     meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
-    removeMeetingsMultipleRooms: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
@@ -216,7 +214,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         removeMeeting: id => dispatch(deleteMeeting(id)),
-        removeMeetingsMultipleRooms: id => dispatch(deleteMeetingsMultipleRooms(id)),
         removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
 };
