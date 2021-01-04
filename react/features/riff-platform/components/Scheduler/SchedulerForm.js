@@ -640,11 +640,19 @@ const SchedulerForm = ({
 
     };
 
-    const defineStartDateMinValue = isEditing
-        ? isEditAllMeetingsRecurring
+    const defineStartDateMinValue = () => {
+        const meetingDateStart = isEditAllMeetingsRecurring
             ? meeting?.recurrenceOptions?.defaultOptions?.dateStart
-            : meeting?.dateStart
-        : moment();
+            : meeting?.dateStart;
+
+        const isPastDate = moment(meetingDateStart).isBefore(moment());
+
+        return isEditing
+            ? isPastDate
+                ? meetingDateStart
+                : moment()
+            : moment();
+    };
 
     return (
         <form
@@ -725,7 +733,7 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    minDate = { defineStartDateMinValue }
+                                    minDate = { defineStartDateMinValue() }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {

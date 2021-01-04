@@ -163,8 +163,7 @@ const MeetingsRow = ({
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
                     && <>
-                        { meetingsListType === 'upcoming'
-                        && <Button
+                        <Button
                             className = { classes.meetingButton }
                             color = 'default'
                             // eslint-disable-next-line react/jsx-no-bind
@@ -172,7 +171,7 @@ const MeetingsRow = ({
                             variant = 'outlined'>
                         Edit
                         </Button>
-                        }
+
                         <Button
                             className = { classes.meetingButton }
                             // eslint-disable-next-line react/jsx-no-bind
