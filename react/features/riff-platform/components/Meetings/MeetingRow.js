@@ -46,8 +46,7 @@ const MeetingsRow = ({
     meeting = {},
     removeMeeting,
     removeMeetingsRecurring,
-    groupName,
-    meetingsListType }) => {
+    groupName }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -199,15 +198,12 @@ MeetingsRow.propTypes = {
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
-    meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = state => {
-    return {
-        meetingsListType: state['features/riff-platform'].meetings.listType
-    };
+const mapStateToProps = () => {
+    return {};
 };
 
 const mapDispatchToProps = dispatch => {
