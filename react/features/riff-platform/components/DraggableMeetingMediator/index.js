@@ -1,17 +1,19 @@
+/* global process */
+
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, Fragment } from 'react';
 import Draggable from 'react-draggable';
 
 // eslint-disable-next-line import/order
+import { Icon, IconClose } from '../../../base/icons';
 import { connect } from '../../../base/redux';
 
 // eslint-disable-next-line max-len
 import { MeetingMediator } from '../../../riff-dashboard-page/src/components/Chat/Meeting/MeetingSidebar/MeetingMediator';
-import { Icon, IconClose } from '../../../base/icons';
 
 const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
-    const [isOpened, setIsOpened] = useState(false);
-    
+    const [ isOpened, setIsOpened ] = useState(false);
+
     const size = useWindowSize();
     const bounds = { left: -200,
         top: -250,
@@ -19,14 +21,15 @@ const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
         bottom: size.height - 26 };
 
     const onCloseMeetingMediator = () => setIsOpened(false);
-    const onOpenMeetingMediator = () => !isOpened && setIsOpened(true); 
+    const onOpenMeetingMediator = () => !isOpened && setIsOpened(true);
 
     const MeetingMediatorWrapper = isOpened ? Draggable : Fragment;
     const wrapperProps = isOpened ? { bounds } : {};
 
+    const meetingMediatorEnabled = process.env.MEETING_MEDIATOR_ENABLED === 'true';
 
     return (
-        <MeetingMediatorWrapper {...wrapperProps}>
+        <MeetingMediatorWrapper { ...wrapperProps }>
             <div
                 id = 'meeting-mediator-wrapper'
                 className = { isOpened ? '' : 'closed' }
@@ -38,7 +41,7 @@ const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
                 }
                 <MeetingMediator
                     displayName = { displayName }
-                    isEnabled = { true }
+                    isEnabled = { meetingMediatorEnabled }
                     webRtcPeers = { webRtcPeers } />
             </div>
         </MeetingMediatorWrapper>
