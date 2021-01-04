@@ -93,7 +93,7 @@ export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting) {
         dispatch(updateSchedulerRequest());
 
         try {
-            const meetings = await api.fetchMeetingsRecurring(roomId, 'upcoming');
+            const meetings = await api.fetchMeetingsRecurring(roomId);
             const isMeetingDateValid = checkMeetingSingleOccurrenceDate({ meetingId: id,
                 meeting,
                 meetingsRecurring: meetings });
