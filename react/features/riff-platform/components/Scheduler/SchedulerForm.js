@@ -212,8 +212,8 @@ const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) =
     return acc;
 }, []);
 
-const getDaysOfWeekObj = daysOfWeekArr => daysOfWeekArr.reduce((acc, v) => {
-    acc[v] = true;
+const getDaysOfWeekObj = ({ daysOfWeekArr, selectedDaysOfWeekArr }) => daysOfWeekArr.reduce((acc, v) => {
+    acc[v] = selectedDaysOfWeekArr.includes(v);
 
     return acc;
 }, {});
@@ -369,8 +369,8 @@ const SchedulerForm = ({
                 if (meetingRecurrenceOptions.recurrenceType === 'daily') {
                     setRecurrenceInterval(meetingRecurrenceOptions.dailyInterval);
                 } else if (meetingRecurrenceOptions.recurrenceType === 'weekly') {
-                    setDaysOfWeek({ ...daysOfWeek,
-                        ...getDaysOfWeekObj(meetingRecurrenceOptions.daysOfWeek) });
+                    setDaysOfWeek(getDaysOfWeekObj({ daysOfWeekArr: daysOfWeekArray,
+                        selectedDaysOfWeekArr: meetingRecurrenceOptions.daysOfWeek }));
                 } else if (meetingRecurrenceOptions.recurrenceType === 'monthly') {
                     if (meetingRecurrenceOptions.monthlyByDay) {
                         setMonthlyBy('monthlyByDay');
