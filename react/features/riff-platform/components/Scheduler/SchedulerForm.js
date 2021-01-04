@@ -235,6 +235,23 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     });
 };
 
+const getMeetingDuration = ({ dateStart, dateEnd }) => {
+
+    const meetingDuration = moment
+    .duration(moment(dateEnd)
+    .diff(moment(dateStart)));
+
+    const durationMinutes = meetingDuration.asMinutes();
+
+    const hours = durationMinutes / 60;
+    const durationH = Math.floor(hours);
+    const minutes = (hours - durationH) * 60;
+    const durationM = Math.round(minutes);
+
+    return { durationH,
+        durationM };
+};
+
 
 const SchedulerForm = ({
     userId,
@@ -329,12 +346,8 @@ const SchedulerForm = ({
                 setmultipleRooms(meetingData.multipleRoomsQuantity);
             }
 
-            const meetingDuration = moment
-            .duration(moment(meetingData.dateEnd)
-            .diff(moment(meetingData.dateStart)));
-
-            const durationH = meetingDuration.asHours();
-            const durationM = meetingDuration.asMinutes() - (60 * durationH);
+            const { durationH, durationM } = getMeetingDuration({ dateStart: meetingData.dateStart,
+                dateEnd: meetingData.dateEnd });
 
             setHours(durationH);
             setMinutes(durationM);
@@ -627,6 +640,12 @@ const SchedulerForm = ({
 
     };
 
+    const defineStartDateMinValue = isEditing
+        ? isEditAllMeetingsRecurring
+            ? meeting?.recurrenceOptions?.defaultOptions?.dateStart
+            : meeting?.dateStart
+        : moment();
+
     return (
         <form
             className = { classes.form }
@@ -706,11 +725,7 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-
-                                    // min date for editing meetings recurring is the start date for all meetings recurring
-                                    minDate = { isEditing && isEditAllMeetingsRecurring
-                                        ? meeting?.recurrenceOptions?.defaultOptions?.dateStart
-                                        : moment() }
+                                    minDate = { defineStartDateMinValue }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {
