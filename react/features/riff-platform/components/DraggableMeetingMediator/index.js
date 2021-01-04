@@ -1,4 +1,5 @@
 /* global process */
+/* eslint-disable react/jsx-no-bind */
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, Fragment } from 'react';
@@ -6,6 +7,7 @@ import Draggable from 'react-draggable';
 
 // eslint-disable-next-line import/order
 import { Icon, IconClose } from '../../../base/icons';
+// eslint-disable-next-line import/order
 import { connect } from '../../../base/redux';
 
 // eslint-disable-next-line max-len
@@ -31,13 +33,13 @@ const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
     return (
         <MeetingMediatorWrapper { ...wrapperProps }>
             <div
-                id = 'meeting-mediator-wrapper'
                 className = { isOpened ? '' : 'closed' }
+                id = 'meeting-mediator-wrapper'
                 onClick = { onOpenMeetingMediator }>
                 { isOpened && <Icon
-                    src = { IconClose }
                     className = 'meeting-mediator-close'
-                    onClick = { onCloseMeetingMediator } />
+                    onClick = { onCloseMeetingMediator }
+                    src = { IconClose } />
                 }
                 <MeetingMediator
                     displayName = { displayName }
