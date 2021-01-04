@@ -706,7 +706,11 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    minDate = { isEditing ? date : moment() }
+
+                                    // min date for editing meetings recurring is the start date for all meetings recurring
+                                    minDate = { isEditing && isEditAllMeetingsRecurring
+                                        ? meeting?.recurrenceOptions?.defaultOptions?.dateStart
+                                        : moment() }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {
