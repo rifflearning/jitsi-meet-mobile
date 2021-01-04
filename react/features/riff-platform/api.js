@@ -50,7 +50,7 @@ class ApiService {
     fetchMeetingByRoomId = roomId => this.fetchWithJwt(`/meetingByRoomId/${roomId}`);
     fetchMeetings = listType => this.fetchWithJwt(`/meetings?listType=${listType}`);
     fetchMeetingsByGroup = (groupName, listType) => this.fetchWithJwt(`/fetchMeetingsByGroup/${groupName}?listType=${listType}`);
-    fetchMeetingsRecurring = (roomId, listType) => this.fetchWithJwt(`/fetchMeetingsRecurring/${roomId}?listType=${listType}`);
+    fetchMeetingsRecurring = roomId => this.fetchWithJwt(`/fetchMeetingsRecurring/${roomId}`);
     scheduleMeeting = meeting => this.postWithJwt('/meetings', { meeting });
     deleteMeeting = id => this.fetchWithJwt(`/meetings/${id}`, { method: 'delete' });
     deleteMeetingsRecurring = roomId => this.fetchWithJwt(`/meetingsRecurring/${roomId}`, { method: 'delete' });

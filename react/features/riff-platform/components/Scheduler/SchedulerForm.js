@@ -212,8 +212,8 @@ const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) =
     return acc;
 }, []);
 
-const getDaysOfWeekObj = daysOfWeekArr => daysOfWeekArr.reduce((acc, v) => {
-    acc[v] = true;
+const getDaysOfWeekObj = ({ daysOfWeekArr, selectedDaysOfWeekArr }) => daysOfWeekArr.reduce((acc, v) => {
+    acc[v] = selectedDaysOfWeekArr.includes(v);
 
     return acc;
 }, {});
@@ -233,6 +233,23 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
             endDate: newDateEnd.toISOString()
         };
     });
+};
+
+const getMeetingDuration = ({ dateStart, dateEnd }) => {
+
+    const meetingDuration = moment
+    .duration(moment(dateEnd)
+    .diff(moment(dateStart)));
+
+    const durationMinutes = meetingDuration.asMinutes();
+
+    const hours = durationMinutes / 60;
+    const durationH = Math.floor(hours);
+    const minutes = (hours - durationH) * 60;
+    const durationM = Math.round(minutes);
+
+    return { durationH,
+        durationM };
 };
 
 
@@ -329,12 +346,8 @@ const SchedulerForm = ({
                 setmultipleRooms(meetingData.multipleRoomsQuantity);
             }
 
-            const meetingDuration = moment
-            .duration(moment(meetingData.dateEnd)
-            .diff(moment(meetingData.dateStart)));
-
-            const durationH = meetingDuration.asHours();
-            const durationM = meetingDuration.asMinutes() - (60 * durationH);
+            const { durationH, durationM } = getMeetingDuration({ dateStart: meetingData.dateStart,
+                dateEnd: meetingData.dateEnd });
 
             setHours(durationH);
             setMinutes(durationM);
@@ -356,8 +369,8 @@ const SchedulerForm = ({
                 if (meetingRecurrenceOptions.recurrenceType === 'daily') {
                     setRecurrenceInterval(meetingRecurrenceOptions.dailyInterval);
                 } else if (meetingRecurrenceOptions.recurrenceType === 'weekly') {
-                    setDaysOfWeek({ ...daysOfWeek,
-                        ...getDaysOfWeekObj(meetingRecurrenceOptions.daysOfWeek) });
+                    setDaysOfWeek(getDaysOfWeekObj({ daysOfWeekArr: daysOfWeekArray,
+                        selectedDaysOfWeekArr: meetingRecurrenceOptions.daysOfWeek }));
                 } else if (meetingRecurrenceOptions.recurrenceType === 'monthly') {
                     if (meetingRecurrenceOptions.monthlyByDay) {
                         setMonthlyBy('monthlyByDay');
@@ -627,6 +640,20 @@ const SchedulerForm = ({
 
     };
 
+    const defineStartDateMinValue = () => {
+        const meetingDateStart = isEditAllMeetingsRecurring
+            ? meeting?.recurrenceOptions?.defaultOptions?.dateStart
+            : meeting?.dateStart;
+
+        const isPastDate = moment(meetingDateStart).isBefore(moment());
+
+        return isEditing
+            ? isPastDate
+                ? meetingDateStart
+                : moment()
+            : moment();
+    };
+
     return (
         <form
             className = { classes.form }
@@ -706,7 +733,7 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    minDate = { isEditing ? date : moment() }
+                                    minDate = { defineStartDateMinValue() }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {

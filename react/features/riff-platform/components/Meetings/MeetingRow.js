@@ -46,8 +46,7 @@ const MeetingsRow = ({
     meeting = {},
     removeMeeting,
     removeMeetingsRecurring,
-    groupName,
-    meetingsListType }) => {
+    groupName }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -162,8 +161,7 @@ const MeetingsRow = ({
                     variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
                 {!groupName
                     && <>
-                        { meetingsListType === 'upcoming'
-                        && <Button
+                        <Button
                             className = { classes.meetingButton }
                             color = 'default'
                             // eslint-disable-next-line react/jsx-no-bind
@@ -171,7 +169,7 @@ const MeetingsRow = ({
                             variant = 'outlined'>
                         Edit
                         </Button>
-                        }
+
                         <Button
                             className = { classes.meetingButton }
                             // eslint-disable-next-line react/jsx-no-bind
@@ -200,15 +198,12 @@ MeetingsRow.propTypes = {
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
-    meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = state => {
-    return {
-        meetingsListType: state['features/riff-platform'].meetings.listType
-    };
+const mapStateToProps = () => {
+    return {};
 };
 
 const mapDispatchToProps = dispatch => {
