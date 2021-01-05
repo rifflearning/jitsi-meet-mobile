@@ -32,6 +32,30 @@ export function getMeeting(meetingId) {
         let meeting = null;
 
         try {
+            // const res = await api.fetchMeeting(meetingId);
+            const res = await api.fetchMeetingByRoomId(meetingId);
+
+            if (res) {
+                meeting = res;
+                dispatch(meetingSuccess(meeting));
+            } else {
+                dispatch(meetingFailure('No meeting with this ID'));
+            }
+        } catch (error) {
+            dispatch(meetingFailure('No meeting with this ID'));
+            console.error('Error in getMeeting', error);
+        }
+
+        return meeting;
+    };
+}
+
+export function getMeetingById(meetingId) {
+    return async dispatch => {
+        dispatch(meetingRequest());
+        let meeting = null;
+
+        try {
             const res = await api.fetchMeeting(meetingId);
 
             if (res) {
@@ -128,4 +152,10 @@ function isHostEntered(meeting) {
     }
 
     return false;
+}
+
+export function meetingReset() {
+    return {
+        type: actionTypes.MEETING_RESET
+    };
 }

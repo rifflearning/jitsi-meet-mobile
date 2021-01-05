@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import * as ROUTES from './constants/routes';
 
 // Save room name before redirecting to signIn page, so we could redirect back to meeting after login.
@@ -52,37 +54,7 @@ export function groupMeetingsByDays(meetings) {
 
     const groupedMeetings = {};
 
-    // get grouped meetings to multiple
-    const groups = {};
-    const newMeetings = meetings.filter(m => {
-        // put all groups meetings to groups
-        if (m.multipleRoomsParentId) {
-            if (groups[m.multipleRoomsParentId]) {
-                groups[m.multipleRoomsParentId].push(m);
-            } else {
-                groups[m.multipleRoomsParentId] = [ m ];
-            }
-        }
-
-        // filter out all groupped, whenre m.multipleRoomsParentId !== m._id
-        if (m.multipleRoomsParentId && m.multipleRoomsParentId !== m._id) {
-            return false;
-        }
-
-        return true;
-    });
-
-    // sort groups
-    // eslint-disable-next-line no-confusing-arrow, max-len
-    Object.keys(groups).forEach(el => groups[el].sort((a, b) => Number(a.name.split('#')[1]) > Number(b.name.split('#')[1]) ? 1 : -1));
-
-    // put all groups to meetings
-    const newMeetingsWithGroups = newMeetings.map(m => {
-        return { ...m,
-            multipleRooms: groups[m._id] || null };
-    });
-
-    newMeetingsWithGroups.forEach(el => {
+    meetings.forEach(el => {
         if (groupedMeetings[transformDate(el.dateStart)]) {
             groupedMeetings[transformDate(el.dateStart)].push(el);
         } else {
@@ -153,4 +125,28 @@ export function msToTime(milliseconds) {
  */
 export function isRiffPlatformCurrentPath() {
     return window.location.pathname.split('/')[1] === ROUTES.BASENAME.slice(1) || window.location.pathname === '/';
+}
+
+/**
+ * Check if the meeting has a different time from other recurrences.
+ *
+ * @param {Array} meetingsRecurring - Array of meetings recurring from db.
+ * @param {Object} meeting - Current meeting recurring.
+ * @param {string} meetingId - Current meetingId.
+ * @returns {boolean} - True if the meeting has a different time from other recurrences.
+ */
+export function checkMeetingSingleOccurrenceDate({ meetingId, meeting, meetingsRecurring }) {
+    const checkRecurrence = meetingsRecurring.filter(m => {
+        const dateStart = moment(m.dateStart).subtract(1, 'hour');
+        const dateEnd = moment(m.dateEnd).add(1, 'hour');
+
+        if ((moment(meeting.dateStart).isBetween(dateStart, dateEnd, undefined, '[]')
+        || moment(meeting.dateEnd).isBetween(dateStart, dateEnd, undefined, '[]')) && m._id !== meetingId) {
+            return true;
+        }
+
+        return false;
+    });
+
+    return !checkRecurrence.length;
 }

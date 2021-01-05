@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { deleteMeeting, deleteMeetingsMultipleRooms, deleteMeetingsRecurring } from '../../actions/meetings';
+import { deleteMeeting, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
 
@@ -47,28 +47,29 @@ const MenuProps = {
 const MeetingsRow = ({
     meeting = {},
     removeMeeting,
-    removeMeetingsMultipleRooms,
     removeMeetingsRecurring,
-    groupName,
-    meetingsListType }) => {
+    groupName }) => {
     const classes = useStyles();
     const history = useHistory();
 
-    const [ multipleRoom, setmultipleRooms ] = useState(meeting.multipleRooms ? meeting.multipleRooms[0]?.name : '');
+    const [ isLinkCopied, setLinkCopied ] = useState(false);
+    const [ multipleRoom, setmultipleRooms ] = useState(1);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
-    const handleStartClick = e => {
-        e.stopPropagation();
-        let id = meeting._id;
+    const handleLinkCopy = () => {
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
-        if (meeting.multipleRooms) {
-            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+        // onclick Copy button copy meeting link + description, Beth's request
+        const description = meeting.description ? ` ${meeting.description}` : '';
 
-            if (_id) {
-                id = _id;
-            }
-        }
+        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 1000);
+    };
+
+    const handleStartClick = () => {
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
@@ -80,36 +81,31 @@ const MeetingsRow = ({
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete groupped meetings') {
-            return removeMeetingsMultipleRooms(meeting._id);
-        } else if (value === 'Delete one meeting') {
+        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
     };
 
     const onEditDialogClose = value => {
-        const url = `${ROUTES.MEETING}/${meeting._id}/edit`;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
+        const url = `${ROUTES.MEETING}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
             return history.push(url);
         } else if (value === 'Edit all recurring meetings') {
             return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            return history.push(`${url}?mode=one`);
-        } else if (value === 'Edit groupped meetings') {
-            const selectedMultipleRoomId = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
+            const meetingId = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
 
-            return history.push(`${ROUTES.MEETING}/${selectedMultipleRoomId}/edit?mode=group`);
+            return history.push(`${ROUTES.MEETING}/${meetingId}/edit?mode=one`);
         }
-
         setIsOpenEditDialog(false);
     };
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
-    const dialogDeleteValues = [
-        multipleRoom ? 'Delete groupped meetings' : 'Delete one meeting',
+    const dialogDeleteValues = [ 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
     const handleMeetingItemClick = e => {
@@ -126,9 +122,12 @@ const MeetingsRow = ({
         history.push(`${ROUTES.MEETING}/${id}`);
     };
 
-    const dialogEditValues = [
-        multipleRoom ? 'Edit groupped meetings' : 'Edit one meeting',
+    const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
+
+    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
+
+    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
 
     return (
         <TableRow
@@ -145,7 +144,7 @@ const MeetingsRow = ({
             </TableCell>
             <TableCell>
 
-                {meeting.multipleRooms
+                {meeting.multipleRoomsQuantity
                     ? <TextField
                         id = 'room-names'
                         select = { true }
@@ -157,9 +156,11 @@ const MeetingsRow = ({
                             e.stopPropagation();
                             setmultipleRooms(e.target.value);
                         } }>
-                        {meeting.multipleRooms.map(m => (<MenuItem
-                            key = { m._id }
-                            value = { m.name }>{m.name}</MenuItem>))}
+                        {roomsNumbersArr.map(el => (<MenuItem
+                            key = { el }
+                            value = { el }>
+                            {meeting.name}-{el}
+                        </MenuItem>))}
                     </TextField>
                     : <Typography
                         component = 'p'
@@ -176,8 +177,7 @@ const MeetingsRow = ({
                     variant = 'contained'>Start</Button>
                 {!groupName
                     && <>
-                        { meetingsListType === 'upcoming'
-                        && <Button
+                        <Button
                             className = { classes.meetingButton }
                             color = 'default'
                             // eslint-disable-next-line react/jsx-no-bind
@@ -185,7 +185,7 @@ const MeetingsRow = ({
                             variant = 'outlined'>
                         Edit
                         </Button>
-                        }
+
                         <Button
                             className = { classes.meetingButton }
                             // eslint-disable-next-line react/jsx-no-bind
@@ -214,22 +214,17 @@ MeetingsRow.propTypes = {
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     meeting: PropTypes.object,
-    meetingsListType: PropTypes.string,
     removeMeeting: PropTypes.func,
-    removeMeetingsMultipleRooms: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = state => {
-    return {
-        meetingsListType: state['features/riff-platform'].meetings.listType
-    };
+const mapStateToProps = () => {
+    return {};
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         removeMeeting: id => dispatch(deleteMeeting(id)),
-        removeMeetingsMultipleRooms: id => dispatch(deleteMeetingsMultipleRooms(id)),
         removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
 };
