@@ -5,15 +5,14 @@ import type { Component } from 'react';
 import { isRoomValid } from '../base/conference';
 import { isSupportedBrowser, isSupportedMobileBrowser } from '../base/environment';
 import { isMobileBrowser } from '../base/environment/utils';
-
 import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
 import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
 import RiffPlatform from '../riff-platform/components';
+import UnsupportedMobileBrowser from '../riff-platform/components/UnsupportedBrowser';
 import { isRiffPlatformCurrentPath } from '../riff-platform/functions';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
-import { NoMobileApp } from '../deep-linking/components'
 import { BlankPage,
     WelcomePage,
     isWelcomePageAppEnabled,
@@ -131,7 +130,7 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
     }
 
     return getDeepLinkingPage(state)
-        .then(deepLinkComponent => {
+        .then(deepLinkComponent => {          
             if (deepLinkComponent) {
                 route.component = deepLinkComponent;
             } else if (isSupportedBrowser() && !isMobileBrowser()) {
@@ -139,7 +138,7 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
             } else if (isMobileBrowser() && isSupportedMobileBrowser()) {
                 route.component = Conference;
             } else if (isMobileBrowser() && !isSupportedMobileBrowser()) {
-                route.component = NoMobileApp;
+                route.component = UnsupportedMobileBrowser;
             } else {
                 route.component = UnsupportedDesktopBrowser;
             }
