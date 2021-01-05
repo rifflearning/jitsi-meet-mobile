@@ -13,7 +13,8 @@ import RiffPlatform from '../riff-platform/components';
 import UnsupportedMobileBrowser from '../riff-platform/components/UnsupportedBrowser';
 import { isRiffPlatformCurrentPath } from '../riff-platform/functions';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
-import { BlankPage,
+import {
+    BlankPage,
     WelcomePage,
     isWelcomePageAppEnabled,
     isWelcomePageUserEnabled
@@ -130,7 +131,7 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
     }
 
     return getDeepLinkingPage(state)
-        .then(deepLinkComponent => {          
+        .then(deepLinkComponent => {
             if (deepLinkComponent) {
                 route.component = deepLinkComponent;
             } else if (isSupportedBrowser() && !isMobileBrowser()) {
