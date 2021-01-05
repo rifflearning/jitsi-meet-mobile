@@ -3,7 +3,9 @@ import { generateRoomWithoutSeparator } from '@jitsi/js-utils/random';
 import type { Component } from 'react';
 
 import { isRoomValid } from '../base/conference';
-import { isSupportedBrowser } from '../base/environment';
+import { isSupportedBrowser, isSupportedMobileBrowser } from '../base/environment';
+import { isMobileBrowser } from '../base/environment/utils';
+
 import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
@@ -11,8 +13,8 @@ import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-pl
 import RiffPlatform from '../riff-platform/components';
 import { isRiffPlatformCurrentPath } from '../riff-platform/functions';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
-import {
-    BlankPage,
+import { NoMobileApp } from '../deep-linking/components'
+import { BlankPage,
     WelcomePage,
     isWelcomePageAppEnabled,
     isWelcomePageUserEnabled
@@ -132,8 +134,12 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
         .then(deepLinkComponent => {
             if (deepLinkComponent) {
                 route.component = deepLinkComponent;
-            } else if (isSupportedBrowser()) {
+            } else if (isSupportedBrowser() && !isMobileBrowser()) {
                 route.component = Conference;
+            } else if (isMobileBrowser() && isSupportedMobileBrowser()) {
+                route.component = Conference;
+            } else if (isMobileBrowser() && !isSupportedMobileBrowser()) {
+                route.component = NoMobileApp;
             } else {
                 route.component = UnsupportedDesktopBrowser;
             }
