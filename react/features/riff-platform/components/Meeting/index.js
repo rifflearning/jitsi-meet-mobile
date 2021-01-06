@@ -4,6 +4,7 @@
 
 import {
     Button,
+    CircularProgress,
     Grid,
     Typography,
     Box,
@@ -46,6 +47,18 @@ const useStyles = makeStyles(theme => {
     };
 });
 
+const repeatIntervalMap = {
+    daily: 'day(s)',
+    weekly: 'week',
+    monthly: 'month'
+};
+
+const loader = (<Grid
+    container = { true }
+    item = { true }
+    justify = 'center'
+    xs = { 12 }><CircularProgress /></Grid>);
+
 
 function Meeting({
     meeting = {},
@@ -73,9 +86,41 @@ function Meeting({
 
     const getFormattedDate = () => {
         const duration = formatDurationTime(meeting.dateStart, meeting.dateEnd);
-        const date = moment(meeting.dateStart).format('MMM dd, YYYY ');
+        const date = moment(meeting.dateStart).format('MMM DD, YYYY ');
 
         return `${duration}, ${date}`;
+    };
+
+    const getRecurrenceDesc = () => {
+        const recurring = meeting?.recurrenceOptions?.options;
+        const intervalPart = `Every ${
+            recurring.recurrenceType === 'daily' ? recurring.dailyInterval : ''
+        } ${repeatIntervalMap[recurring.recurrenceType]}`;
+
+        const endDatePart = `${
+            recurring.dateEnd
+                ? `, until ${moment(recurring.dateEnd).format('MMM DD, YYYY')}`
+                : ''
+        }`;
+
+        const daysOfWeekPart = `${
+            recurring.recurrenceType === 'weekly'
+                ? recurring.daysOfWeek.length > 0
+                    ? ` on ${recurring.daysOfWeek.join(', ')}`
+                    : ''
+                : ''
+        }`;
+
+        const daysOfMonthPart = `${recurring.recurrenceType === 'monthly'
+            ? recurring.monthlyByDay
+                ? ` on the ${recurring.monthlyByDay} of the month`
+                : ` on the ${recurring.monthlyByPosition} ${recurring.monthlyByWeekDay}`
+            : ''
+        }`;
+
+        const occurrencePart = recurring.endTimes ? `, ${recurring.endTimes} occurrence(s)` : '';
+
+        return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
     };
 
     const handleLinkCopy = () => {
@@ -105,7 +150,7 @@ function Meeting({
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
+        } else if (value === 'Delete one meeting') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
@@ -132,6 +177,11 @@ function Meeting({
 
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
+
+
+    if (loading) {
+        return loader;
+    }
 
     return (
         <Grid
@@ -210,13 +260,30 @@ function Meeting({
                                 </Typography>
                             </Grid>
                             <Grid
+                                alignItems = 'center'
+                                container = { true }
+                                direction = 'column'
                                 item = { true }
                                 md = { 10 }
                                 sm = { 8 }
+                                spacing = { 2 }
                                 xs = { 12 }>
-                                <Typography>
-                                    {getFormattedDate()}
-                                </Typography>
+                                <Grid
+                                    container = { true }
+                                    item = { true }>
+                                    <Typography>
+                                        {getFormattedDate()}
+                                    </Typography>
+                                </Grid>
+                                { meeting.recurrenceOptions
+                                && <Grid
+                                    container = { true }
+                                    item = { true }>
+                                    <Typography>
+                                        {getRecurrenceDesc()}
+                                    </Typography>
+                                </Grid>
+                                }
                             </Grid>
                         </Grid>
                         <Divider className = { classes.infoDivider } />
