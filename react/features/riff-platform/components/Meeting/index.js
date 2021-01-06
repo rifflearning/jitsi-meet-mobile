@@ -133,9 +133,6 @@ function Meeting({
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
-
-    console.log('loading', loading);
-
     return (
         <Grid
             container = { true }
@@ -256,7 +253,9 @@ function Meeting({
                                     <Button
                                         color = { isLinkCopied ? 'default' : 'primary' }
                                         onClick = { () => handleLinkCopy(meetingId) }
-                                        variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
+                                        variant = { isLinkCopied ? 'text' : 'outlined' }>
+                                        {isLinkCopied ? 'Copied!' : 'Copy link'}
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -301,6 +300,32 @@ function Meeting({
                                 </Grid>
                             </Grid>
                         </Grid>
+                        <Divider className = { classes.infoDivider } />
+                        {meeting.multipleRoomsQuantity
+                        && <Grid
+                            alignItems = 'center'
+                            container = { true }
+                            item = { true }>
+                            <Grid
+                                item = { true }
+                                md = { 2 }
+                                sm = { 3 }
+                                xs = { 12 }>
+                                <Typography>
+                                Multiple Rooms Quantity
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item = { true }
+                                md = { 10 }
+                                sm = { 8 }
+                                xs = { 12 }>
+                                <Typography>
+                                    {meeting.multipleRoomsQuantity }
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        }
                         <Divider className = { classes.infoDivider } />
                         <Grid
                             alignItems = 'center'
@@ -348,8 +373,9 @@ function Meeting({
 }
 
 Meeting.propTypes = {
-    // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
     fetchMeeting: PropTypes.func,
+
+    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
     loading: PropTypes.bool,
     meeting: PropTypes.object,

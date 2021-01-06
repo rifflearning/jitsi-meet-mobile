@@ -25,8 +25,6 @@ const useStyles = makeStyles(() => {
         },
         tableRow: {
             '&:hover': {
-                boxShadow: '0 3px 9px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.18)',
-                cursor: 'pointer',
                 '& $meetingButton': {
                     visibility: 'visible'
                 }
@@ -96,8 +94,7 @@ const MeetingsRow = ({
     const dialogDeleteValues = [ 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
 
-    const handleMeetingItemClick = e => {
-        e.preventDefault();
+    const handleMeetingDetailsClick = () => {
         const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
         history.push(`${ROUTES.MEETING}/${id}`);
@@ -113,9 +110,7 @@ const MeetingsRow = ({
     return (
         <TableRow
             className = { classes.tableRow }
-            key = { meeting._id }
-            // eslint-disable-next-line react/jsx-no-bind
-            onClick = { handleMeetingItemClick }>
+            key = { meeting._id }>
             <TableCell>
                 <Typography
                     component = 'p'
@@ -133,10 +128,7 @@ const MeetingsRow = ({
                         SelectProps = {{ MenuProps }}
                         value = { multipleRoom }
                         // eslint-disable-next-line react/jsx-no-bind, react/jsx-sort-props
-                        onChange = { e => {
-                            e.stopPropagation();
-                            setmultipleRooms(e.target.value);
-                        } }>
+                        onChange = { e => setmultipleRooms(e.target.value) }>
                         {roomsNumbersArr.map(el => (<MenuItem
                             key = { el }
                             value = { el }>
@@ -156,6 +148,12 @@ const MeetingsRow = ({
                     // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleStartClick }
                     variant = 'contained'>Start</Button>
+                <Button
+                    className = { classes.meetingButton }
+                    color = 'primary'
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onClick = { handleMeetingDetailsClick }
+                    variant = 'outlined'>Details</Button>
                 {!groupName
                     && <>
                         <Button

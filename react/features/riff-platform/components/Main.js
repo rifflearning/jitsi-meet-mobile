@@ -82,7 +82,7 @@ const Main = ({ user }) => {
                 <Scheduler />
             </Route>
             <Route path = { `${ROUTES.MEETING}/:meetingId` }>
-                <Meeting groupName = { negotiationsGroupId } />
+                <Meeting />
             </Route>
             <Redirect to = { ROUTES.PROFILE } />
         </Switch>
