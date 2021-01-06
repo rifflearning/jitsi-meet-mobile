@@ -20,7 +20,6 @@ import { useParams } from 'react-router-dom';
 import { connect } from '../../../base/redux';
 import { getMeeting } from '../../actions/meeting';
 import { deleteMeeting,
-    deleteMeetingsMultipleRooms,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
@@ -35,7 +34,8 @@ const useStyles = makeStyles(theme => {
             alignItems: 'center'
         },
         meetingButton: {
-            marginLeft: '10px'
+            marginLeft: '10px',
+            marginTop: '10px'
         },
         infoDivider: {
             width: '100%'
@@ -52,13 +52,13 @@ function Meeting({
     fetchMeeting,
     loading,
     removeMeeting,
-    removeMeetingsMultipleRooms,
     removeMeetingsRecurring,
     groupName
 }) {
 
     const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
+    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     const history = useHistory();
     const { meetingId } = useParams();
@@ -78,34 +78,61 @@ function Meeting({
         return `${duration}, ${date}`;
     };
 
-    const handleLinkCopy = id => {
-        navigator.clipboard.writeText(`${window.location.origin}/${id}`);
+    const handleLinkCopy = () => {
+        const id = meeting.multipleRoomsQuantity
+            ? `${meeting.roomId}-${meeting.multipleRoomsQuantity}`
+            : meeting.roomId;
+
+        // onclick Copy button copy meeting link + description, Beth's request
+        const description = meeting.description ? ` ${meeting.description}` : '';
+
+        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
         setLinkCopied(true);
         setTimeout(() => setLinkCopied(false), 1000);
     };
+
     const handleStartClick = id => history.push(`${ROUTES.WAITING}/${id}`);
 
     const handleDeleteClick = () => setisOpenDeleteDialog(true);
+
+    const handleEditClick = () => setIsOpenEditDialog(true);
 
     const defineIcon = {
         true: <CheckCircleOutline />,
         false: <HighlightOffOutlined />
     };
 
-    const onDialogClose = (e, value) => {
+    const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete groupped meetings') {
-            return removeMeetingsMultipleRooms(meeting._id);
-        } else if (value === 'Delete one meeting') {
+        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
     };
 
-    const dialogValues = [
-        meeting.multipleRoomsParentId ? 'Delete groupped meetings' : 'Delete one meeting',
+    const onEditDialogClose = value => {
+        let id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${meeting.multipleRoomsQuantity}` : meeting.roomId;
+        const url = `${ROUTES.MEETING}/${id}/edit`;
+
+        if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
+            return history.push(url);
+        } else if (value === 'Edit all recurring meetings') {
+            return history.push(`${url}?mode=all`);
+        } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
+            id = meeting.multipleRoomsQuantity ? `${meeting._id}-${meeting.multipleRoomsQuantity}` : meeting._id;
+
+            return history.push(`${ROUTES.MEETING}/${id}/edit?mode=one`);
+        }
+        setIsOpenEditDialog(false);
+    };
+
+    const dialogDeleteValues = [ 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
+
+    const dialogEditValues = [ 'Edit one meeting',
+        meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
+
 
     console.log('loading', loading);
 
@@ -118,8 +145,8 @@ function Meeting({
                 xs = { 12 }>
                 <StyledPaper title = 'Meeting information'>
                     <Grid
-                        className = { classes.container }
                         alignItems = 'center'
+                        className = { classes.container }
                         container = { true }
                         item = { true }
                         spacing = { 4 }
@@ -130,18 +157,18 @@ function Meeting({
                             item = { true }>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 2 }
-                                sm = { 3 }>
+                                sm = { 3 }
+                                xs = { 12 }>
                                 <Typography>
                                 Name
                                 </Typography>
                             </Grid>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 10 }
-                                sm = { 8 } >
+                                sm = { 8 }
+                                xs = { 12 } >
                                 <Typography>
                                     {meeting.name}
                                 </Typography>
@@ -154,18 +181,18 @@ function Meeting({
                             item = { true }>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 2 }
-                                sm = { 3 }>
+                                sm = { 3 }
+                                xs = { 12 }>
                                 <Typography>
                     Description
                                 </Typography>
                             </Grid>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
+                                md = { 10 }
                                 sm = { 8 }
-                                md = { 10 } >
+                                xs = { 12 }>
                                 <Typography>
                                     {meeting.description}
                                 </Typography>
@@ -178,18 +205,18 @@ function Meeting({
                             item = { true }>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 2 }
-                                sm = { 3 }>
+                                sm = { 3 }
+                                xs = { 12 }>
                                 <Typography>
                     Time
                                 </Typography>
                             </Grid>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
+                                md = { 10 }
                                 sm = { 8 }
-                                md = { 10 } >
+                                xs = { 12 }>
                                 <Typography>
                                     {getFormattedDate()}
                                 </Typography>
@@ -202,22 +229,22 @@ function Meeting({
                             item = { true }>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 2 }
-                                sm = { 3 }>
+                                sm = { 3 }
+                                xs = { 12 }>
                                 <Typography>
                                 Invite Link
                                 </Typography>
                             </Grid>
                             <Grid
+                                alignItems = 'center'
                                 container = { true }
                                 item = { true }
                                 justify = 'space-between'
-                                alignItems = 'center'
-                                spacing = { 1 }
-                                xs = { 12 }
+                                md = { 10 }
                                 sm = { 8 }
-                                md = { 10 }>
+                                spacing = { 1 }
+                                xs = { 12 }>
                                 <Grid
                                     item = { true }>
                                     <Typography>
@@ -240,22 +267,22 @@ function Meeting({
                             item = { true }>
                             <Grid
                                 item = { true }
-                                xs = { 12 }
                                 md = { 2 }
-                                sm = { 3 }>
+                                sm = { 3 }
+                                xs = { 12 }>
                                 <Typography>
                                     Meeting Options
                                 </Typography>
                             </Grid>
                             <Grid
+                                alignItems = 'center'
                                 container = { true }
                                 direction = 'column'
                                 item = { true }
-                                alignItems = 'center'
-                                spacing = { 2 }
-                                xs = { 12 }
+                                md = { 10 }
                                 sm = { 8 }
-                                md = { 10 }>
+                                spacing = { 2 }
+                                xs = { 12 }>
                                 <Grid
                                     container = { true }
                                     item = { true }>
@@ -287,17 +314,31 @@ function Meeting({
                                 onClick = { () => handleStartClick(meetingId) }
                                 variant = 'contained'>Start</Button>
                             {!groupName
-                                    && <Button
-                                        className = { classes.meetingButton }
-                                        onClick = { handleDeleteClick }>
+                            && <>
+                                <Button
+                                    className = { classes.meetingButton }
+                                    color = 'default'
+                                    onClick = { handleEditClick }
+                                    variant = 'outlined'>
+                             Edit
+                                </Button>
+                                <Button
+                                    className = { classes.meetingButton }
+                                    onClick = { handleDeleteClick }>
                                         Delete
-                                    </Button>
+                                </Button>
+                                    </>
                             }
                             <ConfirmationDialogRaw
-
-                                onClose = { onDialogClose }
+                                onClose = { onDeleteDialogClose }
                                 open = { isOpenDeleteDialog }
-                                value = { dialogValues } />
+                                title = 'Delete meeting?'
+                                value = { dialogDeleteValues } />
+                            <ConfirmationDialogRaw
+                                onClose = { onEditDialogClose }
+                                open = { isOpenEditDialog }
+                                title = 'Edit meeting'
+                                value = { dialogEditValues } />
                         </Grid>
                     </Grid>
                 </StyledPaper>
@@ -313,7 +354,6 @@ Meeting.propTypes = {
     loading: PropTypes.bool,
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
-    removeMeetingsMultipleRooms: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
@@ -328,7 +368,6 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchMeeting: id => dispatch(getMeeting(id)),
         removeMeeting: id => dispatch(deleteMeeting(id)),
-        removeMeetingsMultipleRooms: id => dispatch(deleteMeetingsMultipleRooms(id)),
         removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
 };

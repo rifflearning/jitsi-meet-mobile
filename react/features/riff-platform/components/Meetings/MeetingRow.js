@@ -52,21 +52,9 @@ const MeetingsRow = ({
     const classes = useStyles();
     const history = useHistory();
 
-    const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(1);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
-
-    const handleLinkCopy = () => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
-
-        // onclick Copy button copy meeting link + description, Beth's request
-        const description = meeting.description ? ` ${meeting.description}` : '';
-
-        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
-        setLinkCopied(true);
-        setTimeout(() => setLinkCopied(false), 1000);
-    };
 
     const handleStartClick = () => {
         const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
@@ -110,15 +98,8 @@ const MeetingsRow = ({
 
     const handleMeetingItemClick = e => {
         e.preventDefault();
-        let id = meeting._id;
+        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
-        if (meeting.multipleRooms) {
-            const _id = meeting.multipleRooms.find(m => m.name === multipleRoom)?._id;
-
-            if (_id) {
-                id = _id;
-            }
-        }
         history.push(`${ROUTES.MEETING}/${id}`);
     };
 
