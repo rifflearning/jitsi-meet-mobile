@@ -24,6 +24,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import 'moment-recur';
+import { useHistory } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
@@ -309,6 +310,7 @@ const SchedulerForm = ({
     const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
 
     const { id } = useParams();
+    const history = useHistory();
 
     const defineEditMode = () => {
         const params = new URLSearchParams(location.search);
@@ -480,12 +482,12 @@ const SchedulerForm = ({
         };
 
         if (!isEditing) {
-            return scheduleMeeting(meetingData);
+            return scheduleMeeting(meetingData, history);
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
                 return updateScheduleMeetingsRecurring(meeting.roomId,
                     { roomId: meeting.roomId,
-                        ...meetingData });
+                        ...meetingData }, history);
             } else if (isEditOneOccurrence) {
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
@@ -496,11 +498,11 @@ const SchedulerForm = ({
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,
                     multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
-                });
+                }, history);
             }
 
             return updateScheduleMeeting(meeting._id, { roomId: meeting.roomId,
-                ...meetingData });
+                ...meetingData }, history);
 
         }
     };
@@ -1236,12 +1238,13 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        scheduleMeeting: meeting => dispatch(schedule(meeting)),
+        scheduleMeeting: (meeting, history) => dispatch(schedule(meeting, history)),
         fetchMeetingById: id => dispatch(getMeetingById(id)),
-        updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
-        updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
-        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) =>
-            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
+        updateScheduleMeeting: (id, meeting, history) => dispatch(updateSchedule(id, meeting, history)),
+        updateScheduleMeetingsRecurring: (roomId, meeting, history) =>
+            dispatch(updateScheduleRecurring(roomId, meeting, history)),
+        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting, history) =>
+            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting, history))
     };
 };
 

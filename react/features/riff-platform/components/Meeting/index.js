@@ -181,11 +181,11 @@ function Meeting({
         const meetingsUrl = `${ROUTES.MEETINGS}`;
 
         if (value === 'Delete all recurring meetings') {
-            removeMeetingsRecurring(meeting.roomId);
+            removeMeetingsRecurring(meeting.roomId, history);
 
             return history.push(meetingsUrl);
         } else if (value === 'Delete one meeting') {
-            removeMeeting(meeting._id);
+            removeMeeting(meeting._id, history);
 
             return history.push(meetingsUrl);
         }

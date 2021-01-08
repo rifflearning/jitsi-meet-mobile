@@ -1,6 +1,7 @@
 /* eslint-disable require-jsdoc */
 import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
+import * as ROUTES from '../constants/routes';
 import { checkMeetingSingleOccurrenceDate } from '../functions';
 
 function schedulerRequest() {
@@ -23,7 +24,7 @@ function schedulerFailure(error) {
     };
 }
 
-export function schedule(meeting) {
+export function schedule(meeting, history) {
     return async dispatch => {
         dispatch(schedulerRequest());
 
@@ -31,6 +32,12 @@ export function schedule(meeting) {
             const res = await api.scheduleMeeting(meeting);
 
             dispatch(schedulerSuccess(res));
+            if (history) {
+                // if the meeting has multiple rooms set default room number 1
+                const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
+
+                history.push(`${ROUTES.MEETING}/${meetingId}`);
+            }
         } catch (e) {
             dispatch(schedulerFailure(e.message));
         }
@@ -58,7 +65,7 @@ function updateSchedulerFailure(error) {
 }
 
 
-export function updateSchedule(id, meeting) {
+export function updateSchedule(id, meeting, history) {
     return async dispatch => {
         dispatch(updateSchedulerRequest());
 
@@ -67,13 +74,19 @@ export function updateSchedule(id, meeting) {
             const res = await api.scheduleMeeting(meeting);
 
             dispatch(updateSchedulerSuccess(res));
+            if (history) {
+                // if the meeting has multiple rooms set default room number 1
+                const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
+
+                history.push(`${ROUTES.MEETING}/${meetingId}`);
+            }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
 
-export function updateScheduleRecurring(roomId, meeting) {
+export function updateScheduleRecurring(roomId, meeting, history) {
     return async dispatch => {
         dispatch(updateSchedulerRequest());
 
@@ -82,13 +95,19 @@ export function updateScheduleRecurring(roomId, meeting) {
             const res = await api.scheduleMeeting(meeting);
 
             dispatch(updateSchedulerSuccess(res));
+            if (history) {
+                // if the meeting has multiple rooms set default room number 1
+                const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
+
+                history.push(`${ROUTES.MEETING}/${meetingId}`);
+            }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
         }
     };
 }
 
-export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting) {
+export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting, history) {
     return async dispatch => {
         dispatch(updateSchedulerRequest());
 
@@ -103,6 +122,12 @@ export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting) {
                 const res = await api.updateMeeting(id, meeting);
 
                 dispatch(updateSchedulerSuccess(res));
+                if (history) {
+                    // if the meeting has multiple rooms set default room number 1
+                    const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
+
+                    history.push(`${ROUTES.MEETING}/${meetingId}`);
+                }
             } else {
                 dispatch(updateSchedulerFailure('This occurrence has conflicts with an existing occurrence.'));
             }
