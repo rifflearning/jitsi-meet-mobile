@@ -27,7 +27,7 @@ import 'moment-recur';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeeting, getMeetingById } from '../../actions/meeting';
+import { getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
@@ -259,7 +259,6 @@ const SchedulerForm = ({
     error,
     scheduleMeeting,
     isEditing,
-    fetchMeeting,
     fetchMeetingById,
     meeting,
     updateScheduleMeetingsRecurring,
@@ -322,11 +321,7 @@ const SchedulerForm = ({
 
     useEffect(() => {
         if (isEditing) {
-            if (isEditOneOccurrence) {
-                fetchMeetingById(id);
-            } else {
-                fetchMeeting(id);
-            }
+            fetchMeetingById(id);
         }
     }, [ id ]);
 
@@ -1215,7 +1210,6 @@ const SchedulerForm = ({
 
 SchedulerForm.propTypes = {
     error: PropTypes.string,
-    fetchMeeting: PropTypes.func,
     fetchMeetingById: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
@@ -1243,7 +1237,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         scheduleMeeting: meeting => dispatch(schedule(meeting)),
-        fetchMeeting: id => dispatch(getMeeting(id)),
         fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
         updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
