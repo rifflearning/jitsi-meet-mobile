@@ -74,6 +74,12 @@ const loader = (<Grid
     justify = 'center'
     xs = { 12 }><CircularProgress /></Grid>);
 
+const errorMessage = err => (<Grid
+    container = { true }
+    item = { true }
+    justify = 'center'
+    xs = { 12 }><Typography color = 'error'>{err}</Typography></Grid>);
+
 
 function Meeting({
     meeting = {},
@@ -81,7 +87,8 @@ function Meeting({
     loading,
     removeMeeting,
     removeMeetingsRecurring,
-    userId
+    userId,
+    error
 }) {
 
     const history = useHistory();
@@ -212,9 +219,12 @@ function Meeting({
 
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 
-
     if (loading) {
         return loader;
+    }
+
+    if (error) {
+        return errorMessage(error);
     }
 
     return (
@@ -472,6 +482,7 @@ function Meeting({
 }
 
 Meeting.propTypes = {
+    error: PropTypes.string,
     fetchMeeting: PropTypes.func,
     loading: PropTypes.bool,
     meeting: PropTypes.object,
@@ -484,7 +495,8 @@ const mapStateToProps = state => {
     return {
         loading: state['features/riff-platform'].meeting.loading,
         meeting: state['features/riff-platform'].meeting.meeting,
-        userId: state['features/riff-platform'].signIn.user?.uid
+        userId: state['features/riff-platform'].signIn.user?.uid,
+        error: state['features/riff-platform'].meeting.error
     };
 };
 
