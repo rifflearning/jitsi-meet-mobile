@@ -45,6 +45,11 @@ const useStyles = makeStyles(theme => {
         },
         container: {
             margin: '0px' // fix scroll
+        },
+        rightColumn: {
+            '& > .MuiGrid-item': {
+                paddingLeft: '0px'
+            }
         }
     };
 });
@@ -76,7 +81,7 @@ function Meeting({
     loading,
     removeMeeting,
     removeMeetingsRecurring,
-    groupName
+    userId
 }) {
 
     const history = useHistory();
@@ -95,8 +100,6 @@ function Meeting({
             fetchMeeting(meetingId);
         }
     }, [ meetingId ]);
-
-    console.log('mmeting', meeting);
 
     const getFormattedDate = () => {
         const duration = formatDurationTime(meeting.dateStart, meeting.dateEnd);
@@ -172,11 +175,14 @@ function Meeting({
 
         if (value === 'Delete all recurring meetings') {
             removeMeetingsRecurring(meeting.roomId);
+
+            return history.push(meetingsUrl);
         } else if (value === 'Delete one meeting') {
             removeMeeting(meeting._id);
+
+            return history.push(meetingsUrl);
         }
         setisOpenDeleteDialog(false);
-        history.push(meetingsUrl);
     };
 
     const onEditDialogClose = value => {
@@ -203,6 +209,8 @@ function Meeting({
     const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
 
     const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
+
+    const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 
 
     if (loading) {
@@ -345,6 +353,7 @@ function Meeting({
                             </Grid>
                             <Grid
                                 alignItems = 'center'
+                                className = { classes.rightColumn }
                                 container = { true }
                                 direction = 'column'
                                 item = { true }
@@ -428,7 +437,7 @@ function Meeting({
                                 variant = { isLinkCopied ? 'text' : 'outlined' }>
                                 {isLinkCopied ? 'Copied!' : 'Copy link'}
                             </Button>
-                            {!groupName
+                            {isMeetingcreatedByCurrentUser
                             && <>
                                 <Button
                                     className = { classes.meetingButton }
@@ -464,19 +473,18 @@ function Meeting({
 
 Meeting.propTypes = {
     fetchMeeting: PropTypes.func,
-
-    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
-    groupName: PropTypes.string,
     loading: PropTypes.bool,
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
-    removeMeetingsRecurring: PropTypes.func
+    removeMeetingsRecurring: PropTypes.func,
+    userId: PropTypes.string
 };
 
 const mapStateToProps = state => {
     return {
         loading: state['features/riff-platform'].meeting.loading,
-        meeting: state['features/riff-platform'].meeting.meeting
+        meeting: state['features/riff-platform'].meeting.meeting,
+        userId: state['features/riff-platform'].signIn.user?.uid
     };
 };
 
