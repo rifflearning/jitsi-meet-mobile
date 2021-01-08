@@ -9,7 +9,9 @@ import {
     Typography,
     Box,
     Divider,
-    makeStyles
+    makeStyles,
+    MenuItem,
+    TextField
 } from '@material-ui/core';
 import { CheckCircleOutline, HighlightOffOutlined } from '@material-ui/icons';
 import moment from 'moment';
@@ -19,7 +21,7 @@ import { useHistory } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeeting } from '../../actions/meeting';
+import { getMeetingById } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
@@ -47,6 +49,14 @@ const useStyles = makeStyles(theme => {
     };
 });
 
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: 300
+        }
+    }
+};
+
 const repeatIntervalMap = {
     daily: 'day(s)',
     weekly: 'week',
@@ -69,19 +79,23 @@ function Meeting({
     groupName
 }) {
 
-    const [ isLinkCopied, setLinkCopied ] = useState(false);
-    const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
-    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
-
     const history = useHistory();
     const { meetingId } = useParams();
     const classes = useStyles();
+
+    const roomNumber = meetingId.split('-')[1];
+
+    const [ multipleRoom, setmultipleRooms ] = useState(roomNumber ? roomNumber : 1);
+    const [ isLinkCopied, setLinkCopied ] = useState(false);
+    const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
+    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
     useEffect(() => {
         if (meetingId) {
             fetchMeeting(meetingId);
         }
     }, [ meetingId ]);
+
     console.log('mmeting', meeting);
 
     const getFormattedDate = () => {
@@ -118,14 +132,14 @@ function Meeting({
             : ''
         }`;
 
-        const occurrencePart = recurring.endTimes ? `, ${recurring.endTimes} occurrence(s)` : '';
+        const occurrencePart = recurring.timesEnd ? `, ${recurring.timesEnd} occurrence(s)` : '';
 
         return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
     };
 
     const handleLinkCopy = () => {
         const id = meeting.multipleRoomsQuantity
-            ? `${meeting.roomId}-${meeting.multipleRoomsQuantity}`
+            ? `${meeting.roomId}-${multipleRoom}`
             : meeting.roomId;
 
         // onclick Copy button copy meeting link + description, Beth's request
@@ -136,7 +150,13 @@ function Meeting({
         setTimeout(() => setLinkCopied(false), 1000);
     };
 
-    const handleStartClick = id => history.push(`${ROUTES.WAITING}/${id}`);
+    const handleStartClick = () => {
+        const id = meeting.multipleRoomsQuantity
+            ? `${meeting.roomId}-${multipleRoom}`
+            : meeting.roomId;
+
+        return history.push(`${ROUTES.WAITING}/${id}`);
+    };
 
     const handleDeleteClick = () => setisOpenDeleteDialog(true);
 
@@ -148,16 +168,19 @@ function Meeting({
     };
 
     const onDeleteDialogClose = value => {
+        const meetingsUrl = `${ROUTES.MEETINGS}`;
+
         if (value === 'Delete all recurring meetings') {
-            return removeMeetingsRecurring(meeting.roomId);
+            removeMeetingsRecurring(meeting.roomId);
         } else if (value === 'Delete one meeting') {
-            return removeMeeting(meeting._id);
+            removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
+        history.push(meetingsUrl);
     };
 
     const onEditDialogClose = value => {
-        let id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${meeting.multipleRoomsQuantity}` : meeting.roomId;
+        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
         const url = `${ROUTES.MEETING}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
@@ -165,9 +188,7 @@ function Meeting({
         } else if (value === 'Edit all recurring meetings') {
             return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            id = meeting.multipleRoomsQuantity ? `${meeting._id}-${meeting.multipleRoomsQuantity}` : meeting._id;
-
-            return history.push(`${ROUTES.MEETING}/${id}/edit?mode=one`);
+            return history.push(`${url}?mode=one`);
         }
         setIsOpenEditDialog(false);
     };
@@ -177,6 +198,11 @@ function Meeting({
 
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
+
+
+    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
+
+    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
 
 
     if (loading) {
@@ -262,71 +288,48 @@ function Meeting({
                             <Grid
                                 alignItems = 'center'
                                 container = { true }
-                                direction = 'column'
                                 item = { true }
                                 md = { 10 }
                                 sm = { 8 }
                                 spacing = { 2 }
                                 xs = { 12 }>
+                                <Typography>
+                                    {getFormattedDate()}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Divider className = { classes.infoDivider } />
+                        {meeting.recurrenceOptions
+                        && <>
+                            <Grid
+                                alignItems = 'center'
+                                container = { true }
+                                item = { true }>
                                 <Grid
-                                    container = { true }
-                                    item = { true }>
+                                    item = { true }
+                                    md = { 2 }
+                                    sm = { 3 }
+                                    xs = { 12 }>
                                     <Typography>
-                                        {getFormattedDate()}
+                    Recurring meeting
                                     </Typography>
                                 </Grid>
-                                { meeting.recurrenceOptions
-                                && <Grid
+                                <Grid
+                                    alignItems = 'center'
                                     container = { true }
-                                    item = { true }>
+                                    item = { true }
+                                    md = { 10 }
+                                    sm = { 8 }
+                                    spacing = { 2 }
+                                    xs = { 12 }>
                                     <Typography>
                                         {getRecurrenceDesc()}
                                     </Typography>
                                 </Grid>
-                                }
                             </Grid>
-                        </Grid>
-                        <Divider className = { classes.infoDivider } />
-                        <Grid
-                            alignItems = 'center'
-                            container = { true }
-                            item = { true }>
-                            <Grid
-                                item = { true }
-                                md = { 2 }
-                                sm = { 3 }
-                                xs = { 12 }>
-                                <Typography>
-                                Invite Link
-                                </Typography>
-                            </Grid>
-                            <Grid
-                                alignItems = 'center'
-                                container = { true }
-                                item = { true }
-                                justify = 'space-between'
-                                md = { 10 }
-                                sm = { 8 }
-                                spacing = { 1 }
-                                xs = { 12 }>
-                                <Grid
-                                    item = { true }>
-                                    <Typography>
-                                        {`${window.location.origin}/${meetingId}`}
-                                    </Typography>
-                                </Grid>
-                                <Grid
-                                    item = { true } >
-                                    <Button
-                                        color = { isLinkCopied ? 'default' : 'primary' }
-                                        onClick = { () => handleLinkCopy(meetingId) }
-                                        variant = { isLinkCopied ? 'text' : 'outlined' }>
-                                        {isLinkCopied ? 'Copied!' : 'Copy link'}
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Divider className = { classes.infoDivider } />
+                            <Divider className = { classes.infoDivider } />
+                        </>
+                        }
                         <Grid
                             alignItems = 'center'
                             container = { true }
@@ -369,31 +372,44 @@ function Meeting({
                         </Grid>
                         <Divider className = { classes.infoDivider } />
                         {meeting.multipleRoomsQuantity
-                        && <Grid
-                            alignItems = 'center'
-                            container = { true }
-                            item = { true }>
+                        && <>
                             <Grid
-                                item = { true }
-                                md = { 2 }
-                                sm = { 3 }
-                                xs = { 12 }>
-                                <Typography>
-                                Multiple Rooms Quantity
-                                </Typography>
+                                alignItems = 'center'
+                                container = { true }
+                                item = { true }>
+                                <Grid
+                                    item = { true }
+                                    md = { 2 }
+                                    sm = { 3 }
+                                    xs = { 12 }>
+                                    <Typography>
+                                Room Number
+                                    </Typography>
+                                </Grid>
+                                <Grid
+                                    item = { true }
+                                    md = { 10 }
+                                    sm = { 8 }
+                                    xs = { 12 }>
+                                    <TextField
+                                        id = 'room-number'
+                                        select = { true }
+                                        // eslint-disable-next-line react/jsx-sort-props
+                                        SelectProps = {{ MenuProps }}
+                                        value = { multipleRoom }
+                                        // eslint-disable-next-line react/jsx-no-bind, react/jsx-sort-props
+                                        onChange = { e => setmultipleRooms(e.target.value) }>
+                                        {roomsNumbersArr.map(el => (<MenuItem
+                                            key = { el }
+                                            value = { el }>
+                                            {el}
+                                        </MenuItem>))}
+                                    </TextField>
+                                </Grid>
                             </Grid>
-                            <Grid
-                                item = { true }
-                                md = { 10 }
-                                sm = { 8 }
-                                xs = { 12 }>
-                                <Typography>
-                                    {meeting.multipleRoomsQuantity }
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                            <Divider className = { classes.infoDivider } />
+                        </>
                         }
-                        <Divider className = { classes.infoDivider } />
                         <Grid
                             alignItems = 'center'
                             container = { true }
@@ -403,8 +419,15 @@ function Meeting({
                             <Button
                                 className = { classes.meetingButton }
                                 color = 'primary'
-                                onClick = { () => handleStartClick(meetingId) }
+                                onClick = { handleStartClick }
                                 variant = 'contained'>Start</Button>
+                            <Button
+                                className = { classes.meetingButton }
+                                color = { isLinkCopied ? 'default' : 'primary' }
+                                onClick = { handleLinkCopy }
+                                variant = { isLinkCopied ? 'text' : 'outlined' }>
+                                {isLinkCopied ? 'Copied!' : 'Copy link'}
+                            </Button>
                             {!groupName
                             && <>
                                 <Button
@@ -459,7 +482,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        fetchMeeting: id => dispatch(getMeeting(id)),
+        fetchMeeting: id => dispatch(getMeetingById(id)),
         removeMeeting: id => dispatch(deleteMeeting(id)),
         removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
