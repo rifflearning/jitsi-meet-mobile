@@ -1300,15 +1300,12 @@ class Toolbox extends Component<Props, State> {
                             <ChatCounter />
                         </div> }
                     { buttonsLeft.indexOf('meetingmediator') !== -1
-                        && <div className = 'toolbar-button-with-badge'>
-                            <ToolbarButton
-                                accessibilityLabel = 'Toggle meeting mediator'
-                                icon = { EqualizerIcon }
-                                onClick = { this._onToolbarToggleMeetingMediator }
-                                toggled = { _meetingMediatorOpen }
-                                tooltip = 'Open / Close Meeting Mediator' />
-                            <ChatCounter />
-                        </div> }
+                        && <ToolbarButton
+                            accessibilityLabel = 'Toggle meeting mediator'
+                            icon = { EqualizerIcon }
+                            onClick = { this._onToolbarToggleMeetingMediator }
+                            toggled = { _meetingMediatorOpen }
+                            tooltip = 'Open / Close Meeting Mediator' /> }
                     {
                         buttonsLeft.indexOf('closedcaptions') !== -1
                             && <ClosedCaptionButton />
