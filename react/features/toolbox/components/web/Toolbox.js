@@ -1,5 +1,6 @@
 // @flow
 
+import EqualizerIcon from '@material-ui/icons/Equalizer';
 import React, { Component } from 'react';
 
 import {
@@ -45,6 +46,7 @@ import {
     LiveStreamButton,
     RecordButton
 } from '../../../recording';
+import { toggleMeetingMediator } from '../../../riff-platform/actions/meetingMediator';
 import { SecurityDialogButton } from '../../../security';
 import {
     SETTINGS_TABS,
@@ -186,7 +188,12 @@ type Props = {
     /**
      * Invoked to obtain translated strings.
      */
-    t: Function
+    t: Function,
+
+    /**
+     * Whether or not the meeting mediator feature is currently displayed.
+     */
+    _meetingMediatorOpen: Boolean
 };
 
 /**
@@ -246,6 +253,7 @@ class Toolbox extends Component<Props, State> {
         this._onToolbarToggleSharedVideo = this._onToolbarToggleSharedVideo.bind(this);
         this._onToolbarOpenLocalRecordingInfoDialog = this._onToolbarOpenLocalRecordingInfoDialog.bind(this);
         this._onShortcutToggleTileView = this._onShortcutToggleTileView.bind(this);
+        this._onToolbarToggleMeetingMediator = this._onToolbarToggleMeetingMediator.bind(this);
 
         this.state = {
             windowWidth: window.innerWidth
@@ -498,6 +506,16 @@ class Toolbox extends Component<Props, State> {
      */
     _doToggleTileView() {
         this.props.dispatch(toggleTileView());
+    }
+
+    /**
+     * Dispatches an action to toggle the display of meeting mediator.
+     *
+     * @private
+     * @returns {void}
+     */
+    _doToggleMeetingMediator() {
+        this.props.dispatch(toggleMeetingMediator());
     }
 
     _onMouseOut: () => void;
@@ -862,6 +880,25 @@ class Toolbox extends Component<Props, State> {
         this.props.dispatch(openDialog(LocalRecordingInfoDialog));
     }
 
+    _onToolbarToggleMeetingMediator: () => void;
+
+    /**
+     * Creates an analytics toolbar event and dispatches an action for toggling
+     * the display of chat.
+     *
+     * @private
+     * @returns {void}
+     */
+    _onToolbarToggleMeetingMediator() {
+        sendAnalytics(createToolbarEvent(
+            'toggle.meetingmediator',
+            {
+                enable: !this.props._meetingMediatorOpen
+            }));
+
+        this._doToggleMeetingMediator();
+    }
+
     /**
      * Returns true if the the desktop sharing button should be visible and
      * false otherwise.
@@ -1156,7 +1193,8 @@ class Toolbox extends Component<Props, State> {
             _chatOpen,
             _overflowMenuVisible,
             _raisedHand,
-            t
+            t,
+            _meetingMediatorOpen
         } = this.props;
         const overflowMenuContent = this._renderOverflowMenuContent();
         const overflowHasItems = Boolean(overflowMenuContent.filter(child => child).length);
@@ -1186,6 +1224,9 @@ class Toolbox extends Component<Props, State> {
         }
         if (this._shouldShowButton('closedcaptions')) {
             buttonsLeft.push('closedcaptions');
+        }
+        if (this._shouldShowButton('meetingmediator')) {
+            buttonsLeft.push('meetingmediator');
         }
         if (overflowHasItems) {
             buttonsRight.push('overflowmenu');
@@ -1256,6 +1297,16 @@ class Toolbox extends Component<Props, State> {
                                 onClick = { this._onToolbarToggleChat }
                                 toggled = { _chatOpen }
                                 tooltip = { t('toolbar.chat') } />
+                            <ChatCounter />
+                        </div> }
+                    { buttonsLeft.indexOf('meetingmediator') !== -1
+                        && <div className = 'toolbar-button-with-badge'>
+                            <ToolbarButton
+                                accessibilityLabel = 'Toggle meeting mediator'
+                                icon = { EqualizerIcon }
+                                onClick = { this._onToolbarToggleMeetingMediator }
+                                toggled = { _meetingMediatorOpen }
+                                tooltip = 'Open / Close Meeting Mediator' />
                             <ChatCounter />
                         </div> }
                     {
@@ -1383,7 +1434,8 @@ function _mapStateToProps(state) {
             || sharedVideoStatus === 'start'
             || sharedVideoStatus === 'pause',
         _visible: isToolboxVisible(state),
-        _visibleButtons: equals(visibleButtons, buttons) ? visibleButtons : buttons
+        _visibleButtons: equals(visibleButtons, buttons) ? visibleButtons : buttons,
+        _meetingMediatorOpen: state['features/riff-platform'].meetingMediator.isOpen
     };
 }
 
