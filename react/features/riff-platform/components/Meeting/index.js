@@ -197,7 +197,7 @@ function Meeting({
 
     const onEditDialogClose = value => {
         const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
-        const url = `${ROUTES.MEETING}/${id}/edit`;
+        const url = `${ROUTES.MEETINGS}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
             return history.push(url);

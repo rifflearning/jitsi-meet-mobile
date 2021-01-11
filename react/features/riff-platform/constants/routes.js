@@ -7,7 +7,6 @@ export const RESETPASSWORD = '/reset';
 
 export const PROFILE = '/';
 export const MEETINGS = '/meetings';
-export const MEETING = '/meeting';
 export const SCHEDULE = '/schedule';
 export const WAITING = '/waiting';
 export const DASHBOARD = '/dashboard';

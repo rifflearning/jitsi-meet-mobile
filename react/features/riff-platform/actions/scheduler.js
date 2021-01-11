@@ -36,7 +36,7 @@ export function schedule(meeting, history) {
                 // if the meeting has multiple rooms set default room number 1
                 const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
 
-                history.push(`${ROUTES.MEETING}/${meetingId}`);
+                history.push(`${ROUTES.MEETINGS}/${meetingId}`);
             }
         } catch (e) {
             dispatch(schedulerFailure(e.message));
@@ -78,7 +78,7 @@ export function updateSchedule(id, meeting, history) {
                 // if the meeting has multiple rooms set default room number 1
                 const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
 
-                history.push(`${ROUTES.MEETING}/${meetingId}`);
+                history.push(`${ROUTES.MEETINGS}/${meetingId}`);
             }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
@@ -99,7 +99,7 @@ export function updateScheduleRecurring(roomId, meeting, history) {
                 // if the meeting has multiple rooms set default room number 1
                 const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
 
-                history.push(`${ROUTES.MEETING}/${meetingId}`);
+                history.push(`${ROUTES.MEETINGS}/${meetingId}`);
             }
         } catch (e) {
             dispatch(updateSchedulerFailure(e.message));
@@ -126,7 +126,7 @@ export function updateScheduleRecurringSingleOccurrence(id, roomId, meeting, his
                     // if the meeting has multiple rooms set default room number 1
                     const meetingId = res.multipleRoomsQuantity ? `${res._id}-1` : res._id;
 
-                    history.push(`${ROUTES.MEETING}/${meetingId}`);
+                    history.push(`${ROUTES.MEETINGS}/${meetingId}`);
                 }
             } else {
                 dispatch(updateSchedulerFailure('This occurrence has conflicts with an existing occurrence.'));

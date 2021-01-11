@@ -317,7 +317,7 @@ const SchedulerForm = ({
 
     const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
 
-    const { id } = useParams();
+    const { meetingId } = useParams();
     const history = useHistory();
 
     const defineEditMode = () => {
@@ -331,9 +331,9 @@ const SchedulerForm = ({
 
     useEffect(() => {
         if (isEditing) {
-            fetchMeetingById(id);
+            fetchMeetingById(meetingId);
         }
-    }, [ id ]);
+    }, [ meetingId ]);
 
     useEffect(() => {
         if (meeting && isEditing) {

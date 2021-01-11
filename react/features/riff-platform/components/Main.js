@@ -1,6 +1,7 @@
 /* global process */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-sort-props */
+/* eslint-disable react/no-multi-comp */
 
 import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
@@ -20,7 +21,7 @@ import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
 import Meeting from './Meeting';
-import Meetings from './Meetings';
+import AllMeetings from './Meetings';
 import Profile from './Profile';
 import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';
@@ -53,6 +54,30 @@ const useStyles = makeStyles(theme => {
 
 const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
 
+// eslint-disable-next-line require-jsdoc
+function Meetings() {
+    return (
+        <Switch>
+            <Route
+                exact = { true }
+                path = { ROUTES.MEETINGS } >
+                <AllMeetings />
+            </Route>
+            <Switch>
+                <Route
+                    exact = { true }
+                    path = { `${ROUTES.MEETINGS}/:meetingId` }>
+                    <Meeting />
+                </Route>
+                <Route path = { `${ROUTES.MEETINGS}/:meetingId/edit` } >
+                    <EditMeeting />
+                </Route>
+            </Switch>
+
+        </Switch>
+    );
+}
+
 const Main = ({ user }) => {
     const classes = useStyles();
 
@@ -66,12 +91,9 @@ const Main = ({ user }) => {
             <Route
                 component = { DashboardPage }
                 path = { ROUTES.DASHBOARD } />
-            <Route path = { ROUTES.MEETINGS } >
-                <Meetings />
-            </Route>
-            <Route path = { `${ROUTES.MEETING}/:id/edit` } >
-                <EditMeeting />
-            </Route>
+            <Route
+                path = { ROUTES.MEETINGS }
+                component = { Meetings } />
             {negotiationsGroupId
                 && <Route
                     path = { ROUTES.MEETINGS_HARVARD }
@@ -80,9 +102,6 @@ const Main = ({ user }) => {
             }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
-            </Route>
-            <Route path = { `${ROUTES.MEETING}/:meetingId` }>
-                <Meeting />
             </Route>
             <Redirect to = { ROUTES.PROFILE } />
         </Switch>
