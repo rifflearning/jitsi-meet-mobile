@@ -505,6 +505,7 @@ const SchedulerForm = ({
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,
+                    roomId: meeting.roomId,
                     multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
                 }, history);
             }
