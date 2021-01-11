@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-sort-props */
+/* eslint-disable react/no-multi-comp */
+
 import MomentUtils from '@date-io/moment';
 import {
     Button,
@@ -79,6 +81,12 @@ const MenuProps = {
         }
     }
 };
+
+const errorMessage = err => (<Grid
+    container = { true }
+    item = { true }
+    justify = 'center'
+    xs = { 12 }><Typography color = 'error'>{err}</Typography></Grid>);
 
 const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
 
@@ -206,7 +214,6 @@ const calculateRecurringByOccurrence = ({
     return recurringEvents;
 };
 
-
 const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) => {
     daysOfWeek[v] && acc.push(v);
 
@@ -262,6 +269,7 @@ const SchedulerForm = ({
     isEditing,
     fetchMeetingById,
     meeting,
+    meetingError,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
     updateScheduleMeetingRecurringSingleOccurrence,
@@ -650,6 +658,10 @@ const SchedulerForm = ({
                 : moment()
             : moment();
     };
+
+    if (meetingError) {
+        return errorMessage(meetingError);
+    }
 
     return (
         <form
@@ -1216,6 +1228,7 @@ SchedulerForm.propTypes = {
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
+    meetingError: PropTypes.string,
     scheduleMeeting: PropTypes.func,
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
@@ -1232,7 +1245,8 @@ const mapStateToProps = state => {
         error: state['features/riff-platform'].scheduler.error,
         meeting: state['features/riff-platform'].meeting.meeting,
         updateError: state['features/riff-platform'].scheduler.updateError,
-        updateLoading: state['features/riff-platform'].scheduler.updateLoading
+        updateLoading: state['features/riff-platform'].scheduler.updateLoading,
+        meetingError: state['features/riff-platform'].meeting.error
     };
 };
 

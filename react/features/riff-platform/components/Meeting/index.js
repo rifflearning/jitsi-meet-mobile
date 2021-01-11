@@ -21,7 +21,7 @@ import { useHistory } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeetingById } from '../../actions/meeting';
+import { getMeetingById, meetingReset } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
@@ -62,11 +62,50 @@ const MenuProps = {
     }
 };
 
+const getFormattedDate = (dateStart, dateEnd) => {
+    const duration = formatDurationTime(dateStart, dateEnd);
+    const date = moment(dateStart).format('MMM DD, YYYY');
+
+    return `${duration}, ${date}`;
+};
+
 const repeatIntervalMap = {
     daily: 'day(s)',
     weekly: 'week',
     monthly: 'month'
 };
+
+const getRecurrenceDesc = (recurring = {}) => {
+    const intervalPart = `Every ${
+        recurring.recurrenceType === 'daily' ? recurring.dailyInterval : ''
+    } ${repeatIntervalMap[recurring.recurrenceType]}`;
+
+    const endDatePart = `${
+        recurring.dateEnd
+            ? `, until ${moment(recurring.dateEnd).format('MMM DD, YYYY')}`
+            : ''
+    }`;
+
+    const daysOfWeekPart = `${
+        recurring.recurrenceType === 'weekly'
+            ? recurring.daysOfWeek.length > 0
+                ? ` on ${recurring.daysOfWeek.join(', ')}`
+                : ''
+            : ''
+    }`;
+
+    const daysOfMonthPart = `${recurring.recurrenceType === 'monthly'
+        ? recurring.monthlyByDay
+            ? ` on the ${recurring.monthlyByDay} of the month`
+            : ` on the ${recurring.monthlyByPosition} ${recurring.monthlyByWeekDay}`
+        : ''
+    }`;
+
+    const occurrencePart = recurring.timesEnd ? `, ${recurring.timesEnd} occurrence(s)` : '';
+
+    return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
+};
+
 
 const loader = (<Grid
     container = { true }
@@ -84,6 +123,7 @@ const errorMessage = err => (<Grid
 function Meeting({
     meeting = {},
     fetchMeeting,
+    resetMeeting,
     loading,
     removeMeeting,
     removeMeetingsRecurring,
@@ -108,44 +148,7 @@ function Meeting({
         }
     }, [ meetingId ]);
 
-    const getFormattedDate = () => {
-        const duration = formatDurationTime(meeting.dateStart, meeting.dateEnd);
-        const date = moment(meeting.dateStart).format('MMM DD, YYYY ');
-
-        return `${duration}, ${date}`;
-    };
-
-    const getRecurrenceDesc = () => {
-        const recurring = meeting?.recurrenceOptions?.options;
-        const intervalPart = `Every ${
-            recurring.recurrenceType === 'daily' ? recurring.dailyInterval : ''
-        } ${repeatIntervalMap[recurring.recurrenceType]}`;
-
-        const endDatePart = `${
-            recurring.dateEnd
-                ? `, until ${moment(recurring.dateEnd).format('MMM DD, YYYY')}`
-                : ''
-        }`;
-
-        const daysOfWeekPart = `${
-            recurring.recurrenceType === 'weekly'
-                ? recurring.daysOfWeek.length > 0
-                    ? ` on ${recurring.daysOfWeek.join(', ')}`
-                    : ''
-                : ''
-        }`;
-
-        const daysOfMonthPart = `${recurring.recurrenceType === 'monthly'
-            ? recurring.monthlyByDay
-                ? ` on the ${recurring.monthlyByDay} of the month`
-                : ` on the ${recurring.monthlyByPosition} ${recurring.monthlyByWeekDay}`
-            : ''
-        }`;
-
-        const occurrencePart = recurring.timesEnd ? `, ${recurring.timesEnd} occurrence(s)` : '';
-
-        return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
-    };
+    useEffect(() => () => resetMeeting(), []);
 
     const handleLinkCopy = () => {
         const id = meeting.multipleRoomsQuantity
@@ -181,11 +184,11 @@ function Meeting({
         const meetingsUrl = `${ROUTES.MEETINGS}`;
 
         if (value === 'Delete all recurring meetings') {
-            removeMeetingsRecurring(meeting.roomId, history);
+            removeMeetingsRecurring(meeting.roomId);
 
             return history.push(meetingsUrl);
         } else if (value === 'Delete one meeting') {
-            removeMeeting(meeting._id, history);
+            removeMeeting(meeting._id);
 
             return history.push(meetingsUrl);
         }
@@ -312,7 +315,7 @@ function Meeting({
                                 spacing = { 2 }
                                 xs = { 12 }>
                                 <Typography>
-                                    {getFormattedDate()}
+                                    {getFormattedDate(meeting.dateStart, meeting.dateEnd)}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -341,7 +344,7 @@ function Meeting({
                                     spacing = { 2 }
                                     xs = { 12 }>
                                     <Typography>
-                                        {getRecurrenceDesc()}
+                                        {getRecurrenceDesc(meeting?.recurrenceOptions?.options)}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -488,6 +491,7 @@ Meeting.propTypes = {
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func,
+    resetMeeting: PropTypes.func,
     userId: PropTypes.string
 };
 
@@ -503,6 +507,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         fetchMeeting: id => dispatch(getMeetingById(id)),
+        resetMeeting: () => dispatch(meetingReset()),
         removeMeeting: id => dispatch(deleteMeeting(id)),
         removeMeetingsRecurring: roomId => dispatch(deleteMeetingsRecurring(roomId))
     };
