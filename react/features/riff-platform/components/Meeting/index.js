@@ -390,6 +390,14 @@ function Meeting({
                                         Forbid new participants after the meeting is over
                                     </Typography>
                                 </Grid>
+                                <Grid
+                                    container = { true }
+                                    item = { true }>
+                                    <Box pr = { 1 }>{defineIcon[meeting.allowAnonymous]}</Box>
+                                    <Typography>
+                                         Allow anonymous users
+                                    </Typography>
+                                </Grid>
                             </Grid>
                         </Grid>
                         <Divider className = { classes.infoDivider } />
