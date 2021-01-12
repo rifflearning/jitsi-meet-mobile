@@ -50,21 +50,10 @@ const MeetingsRow = ({
     const classes = useStyles();
     const history = useHistory();
 
-    const [ isLinkCopied, setLinkCopied ] = useState(false);
     const [ multipleRoom, setmultipleRooms ] = useState(1);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
-    const handleLinkCopy = () => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
-
-        // onclick Copy button copy meeting link + description, Beth's request
-        const description = meeting.description ? ` ${meeting.description}` : '';
-
-        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
-        setLinkCopied(true);
-        setTimeout(() => setLinkCopied(false), 1000);
-    };
     const handleStartClick = () => {
         const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
 
@@ -85,17 +74,15 @@ const MeetingsRow = ({
     };
 
     const onEditDialogClose = value => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
-        const url = `${ROUTES.MEETING}/${id}/edit`;
+        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+        const url = `${ROUTES.MEETINGS}/${id}/edit`;
 
         if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
             return history.push(url);
         } else if (value === 'Edit all recurring meetings') {
             return history.push(`${url}?mode=all`);
         } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            const meetingId = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
-
-            return history.push(`${ROUTES.MEETING}/${meetingId}/edit?mode=one`);
+            return history.push(`${url}?mode=one`);
         }
         setIsOpenEditDialog(false);
     };
@@ -104,6 +91,12 @@ const MeetingsRow = ({
 
     const dialogDeleteValues = [ 'Delete one meeting',
         meeting.recurringParentMeetingId ? 'Delete all recurring meetings' : undefined ];
+
+    const handleMeetingDetailsClick = () => {
+        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
+
+        history.push(`${ROUTES.MEETINGS}/${id}`);
+    };
 
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
@@ -155,10 +148,10 @@ const MeetingsRow = ({
                     variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
-                    color = { isLinkCopied ? 'default' : 'primary' }
+                    color = 'primary'
                     // eslint-disable-next-line react/jsx-no-bind
-                    onClick = { handleLinkCopy }
-                    variant = { isLinkCopied ? 'text' : 'outlined' }>{isLinkCopied ? 'Copied!' : 'Copy link'}</Button>
+                    onClick = { handleMeetingDetailsClick }
+                    variant = 'outlined'>Details</Button>
                 {!groupName
                     && <>
                         <Button

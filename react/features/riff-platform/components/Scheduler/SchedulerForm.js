@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-sort-props */
+/* eslint-disable react/no-multi-comp */
+
 import MomentUtils from '@date-io/moment';
 import {
     Button,
@@ -24,10 +26,11 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import 'moment-recur';
+import { useHistory } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeeting, getMeetingById } from '../../actions/meeting';
+import { getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
@@ -78,6 +81,12 @@ const MenuProps = {
         }
     }
 };
+
+const errorMessage = err => (<Grid
+    container = { true }
+    item = { true }
+    justify = 'center'
+    xs = { 12 }><Typography color = 'error'>{err}</Typography></Grid>);
 
 const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
 
@@ -205,7 +214,6 @@ const calculateRecurringByOccurrence = ({
     return recurringEvents;
 };
 
-
 const getDaysOfWeekArr = daysOfWeek => Object.keys(daysOfWeek).reduce((acc, v) => {
     daysOfWeek[v] && acc.push(v);
 
@@ -259,9 +267,9 @@ const SchedulerForm = ({
     error,
     scheduleMeeting,
     isEditing,
-    fetchMeeting,
     fetchMeetingById,
     meeting,
+    meetingError,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
     updateScheduleMeetingRecurringSingleOccurrence,
@@ -309,7 +317,8 @@ const SchedulerForm = ({
 
     const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
 
-    const { id } = useParams();
+    const { meetingId } = useParams();
+    const history = useHistory();
 
     const defineEditMode = () => {
         const params = new URLSearchParams(location.search);
@@ -322,13 +331,9 @@ const SchedulerForm = ({
 
     useEffect(() => {
         if (isEditing) {
-            if (isEditOneOccurrence) {
-                fetchMeetingById(id);
-            } else {
-                fetchMeeting(id);
-            }
+            fetchMeetingById(meetingId);
         }
-    }, [ id ]);
+    }, [ meetingId ]);
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -485,12 +490,12 @@ const SchedulerForm = ({
         };
 
         if (!isEditing) {
-            return scheduleMeeting(meetingData);
+            return scheduleMeeting(meetingData, history);
         } else if (isEditing) {
             if (isEditAllMeetingsRecurring) {
                 return updateScheduleMeetingsRecurring(meeting.roomId,
                     { roomId: meeting.roomId,
-                        ...meetingData });
+                        ...meetingData }, history);
             } else if (isEditOneOccurrence) {
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
@@ -500,12 +505,13 @@ const SchedulerForm = ({
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,
+                    roomId: meeting.roomId,
                     multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
-                });
+                }, history);
             }
 
             return updateScheduleMeeting(meeting._id, { roomId: meeting.roomId,
-                ...meetingData });
+                ...meetingData }, history);
 
         }
     };
@@ -653,6 +659,10 @@ const SchedulerForm = ({
                 : moment()
             : moment();
     };
+
+    if (meetingError) {
+        return errorMessage(meetingError);
+    }
 
     return (
         <form
@@ -1215,11 +1225,11 @@ const SchedulerForm = ({
 
 SchedulerForm.propTypes = {
     error: PropTypes.string,
-    fetchMeeting: PropTypes.func,
     fetchMeetingById: PropTypes.func,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
+    meetingError: PropTypes.string,
     scheduleMeeting: PropTypes.func,
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
@@ -1236,19 +1246,20 @@ const mapStateToProps = state => {
         error: state['features/riff-platform'].scheduler.error,
         meeting: state['features/riff-platform'].meeting.meeting,
         updateError: state['features/riff-platform'].scheduler.updateError,
-        updateLoading: state['features/riff-platform'].scheduler.updateLoading
+        updateLoading: state['features/riff-platform'].scheduler.updateLoading,
+        meetingError: state['features/riff-platform'].meeting.error
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        scheduleMeeting: meeting => dispatch(schedule(meeting)),
-        fetchMeeting: id => dispatch(getMeeting(id)),
+        scheduleMeeting: (meeting, history) => dispatch(schedule(meeting, history)),
         fetchMeetingById: id => dispatch(getMeetingById(id)),
-        updateScheduleMeeting: (id, meeting) => dispatch(updateSchedule(id, meeting)),
-        updateScheduleMeetingsRecurring: (roomId, meeting) => dispatch(updateScheduleRecurring(roomId, meeting)),
-        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting) =>
-            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting))
+        updateScheduleMeeting: (id, meeting, history) => dispatch(updateSchedule(id, meeting, history)),
+        updateScheduleMeetingsRecurring: (roomId, meeting, history) =>
+            dispatch(updateScheduleRecurring(roomId, meeting, history)),
+        updateScheduleMeetingRecurringSingleOccurrence: (roomId, id, meeting, history) =>
+            dispatch(updateScheduleRecurringSingleOccurrence(roomId, id, meeting, history))
     };
 };
 
