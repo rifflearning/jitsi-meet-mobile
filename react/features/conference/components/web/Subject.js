@@ -1,11 +1,9 @@
 /* @flow */
-/* global process */
 
 import React, { Component } from 'react';
 
 import { getParticipantCount } from '../../../base/participants/functions';
 import { connect } from '../../../base/redux';
-import { isToolboxVisible } from '../../../toolbox';
 import ConferenceTimer from '../ConferenceTimer';
 
 import ParticipantsCount from './ParticipantsCount';
@@ -75,7 +73,7 @@ function _mapStateToProps(state) {
     return {
         _showParticipantCount: participantCount > 2,
         _subject: state['features/riff-platform']?.meeting?.meeting?.name,
-        _visible: (process.env.TOP_TOOLBAR_ALWAYS_VISIBLE || isToolboxVisible(state)) && participantCount > 1
+        _visible: participantCount > 1
     };
 }
 
