@@ -1,4 +1,5 @@
 /* @flow */
+/* global process */
 
 import React, { Component } from 'react';
 
@@ -74,7 +75,7 @@ function _mapStateToProps(state) {
     return {
         _showParticipantCount: participantCount > 2,
         _subject: state['features/riff-platform']?.meeting?.meeting?.name,
-        _visible: isToolboxVisible(state) && participantCount > 1
+        _visible: (process.env.TOP_TOOLBAR_ALWAYS_VISIBLE || isToolboxVisible(state)) && participantCount > 1
     };
 }
 
