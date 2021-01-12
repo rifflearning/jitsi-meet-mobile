@@ -1,20 +1,18 @@
-/* global process */
+/* eslint-disable max-len */
 /* eslint-disable react/jsx-no-bind */
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
 
 // eslint-disable-next-line import/order
 import { Icon, IconClose } from '../../../base/icons';
 // eslint-disable-next-line import/order
 import { connect } from '../../../base/redux';
-
-// eslint-disable-next-line max-len
 import { MeetingMediator } from '../../../riff-dashboard-page/src/components/Chat/Meeting/MeetingSidebar/MeetingMediator';
+import { toggleMeetingMediator } from '../../actions/meetingMediator';
 
-const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
-    const [ isOpened, setIsOpened ] = useState(false);
+const DraggableMeetingMediator = ({ displayName, webRtcPeers, isOpen, toggleMediator }) => {
 
     const size = useWindowSize();
     const bounds = { left: -200,
@@ -22,36 +20,30 @@ const DraggableMeetingMediator = ({ displayName, webRtcPeers }) => {
         right: size.width - 26,
         bottom: size.height - 26 };
 
-    const onCloseMeetingMediator = () => setIsOpened(false);
-    const onOpenMeetingMediator = () => !isOpened && setIsOpened(true);
-
-    const MeetingMediatorWrapper = isOpened ? Draggable : Fragment;
-    const wrapperProps = isOpened ? { bounds } : {};
-
-    const meetingMediatorEnabled = process.env.MEETING_MEDIATOR_ENABLED === 'true';
+    const onCloseMeetingMediator = () => toggleMediator();
 
     return (
-        <MeetingMediatorWrapper { ...wrapperProps }>
+        <Draggable bounds = { bounds }>
             <div
-                className = { isOpened ? '' : 'closed' }
-                id = 'meeting-mediator-wrapper'
-                onClick = { onOpenMeetingMediator }>
-                { isOpened && <Icon
+                className = { isOpen ? '' : 'closed' }
+                id = 'meeting-mediator-wrapper'>
+                <Icon
                     className = 'meeting-mediator-close'
                     onClick = { onCloseMeetingMediator }
                     src = { IconClose } />
-                }
                 <MeetingMediator
                     displayName = { displayName }
-                    isEnabled = { meetingMediatorEnabled }
+                    isEnabled = { true }
                     webRtcPeers = { webRtcPeers } />
             </div>
-        </MeetingMediatorWrapper>
+        </Draggable>
     );
 };
 
 DraggableMeetingMediator.propTypes = {
     displayName: PropTypes.string,
+    isOpen: PropTypes.bool,
+    toggleMediator: PropTypes.func,
     webRtcPeers: PropTypes.array
 };
 
@@ -67,6 +59,7 @@ DraggableMeetingMediator.propTypes = {
 function _mapStateToProps(state) {
     return {
         displayName: state['features/riff-platform'].signIn.user?.displayName || '',
+        isOpen: state['features/riff-platform'].meetingMediator.isOpen,
         webRtcPeers: state['features/base/participants'].map((p, i) => {
             if (i === 0) {
                 const { uid, displayName } = state['features/riff-platform'].signIn.user || {};
@@ -79,7 +72,20 @@ function _mapStateToProps(state) {
     };
 }
 
-export default connect(_mapStateToProps)(DraggableMeetingMediator);
+/**
+ * Maps part of redux actions to component's props.
+ *
+ * @param {Function} dispatch - Redux's {@code dispatch} function.
+ * @private
+ * @returns {Object}
+ */
+function _mapDispatchToProps(dispatch) {
+    return {
+        toggleMediator: () => dispatch(toggleMeetingMediator())
+    };
+}
+
+export default connect(_mapStateToProps, _mapDispatchToProps)(DraggableMeetingMediator);
 
 
 /**

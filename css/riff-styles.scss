@@ -22,17 +22,7 @@ html body {
     pointer-events: all;
 
     &.closed {
-        left: 26px;
-        top: 32px;
-        overflow: hidden;
-        transform: scale(0.3);
-        transform-origin: 0 0;
-        border-radius: 50%;
-        cursor: pointer;
-
-        .chart-card-component {
-            margin-top: -50;
-        }
+       visibility: hidden;
     }
 
      .chart-card-title {

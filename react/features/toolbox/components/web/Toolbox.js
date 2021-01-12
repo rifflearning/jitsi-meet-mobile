@@ -45,6 +45,7 @@ import {
     LiveStreamButton,
     RecordButton
 } from '../../../recording';
+import MeetingMediatorButton from '../../../riff-platform/components/DraggableMeetingMediator/MeetingMediatorButton';
 import { SecurityDialogButton } from '../../../security';
 import {
     SETTINGS_TABS,
@@ -1187,6 +1188,9 @@ class Toolbox extends Component<Props, State> {
         if (this._shouldShowButton('closedcaptions')) {
             buttonsLeft.push('closedcaptions');
         }
+        if (this._shouldShowButton('meetingmediator')) {
+            buttonsLeft.push('meetingmediator');
+        }
         if (overflowHasItems) {
             buttonsRight.push('overflowmenu');
         }
@@ -1258,6 +1262,8 @@ class Toolbox extends Component<Props, State> {
                                 tooltip = { t('toolbar.chat') } />
                             <ChatCounter />
                         </div> }
+                    { buttonsLeft.indexOf('meetingmediator') !== -1
+                        && <MeetingMediatorButton />}
                     {
                         buttonsLeft.indexOf('closedcaptions') !== -1
                             && <ClosedCaptionButton />
