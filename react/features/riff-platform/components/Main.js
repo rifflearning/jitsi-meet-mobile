@@ -73,7 +73,6 @@ function Meetings() {
                     <EditMeeting />
                 </Route>
             </Switch>
-
         </Switch>
     );
 }
@@ -98,7 +97,7 @@ const Main = ({ user }) => {
                 && <Route
                     path = { ROUTES.MEETINGS_HARVARD }
                     // eslint-disable-next-line react/jsx-no-bind
-                    component = { () => <Meetings groupName = { negotiationsGroupId } /> } />
+                    component = { () => <AllMeetings groupName = { negotiationsGroupId } /> } />
             }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
