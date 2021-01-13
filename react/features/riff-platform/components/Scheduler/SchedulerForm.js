@@ -1210,7 +1210,7 @@ const SchedulerForm = ({
                     <Button
                         variant = 'outlined'
                         className = { classes.submit }
-                        onClick = { () => history.back() }>
+                        onClick = { () => history.goBack() }>
             Cancel
                     </Button>
                 </Grid>
