@@ -52,7 +52,7 @@ const MeetingsRow = ({
 
     const [ multipleRoom, setmultipleRooms ] = useState(1);
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
-    const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
+    const [ isLinkCopied, setLinkCopied ] = useState(false);
 
     const handleStartClick = () => {
         const id = meeting.multipleRoomsQuantity ? `${meeting.roomId}-${multipleRoom}` : meeting.roomId;
@@ -60,9 +60,20 @@ const MeetingsRow = ({
         return history.push(`${ROUTES.WAITING}/${id}`);
     };
 
-    const handleDeleteClick = () => setisOpenDeleteDialog(true);
+    const handleLinkCopy = () => {
+        const id = meeting.multipleRoomsQuantity
+            ? `${meeting.roomId}-${multipleRoom}`
+            : meeting.roomId;
 
-    const handleEditClick = () => setIsOpenEditDialog(true);
+        // onclick Copy button copy meeting link + description, Beth's request
+        const description = meeting.description ? ` ${meeting.description}` : '';
+
+        navigator.clipboard.writeText(`${window.location.origin}/${id}${description}`);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 1000);
+    };
+
+    const handleDeleteClick = () => setisOpenDeleteDialog(true);
 
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
@@ -71,20 +82,6 @@ const MeetingsRow = ({
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
-    };
-
-    const onEditDialogClose = value => {
-        const id = meeting.multipleRoomsQuantity ? `${meeting._id}-${multipleRoom}` : meeting._id;
-        const url = `${ROUTES.MEETINGS}/${id}/edit`;
-
-        if (value === 'Edit one meeting' && !meeting.recurringParentMeetingId) {
-            return history.push(url);
-        } else if (value === 'Edit all recurring meetings') {
-            return history.push(`${url}?mode=all`);
-        } else if (value === 'Edit one meeting' && meeting.recurringParentMeetingId) {
-            return history.push(`${url}?mode=one`);
-        }
-        setIsOpenEditDialog(false);
     };
 
     const durationTime = formatDurationTime(meeting.dateStart, meeting.dateEnd);
@@ -97,9 +94,6 @@ const MeetingsRow = ({
 
         history.push(`${ROUTES.MEETINGS}/${id}`);
     };
-
-    const dialogEditValues = [ 'Edit one meeting',
-        meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
     const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
 
@@ -148,39 +142,30 @@ const MeetingsRow = ({
                     variant = 'contained'>Start</Button>
                 <Button
                     className = { classes.meetingButton }
-                    color = 'primary'
+                    color = { isLinkCopied ? 'default' : 'primary' }
+                    onClick = { handleLinkCopy }
+                    variant = { isLinkCopied ? 'text' : 'outlined' }>
+                    {isLinkCopied ? 'Copied!' : 'Copy link'}
+                </Button>
+                <Button
+                    className = { classes.meetingButton }
+                    color = 'default'
                     // eslint-disable-next-line react/jsx-no-bind
                     onClick = { handleMeetingDetailsClick }
                     variant = 'outlined'>Details</Button>
                 {!groupName
-                    && <>
-                        <Button
-                            className = { classes.meetingButton }
-                            color = 'default'
-                            // eslint-disable-next-line react/jsx-no-bind
-                            onClick = { handleEditClick }
-                            variant = 'outlined'>
-                        Edit
-                        </Button>
-
-                        <Button
-                            className = { classes.meetingButton }
-                            // eslint-disable-next-line react/jsx-no-bind
-                            onClick = { handleDeleteClick }>
+                    && <Button
+                        className = { classes.meetingButton }
+                        // eslint-disable-next-line react/jsx-no-bind
+                        onClick = { handleDeleteClick }>
                         Delete
-                        </Button>
-                   </>
+                    </Button>
                 }
                 <ConfirmationDialogRaw
                     onClose = { onDeleteDialogClose }
                     open = { isOpenDeleteDialog }
                     title = 'Delete meeting?'
                     value = { dialogDeleteValues } />
-                <ConfirmationDialogRaw
-                    onClose = { onEditDialogClose }
-                    open = { isOpenEditDialog }
-                    title = 'Edit meeting'
-                    value = { dialogEditValues } />
             </TableCell>
         </TableRow>
     );
