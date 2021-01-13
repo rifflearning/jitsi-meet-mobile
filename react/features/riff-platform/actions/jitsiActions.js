@@ -1,6 +1,7 @@
 /* global config, APP */
 import { createBrowserHistory } from 'history';
 
+import UIEvents from '../../../../service/UI/UIEvents';
 import { setTileView } from '../../video-layout';
 import { attachSibilant, participantLeaveRoom } from '../actions/sibilantActions';
 import api from '../api';
@@ -131,11 +132,30 @@ export function redirectToRiffMetrics() {
     };
 }
 
+/**
+ * Sets tile view after youtube sharing.
+ *
+ * @returns {void}
+*/
+export function setTileViewAfterYoutubeSharing() {
+    return dispatch => {
+        APP.UI.addListener(
+            UIEvents.UPDATE_SHARED_VIDEO,
+            // eslint-disable-next-line max-params, no-unused-vars
+            (url, state, time, isMuted, volume) => {
+                if (state === 'removed') {
+                    dispatch(setTileView(true));
+                }
+            });
+    };
+}
+
 // Starts all riff services with conference.
 // eslint-disable-next-line require-jsdoc
 export function startRiffServices(tracks) {
     return dispatch => {
         dispatch(setTileViewByDefault());
         dispatch(attachSibilant(tracks));
+        dispatch(setTileViewAfterYoutubeSharing());
     };
 }
