@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useHistory } from 'react-router';
 
+import { connect } from '../../base/redux';
 import * as ROUTES from '../constants/routes';
 
 import { drawerWidth } from './Sidebar';
@@ -49,7 +50,7 @@ const useStyles = makeStyles(theme => {
     };
 });
 
-const Header = ({ handleSidebarOpen, isOpen, isSidebarEnabled }) => {
+const Header = ({ handleSidebarOpen, isOpen, user }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -57,6 +58,8 @@ const Header = ({ handleSidebarOpen, isOpen, isSidebarEnabled }) => {
         display: 'flex',
         alignItems: 'center'
     };
+
+    const isSidebarEnabled = Boolean(user);
 
     return (
         <div>
@@ -98,6 +101,15 @@ const Header = ({ handleSidebarOpen, isOpen, isSidebarEnabled }) => {
                                     variant = 'outlined'>Sign Up</Button>
                             </>
                         }
+                        {user?.isAnon
+                            && <>
+                                <Button
+                                    onClick = { () => {
+                                    // doLogout()
+                                    } }
+                                    variant = 'outlined'>Register</Button>
+                            </>
+                        }
                         {isSidebarEnabled
                             && <IconButton
                                 color = 'inherit'
@@ -117,7 +129,14 @@ const Header = ({ handleSidebarOpen, isOpen, isSidebarEnabled }) => {
 Header.propTypes = {
     handleSidebarOpen: PropTypes.func,
     isOpen: PropTypes.bool,
-    isSidebarEnabled: PropTypes.bool
+    isSidebarEnabled: PropTypes.bool,
+    user: PropTypes.object
 };
 
-export default Header;
+const mapStateToProps = state => {
+    return {
+        user: state['features/riff-platform'].signIn.user
+    };
+};
+
+export default connect(mapStateToProps)(Header);
