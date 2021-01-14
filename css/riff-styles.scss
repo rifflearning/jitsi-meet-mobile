@@ -22,7 +22,7 @@ html body {
     pointer-events: all;
 
     &.closed {
-       visibility: hidden;
+       display: none;
     }
 
      .chart-card-title {
