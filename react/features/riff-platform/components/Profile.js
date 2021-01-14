@@ -10,7 +10,7 @@ import { groupMeetingsByDays } from '../functions';
 import MeetingsTable from './Meetings/MeetingsTable';
 import StyledPaper from './StyledPaper';
 
-const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists }) => {
+const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists, isAnon }) => {
     useEffect(() => {
         getMeetingsLists();
     }, []);
@@ -32,7 +32,7 @@ const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists }) =>
                 <Button
                     color = 'primary'
                     onClick = { doLogout }
-                    variant = 'outlined'>Logout</Button>
+                    variant = 'outlined'>{isAnon ? 'Register' : 'Logout'}</Button>
             </Grid>
             <Grid
                 item = { true }
@@ -70,6 +70,7 @@ App.propTypes = {
 
 const mapStateToProps = state => {
     return {
+        isAnon: Boolean(state['features/riff-platform'].signIn.user?.isAnon),
         profileInfo: state['features/riff-platform'].signIn.user,
         meetingsLists: state['features/riff-platform'].meetings.meetingsLists
     };

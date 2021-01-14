@@ -14,6 +14,7 @@ import React from 'react';
 import { useHistory } from 'react-router';
 
 import { connect } from '../../base/redux';
+import { logout } from '../actions/signIn';
 import * as ROUTES from '../constants/routes';
 
 import { drawerWidth } from './Sidebar';
@@ -50,7 +51,7 @@ const useStyles = makeStyles(theme => {
     };
 });
 
-const Header = ({ handleSidebarOpen, isOpen, user }) => {
+const Header = ({ handleSidebarOpen, isOpen, user, doLogout }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -104,9 +105,7 @@ const Header = ({ handleSidebarOpen, isOpen, user }) => {
                         {user?.isAnon
                             && <>
                                 <Button
-                                    onClick = { () => {
-                                    // doLogout()
-                                    } }
+                                    onClick = { () => doLogout() }
                                     variant = 'outlined'>Register</Button>
                             </>
                         }
@@ -139,4 +138,10 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps)(Header);
+const mapDispatchToProps = dispatch => {
+    return {
+        doLogout: () => dispatch(logout())
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
