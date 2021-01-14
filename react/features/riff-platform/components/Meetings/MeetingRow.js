@@ -46,7 +46,8 @@ const MeetingsRow = ({
     meeting = {},
     removeMeeting,
     removeMeetingsRecurring,
-    groupName }) => {
+    groupName,
+    deleteLoading }) => {
     const classes = useStyles();
     const history = useHistory();
 
@@ -162,6 +163,7 @@ const MeetingsRow = ({
                     </Button>
                 }
                 <ConfirmationDialogRaw
+                    disabled = { deleteLoading }
                     onClose = { onDeleteDialogClose }
                     open = { isOpenDeleteDialog }
                     title = 'Delete meeting?'
@@ -173,15 +175,19 @@ const MeetingsRow = ({
 
 
 MeetingsRow.propTypes = {
-    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
+
+    // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
+    deleteLoading: PropTypes.bool,
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
 };
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = state => {
+    return {
+        deleteLoading: state['features/riff-platform'].meetings.deleteLoading
+    };
 };
 
 const mapDispatchToProps = dispatch => {

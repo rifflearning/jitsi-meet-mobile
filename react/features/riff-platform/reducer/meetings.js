@@ -3,7 +3,9 @@ import * as actionTypes from '../constants/actionTypes';
 const initialState = {
     meetingsLists: [],
     listType: 'upcoming',
-    error: null
+    error: null,
+    deleteLoading: false,
+    deleteError: null
 };
 
 export default (state = initialState, action) => {
@@ -31,6 +33,24 @@ export default (state = initialState, action) => {
         return {
             ...state,
             listType: action.listType
+        };
+    case actionTypes.DELETE_MEETINGS_REQUEST:
+        return {
+            ...state,
+            deleteLoading: true,
+            deleteError: null
+        };
+    case actionTypes.DELETE_MEETINGS_SUCCESS:
+        return {
+            ...state,
+            deleteLoading: false,
+            deleteError: null
+        };
+    case actionTypes.DELETE_MEETINGS_FAILURE:
+        return {
+            ...state,
+            deleteLoading: false,
+            deleteError: action.error
         };
     default:
         return state;

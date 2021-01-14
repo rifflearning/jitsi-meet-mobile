@@ -15,7 +15,7 @@ import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 export function ConfirmationDialogRaw(props) {
-  const { title, onClose, value: valueProp, open, ...other } = props;
+  const { title, onClose, value: valueProp, open, disabled, ...other } = props;
   const [value, setValue] = React.useState();
   const radioGroupRef = React.useRef(null);
 
@@ -75,7 +75,7 @@ export function ConfirmationDialogRaw(props) {
         <Button autoFocus onClick={handleCancel} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleOk} color="primary">
+        <Button disabled = {disabled} onClick={handleOk} color="primary">
           Ok
         </Button>
       </DialogActions>
@@ -84,6 +84,7 @@ export function ConfirmationDialogRaw(props) {
 }
 
 ConfirmationDialogRaw.propTypes = {
+  disabled: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   value: PropTypes.array.isRequired,
