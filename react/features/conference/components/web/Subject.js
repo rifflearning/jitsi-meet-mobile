@@ -4,9 +4,11 @@ import React, { Component } from 'react';
 
 import { getParticipantCount } from '../../../base/participants/functions';
 import { connect } from '../../../base/redux';
+import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MeetingMultipleNameSelect';
 import ConferenceTimer from '../ConferenceTimer';
 
 import ParticipantsCount from './ParticipantsCount';
+
 
 /**
  * The type of the React {@code Component} props of {@link Subject}.
@@ -27,7 +29,12 @@ type Props = {
     /**
      * Indicates whether the component should be visible or not.
      */
-    _visible: boolean
+    _visible: boolean,
+
+    /**
+     * The conference  multiple rooms quantity
+     */
+    _isMultipleRoomsQuantity: number
 };
 
 /**
@@ -44,16 +51,19 @@ class Subject extends Component<Props> {
      * @returns {ReactElement}
      */
     render() {
-        const { _showParticipantCount, _subject, _visible } = this.props;
+        const { _showParticipantCount, _subject, _visible, _isMultipleRoomsQuantity } = this.props;
 
         return (
             <div className = { `subject ${_visible ? 'visible' : ''}` }>
-                <span className = 'subject-text'>{ _subject }</span>
+                { _isMultipleRoomsQuantity
+                    ? <MultipleRoomsNameDropdown />
+                    : <span className = 'subject-text'>{ _subject }</span>}
                 { _showParticipantCount && <ParticipantsCount /> }
                 <ConferenceTimer />
             </div>
         );
     }
+
 }
 
 /**
@@ -64,7 +74,7 @@ class Subject extends Component<Props> {
  * @private
  * @returns {{
  *     _subject: string,
- *     _visible: boolean
+ *     _visible: boolean,
  * }}
  */
 function _mapStateToProps(state) {
@@ -73,7 +83,8 @@ function _mapStateToProps(state) {
     return {
         _showParticipantCount: participantCount > 2,
         _subject: state['features/riff-platform']?.meeting?.meeting?.name,
-        _visible: participantCount > 1
+        _visible: participantCount > 1,
+        _isMultipleRoomsQuantity: state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity
     };
 }
 
