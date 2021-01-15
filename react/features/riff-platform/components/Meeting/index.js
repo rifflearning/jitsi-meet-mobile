@@ -128,7 +128,8 @@ function Meeting({
     removeMeeting,
     removeMeetingsRecurring,
     userId,
-    error
+    error,
+    deleteLoading
 }) {
 
     const history = useHistory();
@@ -475,6 +476,7 @@ function Meeting({
                                     </>
                             }
                             <ConfirmationDialogRaw
+                                disabled = { deleteLoading }
                                 onClose = { onDeleteDialogClose }
                                 open = { isOpenDeleteDialog }
                                 title = 'Delete meeting?'
@@ -493,6 +495,7 @@ function Meeting({
 }
 
 Meeting.propTypes = {
+    deleteLoading: PropTypes.bool,
     error: PropTypes.string,
     fetchMeeting: PropTypes.func,
     loading: PropTypes.bool,
@@ -508,7 +511,8 @@ const mapStateToProps = state => {
         loading: state['features/riff-platform'].meeting.loading,
         meeting: state['features/riff-platform'].meeting.meeting,
         userId: state['features/riff-platform'].signIn.user?.uid,
-        error: state['features/riff-platform'].meeting.error
+        error: state['features/riff-platform'].meeting.error,
+        deleteLoading: state['features/riff-platform'].meetings.deleteLoading
     };
 };
 

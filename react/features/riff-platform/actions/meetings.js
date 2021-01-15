@@ -53,32 +53,57 @@ export function getMeetingsByGroup(groupName, listType) {
     };
 }
 
+function deleteMeetingsRequest() {
+    return {
+        type: actionTypes.DELETE_MEETINGS_REQUEST
+    };
+}
+
+function deleteMeetingsSuccess() {
+    return {
+        type: actionTypes.DELETE_MEETINGS_SUCCESS
+    };
+}
+
+function deleteMeetingsFailure(error) {
+    return {
+        type: actionTypes.DELETE_MEETINGS_FAILURE,
+        error
+    };
+}
+
 export function deleteMeeting(id) {
     return async (dispatch, getState) => {
+        dispatch(deleteMeetingsRequest());
 
         const state = getState();
         const meetingsListType = state['features/riff-platform'].meetings.listType;
 
         try {
             await api.deleteMeeting(id);
+            dispatch(deleteMeetingsSuccess());
             dispatch(getMeetings(meetingsListType));
         } catch (e) {
             console.error('Error in deleteMeeting', e);
+            dispatch(deleteMeetingsFailure(e.message));
         }
     };
 }
 
 export function deleteMeetingsRecurring(roomId) {
     return async (dispatch, getState) => {
+        dispatch(deleteMeetingsRequest());
 
         const state = getState();
         const meetingsListType = state['features/riff-platform'].meetings.listType;
 
         try {
             await api.deleteMeetingsRecurring(roomId);
+            dispatch(deleteMeetingsSuccess());
             dispatch(getMeetings(meetingsListType));
         } catch (e) {
             console.error('Error in deleteMeetingsRecurring', e);
+            dispatch(deleteMeetingsFailure(e.message));
         }
     };
 }
