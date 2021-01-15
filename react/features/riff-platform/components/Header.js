@@ -105,7 +105,7 @@ const Header = ({ handleSidebarOpen, isOpen, user, doLogout }) => {
                         {user?.isAnon
                             && <>
                                 <Button
-                                    onClick = { () => doLogout() }
+                                    onClick = { doLogout }
                                     variant = 'outlined'>Register</Button>
                             </>
                         }
@@ -126,9 +126,9 @@ const Header = ({ handleSidebarOpen, isOpen, user, doLogout }) => {
 };
 
 Header.propTypes = {
+    doLogout: PropTypes.func,
     handleSidebarOpen: PropTypes.func,
     isOpen: PropTypes.bool,
-    isSidebarEnabled: PropTypes.bool,
     user: PropTypes.object
 };
 

@@ -81,7 +81,7 @@ export function maybeRedirectToLoginPage() {
                 const userMock = {
                     uid: ObjectID.generate(),
                     displayName: '',
-                    email: 'anonymousUser@riffanalytics.ai',
+                    email: '',
                     isAnon: true
                 };
 

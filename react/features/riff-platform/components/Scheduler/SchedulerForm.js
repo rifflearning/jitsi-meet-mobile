@@ -1205,11 +1205,9 @@ const SchedulerForm = ({
                         ? <Button
                             variant = 'contained'
                             color = 'primary'
-                            onClick = { () => {
-                                doLogout();
-                            } }
+                            onClick = { doLogout }
                             className = { classes.submit }>
-                            Register
+                            Register to schedule meetings
                         </Button>
                         : <Button
                             type = 'submit'
@@ -1240,8 +1238,10 @@ const SchedulerForm = ({
 };
 
 SchedulerForm.propTypes = {
+    doLogout: PropTypes.func,
     error: PropTypes.string,
     fetchMeetingById: PropTypes.func,
+    isAnon: PropTypes.bool,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,

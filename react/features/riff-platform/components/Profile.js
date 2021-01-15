@@ -64,6 +64,7 @@ const App = ({ doLogout, profileInfo, meetingsLists = [], getMeetingsLists, isAn
 App.propTypes = {
     doLogout: PropTypes.func,
     getMeetingsLists: PropTypes.func,
+    isAnon: PropTypes.bool,
     meetingsLists: PropTypes.array,
     profileInfo: PropTypes.object
 };
