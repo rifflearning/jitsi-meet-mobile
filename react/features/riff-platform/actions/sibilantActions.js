@@ -1,8 +1,9 @@
-/* global config */
+/* global config, APP */
 /* eslint-disable require-jsdoc */
 
 import Sibilant from 'sibilant-webaudio';
 
+import UIEvents from '../../../../service/UI/UIEvents';
 import { app, socket } from '../../riff-dashboard-page/src/libs/riffdata-client';
 import * as actionTypes from '../constants/actionTypes';
 
@@ -31,19 +32,39 @@ export function attachSibilant(tracks) {
                 };
 
                 dispatch(sendUtteranceToServer(mockData, userData, room, accessToken));
+
+                return;
             }
 
-            const stream = tracks.find(t => t.isAudioTrack())?.stream;
+            let oldStream = null;
 
+            const stream = tracks.find(t => t.isAudioTrack())?.stream || null;
+
+            // attach initialStream
             if (stream) {
-                const speakingEvents = new Sibilant(stream);
+                reconnectSibilant(stream);
+            }
 
-                speakingEvents.bind(
-                    'stoppedSpeaking',
-                    data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
-                );
-            } else {
-                console.error('No audio stream. Error while attaching sibilant in attachSibilant action.');
+            // try attach sibilant on devicelist change
+            document.addEventListener('RIFF_UPDATE_DEVICE_LIST', () => reconnectSibilant());
+
+            // try attach sibilant on change audio device // setTimeout as a temprorary solution
+            APP.UI.addListener(UIEvents.AUDIO_DEVICE_CHANGED, () => setTimeout(() => reconnectSibilant(), 1000));
+
+            // eslint-disable-next-line no-inner-declarations
+            function reconnectSibilant(initialStream) {
+                // eslint-disable-next-line max-len
+                const newStream = initialStream || APP.store.getState()['features/base/conference'].conference.getLocalAudioTrack().stream;
+
+                if (newStream && newStream !== oldStream) {
+                    oldStream = newStream;
+                    const speakingEvents = new Sibilant(newStream);
+
+                    speakingEvents.bind(
+                            'stoppedSpeaking',
+                            data => dispatch(sendUtteranceToServer(data, userData, room, accessToken))
+                    );
+                }
             }
         } catch (error) {
             console.error('Error while attachSibilant', error);
