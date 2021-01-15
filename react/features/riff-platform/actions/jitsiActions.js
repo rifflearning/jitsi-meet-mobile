@@ -150,7 +150,9 @@ export function redirectToRiffMetrics() {
         const roomId = getState()['features/riff-platform'].riff.roomId;
         const { uid } = getState()['features/riff-platform'].signIn.user;
 
-        await participantLeaveRoom(roomId, uid);
+        if (roomId) {
+            await participantLeaveRoom(roomId, uid);
+        }
 
         navigateWithoutReload(RiffPlatform, '/app/dashboard');
     };
