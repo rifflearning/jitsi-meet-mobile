@@ -147,6 +147,7 @@ MiddlewareRegistry.register(store => next => action => {
         }
         break;
     case UPDATE_DEVICE_LIST:
+        document.dispatchEvent(new Event('RIFF_UPDATE_DEVICE_LIST'));
         logDeviceList(groupDevicesByKind(action.devices));
         break;
     case CHECK_AND_NOTIFY_FOR_NEW_DEVICE:
