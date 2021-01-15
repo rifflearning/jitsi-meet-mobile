@@ -1,4 +1,5 @@
 /* global config, APP */
+import ObjectID from 'bson-objectid';
 import { createBrowserHistory } from 'history';
 
 import UIEvents from '../../../../service/UI/UIEvents';
@@ -11,6 +12,7 @@ import * as ROUTES from '../constants/routes';
 import { isRiffPlatformCurrentPath, previousLocationRoomName } from '../functions';
 
 import { checkIsMeetingAllowed } from './meeting';
+import { logout } from './signIn';
 
 const customHistory = createBrowserHistory();
 
@@ -76,8 +78,30 @@ export function maybeRedirectToLoginPage() {
         }
         api.isAuth().then(user => {
             if (user === null) {
-                previousLocationRoomName.set(window.location.pathname);
-                navigateWithoutReload(RiffPlatform);
+                const userMock = {
+                    uid: ObjectID.generate(),
+                    displayName: '',
+                    email: '',
+                    isAnon: true
+                };
+
+                APP.store.dispatch({
+                    type: actionTypes.LOGIN_SUCCESS,
+                    user: userMock
+                });
+                setLocalDisplayNameAndEmail(userMock);
+
+                const meetingId = window.location.pathname.split('/')[1];
+
+                APP.store.dispatch(checkIsMeetingAllowed(meetingId)).then(m => {
+                    if (m.allowAnonymous || m.meeting?.allowAnonymous) {
+                        res();
+                    } else {
+                        APP.store.dispatch(logout());
+                        previousLocationRoomName.set(window.location.pathname);
+                        navigateWithoutReload(RiffPlatform);
+                    }
+                });
             } else {
                 APP.store.dispatch({
                     type: actionTypes.LOGIN_SUCCESS,
@@ -126,7 +150,9 @@ export function redirectToRiffMetrics() {
         const roomId = getState()['features/riff-platform'].riff.roomId;
         const { uid } = getState()['features/riff-platform'].signIn.user;
 
-        await participantLeaveRoom(roomId, uid);
+        if (roomId) {
+            await participantLeaveRoom(roomId, uid);
+        }
 
         navigateWithoutReload(RiffPlatform, '/app/dashboard');
     };

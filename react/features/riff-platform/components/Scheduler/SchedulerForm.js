@@ -36,6 +36,7 @@ import { schedule,
     updateScheduleRecurring,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
+import { logout } from '../../actions/signIn';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -274,7 +275,9 @@ const SchedulerForm = ({
     updateScheduleMeeting,
     updateScheduleMeetingRecurringSingleOccurrence,
     updateError,
-    updateLoading
+    updateLoading,
+    isAnon,
+    doLogout
 }) => {
     const classes = useStyles();
 
@@ -283,7 +286,7 @@ const SchedulerForm = ({
     const [ date, setdate ] = useState(moment());
     const [ hours, setHours ] = useState(1);
     const [ minutes, setMinutes ] = useState(0);
-    const [ allowAnonymous ] = useState(false);
+    const [ allowAnonymous, setAllowAnonymous ] = useState(false);
     const [ recurringMeeting, setRecurringMeeting ] = useState(false);
     const [ recurrenceType, setRecurrenceType ] = useState('daily');
     const [ recurrenceInterval, setRecurrenceInterval ] = useState(1);
@@ -345,6 +348,7 @@ const SchedulerForm = ({
             setdescription(meetingData.description);
             setForbidNewParticipantsAfterDateEnd(meetingData.forbidNewParticipantsAfterDateEnd);
             setWaitForHost(meetingData.waitForHost);
+            setAllowAnonymous(meetingData.allowAnonymous);
 
             if (meetingData.multipleRoomsQuantity) {
                 setisMultipleRooms(true);
@@ -1123,7 +1127,7 @@ const SchedulerForm = ({
             <Grid
                 container
                 spacing = { 1 }>
-                {/* <Grid
+                <Grid
                     item
                     xs = { 12 }>
                     <FormControlLabel
@@ -1133,7 +1137,7 @@ const SchedulerForm = ({
                             checked = { allowAnonymous }
                             onChange = { e => setAllowAnonymous(e.target.checked) } />
                         } />
-                </Grid> */}
+                </Grid>
 
                 <Grid
                     item
@@ -1197,14 +1201,24 @@ const SchedulerForm = ({
                 container
                 spacing = { 3 }>
                 <Grid item>
-                    <Button
-                        type = 'submit'
-                        variant = 'contained'
-                        color = 'primary'
-                        className = { classes.submit }
-                        disabled = { loading || updateLoading }>
-            Save
-                    </Button>
+                    {isAnon
+                        ? <Button
+                            variant = 'contained'
+                            color = 'primary'
+                            onClick = { doLogout }
+                            className = { classes.submit }>
+                            Register to schedule meetings
+                        </Button>
+                        : <Button
+                            type = 'submit'
+                            variant = 'contained'
+                            color = 'primary'
+                            className = { classes.submit }
+                            disabled = { loading || updateLoading }>
+                            Save
+                        </Button>
+                    }
+
                 </Grid>
                 <Grid item>
                     <Button
@@ -1224,8 +1238,10 @@ const SchedulerForm = ({
 };
 
 SchedulerForm.propTypes = {
+    doLogout: PropTypes.func,
     error: PropTypes.string,
     fetchMeetingById: PropTypes.func,
+    isAnon: PropTypes.bool,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
@@ -1242,6 +1258,7 @@ SchedulerForm.propTypes = {
 const mapStateToProps = state => {
     return {
         userId: state['features/riff-platform'].signIn.user?.uid,
+        isAnon: Boolean(state['features/riff-platform'].signIn.user?.isAnon),
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
         meeting: state['features/riff-platform'].meeting.meeting,
@@ -1253,6 +1270,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
+        doLogout: () => dispatch(logout()),
         scheduleMeeting: (meeting, history) => dispatch(schedule(meeting, history)),
         fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting, history) => dispatch(updateSchedule(id, meeting, history)),

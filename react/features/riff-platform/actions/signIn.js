@@ -5,6 +5,13 @@ import api from '../api';
 import * as actionTypes from '../constants/actionTypes';
 import { jwt, previousLocationRoomName } from '../functions';
 
+export function updateName(displayName) {
+    return {
+        type: actionTypes.UPDATE_DISPLAY_NAME,
+        displayName
+    };
+}
+
 function signInRequest() {
     return {
         type: actionTypes.LOGIN_REQUEST

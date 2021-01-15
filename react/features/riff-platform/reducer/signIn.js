@@ -5,9 +5,12 @@ export default (state = {}, action) => {
     case actionTypes.LOGIN_REQUEST:
         return { loading: true };
     case actionTypes.LOGIN_SUCCESS:
+        return { user: action.user };
+    case actionTypes.UPDATE_DISPLAY_NAME:
         return {
-            loggedIn: true,
-            user: action.user
+            ...state,
+            user: { ...state.user,
+                displayName: action.displayName }
         };
     case actionTypes.LOGIN_FAILURE:
         return { error: action.error };
