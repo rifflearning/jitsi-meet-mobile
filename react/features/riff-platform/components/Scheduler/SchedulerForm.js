@@ -37,6 +37,7 @@ import { schedule,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
+import { Loader } from '../Meetings';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -271,6 +272,7 @@ const SchedulerForm = ({
     fetchMeetingById,
     meeting,
     meetingError,
+    meetingLoading,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
     updateScheduleMeetingRecurringSingleOccurrence,
@@ -666,6 +668,10 @@ const SchedulerForm = ({
 
     if (meetingError) {
         return errorMessage(meetingError);
+    }
+
+    if (meetingLoading) {
+        return <Loader />;
     }
 
     return (
@@ -1246,6 +1252,7 @@ SchedulerForm.propTypes = {
     loading: PropTypes.bool,
     meeting: PropTypes.any,
     meetingError: PropTypes.string,
+    meetingLoading: PropTypes.bool,
     scheduleMeeting: PropTypes.func,
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
@@ -1264,7 +1271,8 @@ const mapStateToProps = state => {
         meeting: state['features/riff-platform'].meeting.meeting,
         updateError: state['features/riff-platform'].scheduler.updateError,
         updateLoading: state['features/riff-platform'].scheduler.updateLoading,
-        meetingError: state['features/riff-platform'].meeting.error
+        meetingError: state['features/riff-platform'].meeting.error,
+        meetingLoading: state['features/riff-platform'].meeting.loading
     };
 };
 

@@ -36,7 +36,7 @@ function getKeyByValue(object, value) {
 }
 
 // eslint-disable-next-line react-native/no-inline-styles
-const Loader = () => (<div style = {{ marginTop: '100px' }}>
+export const Loader = () => (<div style = {{ marginTop: '100px' }}>
     <Grid
         container = { true }
         item = { true }
