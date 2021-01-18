@@ -32,7 +32,7 @@ type Props = {
     _visible: boolean,
 
     /**
-     * Whether to show multiple rooms quantity instead of name.
+     * Whether to show name with multiple rooms quantity instead of name.
      */
     _isMultipleRoomsQuantity: boolean
 };

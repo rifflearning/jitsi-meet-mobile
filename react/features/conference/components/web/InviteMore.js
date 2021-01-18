@@ -39,7 +39,7 @@ type Props = {
     t: Function,
 
     /**
-     * Whether to show multiple rooms quantity instead of name.
+     * Whether to show name with multiple rooms quantity instead of name.
      */
     _isMultipleRoomsQuantity: boolean
 }
