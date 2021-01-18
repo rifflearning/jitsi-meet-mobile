@@ -28,91 +28,114 @@ export const navigateWithoutReload = (component, route) => {
 };
 
 /**
- * Redirects from jitsi to Waiting room.
+ * Makes all checks to decide wether redirect to riff-app(for login, waiting room etc) or proceed with conference.
  *
- * @returns {Promise.resolve}
+ * @returns {boolean}
 */
-export async function maybeRedirectToWaitingRoom() {
-    return new Promise(res => {
+export async function shouldRedirectToRiff() {
+    if (await shouldRedirectToLoginPage()) {
+        return true;
+    }
+    if (await shouldRedirectToWaitingRoom()) {
+        return true;
+    }
 
-        // no redirect if we're on riff-platform app already. And no redirect for recorder.
-        if (isRiffPlatformCurrentPath() || config.iAmRecorder) {
-            return res();
-        }
-
-        const meetingId = window.location.pathname.split('/')[1];
-
-        APP.store.dispatch(checkIsMeetingAllowed(meetingId)).then(m => {
-            if (m.error) {
-                navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.WAITING}/${meetingId}`);
-            } else {
-                res();
-            }
-        });
-    });
+    return false;
 }
 
+/**
+ * Redirects from jitsi to Waiting room.
+ *
+ * @returns {boolean}
+*/
+export async function shouldRedirectToWaitingRoom() {
+    // no redirect if we're on riff-platform app already. And no redirect for recorder.
+    if (isRiffPlatformCurrentPath() || config.iAmRecorder) {
+        return false;
+    }
+
+    const meetingId = window.location.pathname.split('/')[1];
+    const res = await APP.store.dispatch(checkIsMeetingAllowed(meetingId));
+
+    if (res.error) {
+        customHistory.push(`${ROUTES.BASENAME}${ROUTES.WAITING}/${meetingId}`);
+
+        return true;
+    }
+
+    return false;
+}
 
 /**
  * Redirects from jitsi to Login.
  *
- * @returns {Promise.resolve}
+ * @returns {boolean}
 */
-export function maybeRedirectToLoginPage() {
-    return new Promise(res => {
-        if (config.iAmRecorder) {
-            const user = {
-                uid: 'Recorder',
-                displayName: 'Recorder',
-                email: 'Recorder@Recorder.Recorder'
-            };
+export async function shouldRedirectToLoginPage() {
+    if (config.iAmRecorder) {
+        const user = {
+            uid: 'Recorder',
+            displayName: 'Recorder',
+            email: 'Recorder@Recorder.Recorder'
+        };
 
-            APP.store.dispatch({
-                type: actionTypes.LOGIN_SUCCESS,
-                user
-            });
-
-            // setLocalDisplayNameAndEmail(user);
-
-            return res();
-        }
-        api.isAuth().then(user => {
-            if (user === null) {
-                const userMock = {
-                    uid: ObjectID.generate(),
-                    displayName: '',
-                    email: '',
-                    isAnon: true
-                };
-
-                APP.store.dispatch({
-                    type: actionTypes.LOGIN_SUCCESS,
-                    user: userMock
-                });
-                setLocalDisplayNameAndEmail(userMock);
-
-                const meetingId = window.location.pathname.split('/')[1];
-
-                APP.store.dispatch(checkIsMeetingAllowed(meetingId)).then(m => {
-                    if (m.allowAnonymous || m.meeting?.allowAnonymous) {
-                        res();
-                    } else {
-                        APP.store.dispatch(logout());
-                        previousLocationRoomName.set(window.location.pathname);
-                        navigateWithoutReload(RiffPlatform);
-                    }
-                });
-            } else {
-                APP.store.dispatch({
-                    type: actionTypes.LOGIN_SUCCESS,
-                    user
-                });
-                setLocalDisplayNameAndEmail(user);
-
-                res();
-            }
+        APP.store.dispatch({
+            type: actionTypes.LOGIN_SUCCESS,
+            user
         });
+
+        return false;
+    }
+
+    const user = await api.isAuth();
+
+    if (user === null) {
+        if (await isAnonymousUsersAllowed()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    APP.store.dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        user
     });
+    setLocalDisplayNameAndEmail(user);
+
+    return false;
+}
+
+/**
+ * Check if anonymous users allowed in current meeting.
+ *
+ * @returns {boolean}
+*/
+export async function isAnonymousUsersAllowed() {
+    const userMock = {
+        uid: ObjectID.generate(),
+        displayName: '',
+        email: '',
+        isAnon: true
+    };
+
+    APP.store.dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        user: userMock
+    });
+    setLocalDisplayNameAndEmail(userMock);
+
+    const meetingId = window.location.pathname.split('/')[1];
+    const res = await APP.store.dispatch(checkIsMeetingAllowed(meetingId));
+
+    if (res.meeting?.allowAnonymous) {
+        return true;
+    }
+
+    APP.store.dispatch(logout());
+    previousLocationRoomName.set(window.location.pathname);
+
+    return false;
 }
 
 /**

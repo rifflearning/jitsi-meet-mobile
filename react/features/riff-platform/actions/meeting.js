@@ -107,7 +107,7 @@ export function checkIsMeetingAllowed(meetingId) {
             // if host, send isHostJoined - timestamp;
             if (meeting.waitForHost && isHost) await sendIsHostJoinedTimeStamp(meeting); // or not await?
 
-            return meeting;
+            return { meeting };
         } catch (error) {
             return { error };
         }
