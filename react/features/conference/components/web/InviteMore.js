@@ -7,6 +7,7 @@ import { Icon, IconInviteMore } from '../../../base/icons';
 import { getParticipantCount } from '../../../base/participants';
 import { connect } from '../../../base/redux';
 import { beginAddPeople } from '../../../invite';
+import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MultipleRoomsMeetingNameDropdown';
 import {
     isButtonEnabled,
     isToolboxVisible
@@ -35,7 +36,12 @@ type Props = {
     /**
      * Invoked to obtain translated strings.
      */
-    t: Function
+    t: Function,
+
+    /**
+     * Whether to show name with multiple rooms quantity instead of name.
+     */
+    _isMultipleRoomsQuantity: boolean
 }
 
 /**
@@ -48,14 +54,17 @@ type Props = {
 function InviteMore({
     _tileViewEnabled,
     _visible,
+    _isMultipleRoomsQuantity,
     onClick,
     t
 }: Props) {
+
     return (
         _visible
             ? <div className = { `invite-more-container${_tileViewEnabled ? ' elevated' : ''}` }>
                 <div className = 'invite-more-header'>
                     {t('addPeople.inviteMoreHeader')}
+                    {_isMultipleRoomsQuantity ? <MultipleRoomsNameDropdown /> : null }
                 </div>
                 <div
                     className = 'invite-more-button'
@@ -84,7 +93,9 @@ function mapStateToProps(state) {
 
     return {
         _tileViewEnabled: state['features/video-layout'].tileViewEnabled,
-        _visible: isToolboxVisible(state) && isButtonEnabled('invite') && isAlone && !hide
+        _visible: isToolboxVisible(state) && isButtonEnabled('invite') && isAlone && !hide,
+        _isMultipleRoomsQuantity: Boolean(state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity)
+
     };
 }
 
