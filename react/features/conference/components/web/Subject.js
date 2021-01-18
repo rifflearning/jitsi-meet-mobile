@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 
 import { getParticipantCount } from '../../../base/participants/functions';
 import { connect } from '../../../base/redux';
-import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MeetingMultipleNameSelect';
+import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MultipleRoomsMeetingNameDropdown';
 import ConferenceTimer from '../ConferenceTimer';
 
 import ParticipantsCount from './ParticipantsCount';

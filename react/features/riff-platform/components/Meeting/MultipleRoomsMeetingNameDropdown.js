@@ -35,6 +35,11 @@ const useStyles = makeStyles({
             border: '0',
             borderRadius: '4px'
         }
+    },
+    selectItem: {
+        color: '#5e6d7a',
+        fontSize: '13px',
+        lineHeight: '20px'
     }
 });
 
@@ -46,10 +51,16 @@ const MultipleRoomsMeetingDropdown = ({ meetingId, meetingName, multipleRoomsQua
         window.location.replace(`/${id}`);
     };
 
+    const checkIsSameMeeting = selectedId => meetingId === selectedId;
+
     const onMeetingRoomChange = roomNumber => {
         const id = meetingId.split('-')[0];
+        const selectedMeetingId = `${id}-${roomNumber}`;
+        const isSameMeeting = checkIsSameMeeting(selectedMeetingId);
 
-        redirectToMeeting(`${id}-${roomNumber}`);
+        if (!isSameMeeting) {
+            redirectToMeeting(`${id}-${roomNumber}`);
+        }
     };
 
     const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
@@ -68,6 +79,7 @@ const MultipleRoomsMeetingDropdown = ({ meetingId, meetingName, multipleRoomsQua
         value = { roomNumber }
         variant = 'outlined'>
         {roomsNumbersArr.map(el => (<MenuItem
+            className = { classes.selectItem }
             key = { el }
             value = { el }>
             {meetingName}-{el}
@@ -85,7 +97,7 @@ MultipleRoomsMeetingDropdown.propTypes = {
 
 const mapStateToProps = state => {
     return {
-        multipleRoomsQuantity: state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity,      
+        multipleRoomsQuantity: state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity,
         meetingName: state['features/riff-platform']?.meeting?.meeting?.name,
         meetingId: state['features/base/conference'].room
     };
