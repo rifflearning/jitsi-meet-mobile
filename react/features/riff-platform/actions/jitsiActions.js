@@ -177,6 +177,7 @@ export function redirectToRiffMetrics() {
             await participantLeaveRoom(roomId, uid);
         }
 
+        window.parent.postMessage('JITSI_CONFERENCE_END', '*');
         navigateWithoutReload(RiffPlatform, '/app/dashboard');
     };
 }
