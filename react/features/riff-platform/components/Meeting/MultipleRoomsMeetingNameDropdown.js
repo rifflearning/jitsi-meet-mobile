@@ -10,7 +10,7 @@ import { connect } from '../../../base/redux';
 const MenuProps = {
     PaperProps: {
         style: {
-            maxHeight: 300,
+            maxHeight: 200,
             color: '#5e6d7a',
             fontSize: '13px',
             lineHeight: '20px'

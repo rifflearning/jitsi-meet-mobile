@@ -32,9 +32,9 @@ type Props = {
     _visible: boolean,
 
     /**
-     * The conference  multiple rooms quantity
+     * Whether to show multiple rooms quantity instead of name.
      */
-    _isMultipleRoomsQuantity: number
+    _isMultipleRoomsQuantity: boolean
 };
 
 /**
@@ -84,7 +84,7 @@ function _mapStateToProps(state) {
         _showParticipantCount: participantCount > 2,
         _subject: state['features/riff-platform']?.meeting?.meeting?.name,
         _visible: participantCount > 1,
-        _isMultipleRoomsQuantity: state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity
+        _isMultipleRoomsQuantity: Boolean(state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity)
     };
 }
 
