@@ -93,7 +93,7 @@ function mapStateToProps(state) {
 
     return {
         _tileViewEnabled: state['features/video-layout'].tileViewEnabled,
-        _visible: isButtonEnabled('invite') && isAlone && !hide,
+        _visible: isToolboxVisible(state) && isButtonEnabled('invite') && isAlone && !hide,
         _isMultipleRoomsQuantity: Boolean(state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity)
 
     };
