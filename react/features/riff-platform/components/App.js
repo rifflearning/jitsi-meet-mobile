@@ -32,18 +32,16 @@ const App = ({ user }) => {
         setIsOpen(false);
     };
 
-    const isSidebarEnabled = Boolean(user);
-
     return (
         <div className = { classes.root }>
             <CssBaseline />
             <Header
                 handleSidebarOpen = { handleSidebarOpen }
-                isOpen = { isOpen }
-                isSidebarEnabled = { isSidebarEnabled } />
-            {isSidebarEnabled && <Sidebar
+                isOpen = { isOpen } />
+            {Boolean(user) && <Sidebar
                 handleSidebarClose = { handleSidebarClose }
-                isOpen = { isOpen } />}
+                isOpen = { isOpen } />
+            }
             <Main />
         </div>
     );

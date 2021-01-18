@@ -5,7 +5,6 @@ import { ReducerRegistry } from '../../base/redux';
 import meeting from './meeting';
 import meetingMediator from './meetingMediator';
 import meetings from './meetings';
-import profile from './profile';
 import resetPassword from './resetPassword';
 import riff from './riff';
 import scheduler from './scheduler';
@@ -16,7 +15,6 @@ ReducerRegistry.register('features/riff-platform',
   combineReducers({
       signIn,
       signUp,
-      profile,
       meetings,
       meeting,
       scheduler,
