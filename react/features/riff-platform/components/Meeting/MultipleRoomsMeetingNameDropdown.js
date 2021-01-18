@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-sort-props */
-/* @flow */
+
 import { makeStyles, MenuItem, TextField } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';

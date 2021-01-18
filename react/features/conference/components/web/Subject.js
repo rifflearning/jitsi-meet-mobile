@@ -9,7 +9,6 @@ import ConferenceTimer from '../ConferenceTimer';
 
 import ParticipantsCount from './ParticipantsCount';
 
-
 /**
  * The type of the React {@code Component} props of {@link Subject}.
  */
@@ -74,7 +73,7 @@ class Subject extends Component<Props> {
  * @private
  * @returns {{
  *     _subject: string,
- *     _visible: boolean,
+ *     _visible: boolean
  * }}
  */
 function _mapStateToProps(state) {
