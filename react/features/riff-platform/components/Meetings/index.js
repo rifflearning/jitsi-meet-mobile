@@ -2,7 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/jsx-no-bind */
 
-import { Button, CircularProgress, Grid, Box, makeStyles } from '@material-ui/core';
+import { Button, Grid, Box, makeStyles } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import PropTypes from 'prop-types';
@@ -13,6 +13,7 @@ import { connect } from '../../../base/redux';
 import { getMeetings, getMeetingsByGroup, setMeetingsListType } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { groupMeetingsByDays } from '../../functions';
+import Loader from '../Loader';
 import StyledPaper from '../StyledPaper';
 
 import MeetingTabPanel from './MeetingTabPanel';
@@ -34,15 +35,6 @@ const meetingListTypeMap = {
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
 }
-
-// eslint-disable-next-line react-native/no-inline-styles
-export const Loader = () => (<div style = {{ marginTop: '100px' }}>
-    <Grid
-        container = { true }
-        item = { true }
-        justify = 'center'
-        xs = { 12 }><CircularProgress /></Grid>
-</div>);
 
 const MeetingsList = ({ groupedMeetings = [], groupName }) => (
     <Grid

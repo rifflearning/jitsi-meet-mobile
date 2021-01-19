@@ -4,7 +4,6 @@
 
 import {
     Button,
-    CircularProgress,
     Grid,
     Typography,
     Box,
@@ -26,6 +25,7 @@ import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
 import { formatDurationTime } from '../../functions';
+import Loader from '../Loader';
 import { ConfirmationDialogRaw } from '../Meetings/Dialog';
 import StyledPaper from '../StyledPaper';
 
@@ -105,13 +105,6 @@ const getRecurrenceDesc = (recurring = {}) => {
 
     return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
 };
-
-
-const loader = (<Grid
-    container = { true }
-    item = { true }
-    justify = 'center'
-    xs = { 12 }><CircularProgress /></Grid>);
 
 const errorMessage = err => (<Grid
     container = { true }
@@ -224,7 +217,7 @@ function Meeting({
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 
     if (loading) {
-        return loader;
+        return <Loader />;
     }
 
     if (error) {

@@ -37,7 +37,7 @@ import { schedule,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
-import { Loader } from '../Meetings';
+import Loader from '../Loader';
 
 import {
     getRecurringDailyEventsByOccurance,
