@@ -33,7 +33,6 @@ const useStyles = makeStyles(() => {
     };
 });
 
-
 const MenuProps = {
     PaperProps: {
         style: {
@@ -79,7 +78,7 @@ const MeetingsRow = ({
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
+        } else if (value === 'Delete one meeting') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
@@ -179,7 +178,6 @@ MeetingsRow.propTypes = {
 
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
     groupName: PropTypes.string,
-
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func

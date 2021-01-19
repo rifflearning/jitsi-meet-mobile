@@ -55,9 +55,8 @@ const MeetingsList = ({ groupedMeetings = [], groupName }) => (
 );
 
 MeetingsList.propTypes = {
-    groupName: PropTypes.string,
-
     // groupName - external prop for separate group (harvard), disable 'delete' button, fetch groupped meeting.
+    groupName: PropTypes.string,
     groupedMeetings: PropTypes.object
 };
 

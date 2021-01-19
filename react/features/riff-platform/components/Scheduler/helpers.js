@@ -31,9 +31,10 @@ export const getRecurringDailyEventsByEndDate = ({
     daysOccurances
 }) =>
     endDate
-        ? moment(startDate).recur(endDate)
-.every(daysInterval, 'days')
-.all()
+        ? moment(startDate)
+            .recur(endDate)
+            .every(daysInterval, 'days')
+            .all()
         : getRecurringDailyEventsByOccurance({
             startDate,
             daysOccurances,
@@ -72,10 +73,11 @@ export const getRecurringWeeklyEventsByEndDate = ({
     daysOfWeek
 }) =>
     endDate
-        ? moment(startDate).recur(endDate)
-.every(daysOfWeek)
-.daysOfWeek()
-.all()
+        ? moment(startDate)
+            .recur(endDate)
+            .every(daysOfWeek)
+            .daysOfWeek()
+            .all()
         : getRecurringWeeklyEventsByOccurance({
             startDate,
             weeksOccurances,
