@@ -1,5 +1,5 @@
-import moment from "moment";
-import "moment-recur";
+import moment from 'moment';
+import 'moment-recur';
 
 export const daysOfWeekMap = {
     'Mon': 1,
@@ -8,51 +8,55 @@ export const daysOfWeekMap = {
     'Thu': 4,
     'Fri': 5,
     'Sat': 6,
-    'Sun': 7,
+    'Sun': 7
 };
 
 export const getRecurringDailyEventsByOccurance = ({
     startDate,
     daysOccurances,
-    daysInterval,
+    daysInterval
 }) =>
-    [startDate].concat(
+    [ startDate ].concat(
         moment(startDate)
             .recur()
-            .every(daysInterval, "days")
+            .every(daysInterval, 'days')
             .next(daysOccurances - 1)
     );
 
+// eslint-disable-next-line no-confusing-arrow
 export const getRecurringDailyEventsByEndDate = ({
     startDate,
     endDate,
     daysInterval,
-    daysOccurances,
+    daysOccurances
 }) =>
     endDate
-        ? moment(startDate).recur(endDate).every(daysInterval, "days").all()
+        ? moment(startDate).recur(endDate)
+.every(daysInterval, 'days')
+.all()
         : getRecurringDailyEventsByOccurance({
-              startDate,
-              daysOccurances,
-              daysInterval,
-          });
+            startDate,
+            daysOccurances,
+            daysInterval
+        });
 
 export const getRecurringWeeklyEventsByOccurance = ({
     startDate,
     weeksOccurances,
-    daysOfWeek,
+    daysOfWeek
 }) => {
     const isStartDateBelongsToDaysArr = daysOfWeek.find(
-        (day) => day === daysOfWeekMap[moment(startDate).format("ddd")]
+        day => day === daysOfWeekMap[moment(startDate).format('ddd')]
     );
+
     return isStartDateBelongsToDaysArr
-        ? [startDate].concat(
+        ? [ startDate ].concat(
               moment(startDate)
                   .recur()
                   .every(daysOfWeek)
                   .daysOfWeek()
                   .next(weeksOccurances - 1)
-          )
+        )
         : moment(startDate)
               .recur()
               .every(daysOfWeek)
@@ -60,19 +64,23 @@ export const getRecurringWeeklyEventsByOccurance = ({
               .next(weeksOccurances);
 };
 
+// eslint-disable-next-line no-confusing-arrow
 export const getRecurringWeeklyEventsByEndDate = ({
     startDate,
     endDate,
     weeksOccurances,
-    daysOfWeek,
+    daysOfWeek
 }) =>
     endDate
-        ? moment(startDate).recur(endDate).every(daysOfWeek).daysOfWeek().all()
+        ? moment(startDate).recur(endDate)
+.every(daysOfWeek)
+.daysOfWeek()
+.all()
         : getRecurringWeeklyEventsByOccurance({
-              startDate,
-              weeksOccurances,
-              daysOfWeek,
-          });
+            startDate,
+            weeksOccurances,
+            daysOfWeek
+        });
 
 export const getRecurringMonthlyEventsByOccurance = ({
     startDate,
@@ -80,34 +88,34 @@ export const getRecurringMonthlyEventsByOccurance = ({
     monthlyBy,
     dayOfMonth,
     monthlyByWeekDay,
-    monthlyByPosition,
+    monthlyByPosition
 }) => {
-    if (monthlyBy === "monthlyByDay") {
-        const isStartDayEqualToDayOfMonth =
-            parseInt(moment(startDate).format("D")) === dayOfMonth;
+    if (monthlyBy === 'monthlyByDay') {
+        const isStartDayEqualToDayOfMonth
+            = parseInt(moment(startDate).format('D'), 10) === dayOfMonth;
 
         return isStartDayEqualToDayOfMonth
-            ? [startDate].concat(
+            ? [ startDate ].concat(
                   moment(startDate)
                       .recur()
                       .every(dayOfMonth)
                       .daysOfMonth()
                       .next(monthOccurances - 1)
-              )
+            )
             : moment(startDate)
                   .recur()
                   .every(dayOfMonth)
                   .daysOfMonth()
                   .next(monthOccurances);
-    } else {
-        const recurrence = moment(startDate)
+    }
+    const recurrence = moment(startDate)
             .recur()
             .every(monthlyByWeekDay)
             .daysOfWeek()
             .every(monthlyByPosition)
             .weeksOfMonthByDay()
             .next(monthOccurances);
-        const startDateFromRecurrence = moment(startDate)
+    const startDateFromRecurrence = moment(startDate)
             .recur(recurrence[0])
             .every(monthlyByWeekDay)
             .daysOfWeek()
@@ -115,11 +123,12 @@ export const getRecurringMonthlyEventsByOccurance = ({
             .weeksOfMonthByDay()
             .all()[0];
 
-        const isStartDayEqualToStartDateFromRecurrence = moment(
+    const isStartDayEqualToStartDateFromRecurrence = moment(
             startDate
-        ).isSame(startDateFromRecurrence, "day");
-        return isStartDayEqualToStartDateFromRecurrence
-            ? [startDate].concat(
+    ).isSame(startDateFromRecurrence, 'day');
+
+    return isStartDayEqualToStartDateFromRecurrence
+        ? [ startDate ].concat(
                   moment(startDate)
                       .recur()
                       .every(monthlyByWeekDay)
@@ -127,9 +136,9 @@ export const getRecurringMonthlyEventsByOccurance = ({
                       .every(monthlyByPosition)
                       .weeksOfMonthByDay()
                       .next(monthOccurances - 1)
-              )
-            : recurrence;
-    }
+        )
+        : recurrence;
+
 };
 
 export const getRecurringMonthlyEventsByEndDate = ({
@@ -139,9 +148,9 @@ export const getRecurringMonthlyEventsByEndDate = ({
     monthlyBy,
     dayOfMonth,
     monthlyByWeekDay,
-    monthlyByPosition,
+    monthlyByPosition
 }) => {
-    if (monthlyBy === "monthlyByDay") {
+    if (monthlyBy === 'monthlyByDay') {
         return endDate
             ? moment(startDate)
                   .recur(endDate)
@@ -149,29 +158,30 @@ export const getRecurringMonthlyEventsByEndDate = ({
                   .daysOfMonth()
                   .all()
             : getRecurringMonthlyEventsByOccurance({
-                  startDate,
-                  monthOccurances,
-                  monthlyBy: "monthlyByDay",
-                  dayOfMonth,
-                  monthlyByWeekDay,
-                  monthlyByPosition,
-              });
-    } else {
-        return endDate
-            ? moment(startDate)
+                startDate,
+                monthOccurances,
+                monthlyBy: 'monthlyByDay',
+                dayOfMonth,
+                monthlyByWeekDay,
+                monthlyByPosition
+            });
+    }
+
+    return endDate
+        ? moment(startDate)
                   .recur(endDate)
                   .every(monthlyByWeekDay)
                   .daysOfWeek()
                   .every(monthlyByPosition)
                   .weeksOfMonthByDay()
                   .all()
-            : getRecurringMonthlyEventsByOccurance({
-                  startDate,
-                  monthOccurances,
-                  monthlyBy: "monthlyByWeekDay",
-                  dayOfMonth,
-                  monthlyByWeekDay,
-                  monthlyByPosition,
-              });
-    }
+        : getRecurringMonthlyEventsByOccurance({
+            startDate,
+            monthOccurances,
+            monthlyBy: 'monthlyByWeekDay',
+            dayOfMonth,
+            monthlyByWeekDay,
+            monthlyByPosition
+        });
+
 };

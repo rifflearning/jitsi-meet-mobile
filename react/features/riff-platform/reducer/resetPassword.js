@@ -9,7 +9,7 @@ export default (state = {}, action) => {
     case actionTypes.RESET_FAILURE:
         return { error: action.error };
     case actionTypes.RESET_HIDE_MESSAGE : {
-        return { }
+        return { };
     }
 
     default:

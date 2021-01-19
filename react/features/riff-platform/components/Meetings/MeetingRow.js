@@ -175,10 +175,11 @@ const MeetingsRow = ({
 
 
 MeetingsRow.propTypes = {
-    groupName: PropTypes.string,
+    deleteLoading: PropTypes.bool,
 
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
-    deleteLoading: PropTypes.bool,
+    groupName: PropTypes.string,
+
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func
