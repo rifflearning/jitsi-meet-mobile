@@ -8,6 +8,7 @@ make dev
 ```
 *Also see official guide here [here](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-web)*.
 
+---
 ## Development with Riff features:
 ### Run client:
 1. Clone repository, checkout to `develop` or `integration-riff-platform` branch and install dependencies:
@@ -45,6 +46,7 @@ make dev
     ```
 4. Run api-gateway and mongo locally:
 https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway
+---
 ## Customization and deployment to AWS
 In order to customize *jitsi-meet* with riff theme, all features and set up a new enviroment please follow next steps:
 
@@ -58,32 +60,33 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     ```
     Add appropriate variables `.env` for deployment and put `.pem` file to `~/.ssh/riffdev_1_useast2_key.pem` (*ask colleagues for the `.env` and `.pem` files*):
     ```
-    ## dev webpack:
+    ### Uncomment variables for specific instance deployment:
+
+    ## development mode with webpack:
     # API_GATEWAY=https://localhost:4445/api
     # RIFF_SERVER_URL=https://riff-poc.riffplatform.com
     # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5fbc1698db819207288110d2
-    
-    # Uncomment variables for specific instance:
-    ## Deployment, common variables
+
+    ## Deployment to rif-poc instance:
     API_GATEWAY=/api-gateway
     RIFF_SERVER_URL=/
-    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-
-    ## rif-poc instance:
-    AWS_NAME=ubuntu@riff-poc.riffplatform.com
     NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
+    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    AWS_NAME=ubuntu@riff-poc.riffplatform.com
 
-    ## hls-negotiations instance:
-    # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+    ## Deployment to hls-negotiations instance:
+    # API_GATEWAY=/api-gateway
+    # RIFF_SERVER_URL=/
     # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
     ```
     Build and deploy with:
     ```
     make deploy-aws
     ```
 3. Deploy and run [api-gateway](https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway) to aws instance.
-4. Add nginx configs redirection to `api-gateway`, `riff-data` server, also for blocking native client:
-    
+4. Add nginx configs to `/etc/nginx/sites-available/riff-poc.riffplatform.com.conf`:
     Insert after `gzip_min_length 512;`:
     ```
     
@@ -124,15 +127,24 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     }
 
     ```
-5. Change flags in file`/etc/jitsi/meet/[host]-config.js`:
+5. Change flags in aws instance file `/etc/jitsi/meet/[host]-config.js`:
     ```
-    ? disableSimulcast: true,
-    ? fileRecordingsEnabled: true,
-    ? openBridgeChannel: 'websocket',
     prejoinPageEnabled: true,
     p2p:{
         enabled: false
     }
     disableDeepLinking: true,
-    ? hiddenDomain: 'recorder.riff-poc.riffplatform.com',
+    ```
+    Also optional flags:
+    ```
+    disableSimulcast: true,
+
+    // in case meetings recording by jibri is needed
+    fileRecordingsEnabled: true, 
+
+    // depends on videobridge configuration
+    openBridgeChannel: 'websocket',
+
+    // in case we want jibri, but value itself different for every domain
+    hiddenDomain: 'recorder.example-domain.com',
     ```
