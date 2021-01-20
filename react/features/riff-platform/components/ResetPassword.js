@@ -8,16 +8,16 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Link as LinkTo, useHistory } from 'react-router-dom';
 
-import * as ROUTES from '../constants/routes';
 import { connect } from '../../base/redux';
 import { resetPassword, hideResetMessage } from '../actions/resetPassword';
+import * as ROUTES from '../constants/routes';
 
 
 const useStyles = makeStyles(theme => {
@@ -103,26 +103,24 @@ const ResetPassword = ({ doReset, hideMessage, resetPasswordError, resetingPassw
             email,
             password
         }).then(res => {
-            if(res) {
-            setIsRedirecting(true);
-            setTimeout(() => {
-                history.push(`${ROUTES.SIGNIN}`);
-              }, 5000);
-            } 
+            if (res) {
+                setIsRedirecting(true);
+                setTimeout(() => {
+                    history.push(`${ROUTES.SIGNIN}`);
+                }, 5000);
+            }
         });
     };
 
-    useEffect(() => {
-       return () =>  hideMessage();
-    }, [])
+    useEffect(() => () => hideMessage(), []);
 
     return (
         <Container
             component = 'main'
             maxWidth = 'xs'>
-            { resetPasswordError && <Alert severity="error">{resetPasswordError}</Alert> }
-            { resetPasswordSuccess && <Alert severity="success">{resetPasswordSuccess}</Alert> }
-           <div className = { classes.paper }>
+            { resetPasswordError && <Alert severity = 'error'>{resetPasswordError}</Alert> }
+            { resetPasswordSuccess && <Alert severity = 'success'>{resetPasswordSuccess}</Alert> }
+            <div className = { classes.paper }>
                 <Avatar className = { classes.avatar }>
                     <LockOutlinedIcon />
                 </Avatar>
@@ -214,24 +212,25 @@ const ResetPassword = ({ doReset, hideMessage, resetPasswordError, resetingPassw
 };
 
 ResetPassword.propTypes = {
-    doRegister: PropTypes.func,
+    doReset: PropTypes.func,
+    hideMessage: PropTypes.func,
     resetPasswordError: PropTypes.string,
-    resetingPassword: PropTypes.bool,
     resetPasswordSuccess: PropTypes.string,
+    resetingPassword: PropTypes.bool
 };
 
 const mapStateToProps = state => {
     return {
         resetPasswordError: state['features/riff-platform'].resetPassword.error,
         resetingPassword: state['features/riff-platform'].resetPassword.loading,
-        resetPasswordSuccess: state['features/riff-platform'].resetPassword.success,
+        resetPasswordSuccess: state['features/riff-platform'].resetPassword.success
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         doReset: obj => dispatch(resetPassword(obj)),
-        hideMessage: () => dispatch(hideResetMessage()),
+        hideMessage: () => dispatch(hideResetMessage())
     };
 };
 

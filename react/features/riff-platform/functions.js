@@ -150,3 +150,15 @@ export function checkMeetingSingleOccurrenceDate({ meetingId, meeting, meetingsR
 
     return !checkRecurrence.length;
 }
+
+/**
+ * Generate an array of numbers.
+ *
+ * @param {number} start - First element of array.
+ * @param {number} end - Last element of array.
+ * @param {number} step - Difference between array elements.
+ * @returns {Array} - Returns array of numbers ([start, start + step...end]).
+ */
+export function getNumberRangeArray(start, end, step = 1) {
+    return [ ...Array(Math.floor((end - start) / step) + 1) ].map((_, i) => start + (i * step));
+}

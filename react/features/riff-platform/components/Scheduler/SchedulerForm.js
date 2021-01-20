@@ -37,7 +37,8 @@ import { schedule,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
-import { Loader } from '../Meetings';
+import { getNumberRangeArray } from '../../functions';
+import Loader from '../Loader';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -90,12 +91,10 @@ const errorMessage = err => (<Grid
     justify = 'center'
     xs = { 12 }><Typography color = 'error'>{err}</Typography></Grid>);
 
-const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-const hoursArray = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-const minutesArray = [ 0, 15, 30, 45 ];
-const multipleMeetingArray = getNumberArr(99).slice(1);
-const recurrenceIntervalArray = getNumberArr(20);
+const hoursArray = getNumberRangeArray(0, 9);
+const minutesArray = getNumberRangeArray(0, 45, 15);
+const multipleMeetingArray = getNumberRangeArray(2, 99);
+const recurrenceIntervalArray = getNumberRangeArray(1, 20);
 const recurrenceTypeArray = [ 'daily', 'weekly', 'monthly' ];
 const daysOfWeekArray = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 const monthlyByPositionArray = [ 'First', 'Second', 'Third', 'Fourth' ];
@@ -111,17 +110,17 @@ const repeatIntervalMap = {
     daily: {
         name: 'day(s)',
         label: 'Day',
-        interval: getNumberArr(15)
+        interval: getNumberRangeArray(1, 15)
     },
     weekly: {
         name: 'week',
         label: 'Week',
-        interval: getNumberArr(12)
+        interval: getNumberRangeArray(1, 12)
     },
     monthly: {
         name: 'month',
         label: 'Month',
-        interval: getNumberArr(31)
+        interval: getNumberRangeArray(1, 31)
     }
 };
 

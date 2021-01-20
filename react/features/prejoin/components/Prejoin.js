@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 // @flow
 
 import InlineDialog from '@atlaskit/inline-dialog';
@@ -117,6 +118,16 @@ type Props = {
      * The JitsiLocalTrack to display.
      */
     videoTrack: ?Object,
+
+    /**
+     * If the user is anonymous.
+     */
+    isAnon: Boolean,
+
+    /**
+     * Update name.
+     */
+    doUpdateName: Function
 };
 
 type State = {
@@ -201,7 +212,7 @@ class Prejoin extends Component<Props, State> {
         });
     }
 
-    _setName: () => void;
+    _setName: (string) => void;
 
     /**
      * Sets the guest participant name.
@@ -329,7 +340,7 @@ class Prejoin extends Component<Props, State> {
                                 && <>or
                                     <ActionButton
                                         disabled = { joinButtonDisabled }
-                                        onClick={() => {
+                                        onClick = { () => {
                                             previousLocationRoomName.set(window.location.pathname);
                                             window.location.href = '/app/login'
                                             ;
@@ -390,7 +401,7 @@ function mapStateToProps(state): Object {
     const joinButtonDisabled = isDisplayNameRequired(state) && !name;
 
     return {
-        isAnon: !!state['features/riff-platform'].signIn.user?.isAnon,
+        isAnon: Boolean(state['features/riff-platform'].signIn.user?.isAnon),
         buttonIsToggled: isPrejoinSkipped(state),
         joinButtonDisabled,
         name,

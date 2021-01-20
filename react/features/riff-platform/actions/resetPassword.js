@@ -11,11 +11,11 @@ function resetPasswordRequest() {
 }
 
 function resetPasswordSuccess(success) {
-    return { 
-        type: actionTypes.RESET_SUCCESS, 
-        success: success
+    return {
+        type: actionTypes.RESET_SUCCESS,
+        success
     };
-};
+}
 
 function resetPasswordFailure(error) {
     return {
@@ -29,7 +29,10 @@ export function resetPassword({ email, password }) {
         dispatch(resetPasswordRequest());
 
         try {
-            const res = await api.resetPassword({ email, password });
+            await api.resetPassword({ email,
+                password });
+
+            // eslint-disable-next-line max-len
             return dispatch(resetPasswordSuccess('The password has successfully been changed. You can now login with the new password. You will land to login page in 5 seconds'));
 
         } catch (e) {
@@ -40,11 +43,11 @@ export function resetPassword({ email, password }) {
             }
         }
     };
-};
+}
 
 export function hideResetMessage() {
     return {
-        type: actionTypes.RESET_HIDE_MESSAGE 
-    }
+        type: actionTypes.RESET_HIDE_MESSAGE
+    };
 }
 

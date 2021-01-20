@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { connect } from '../../../base/redux';
+import { getNumberRangeArray } from '../../functions';
+
 
 const MenuProps = {
     PaperProps: {
@@ -63,9 +65,7 @@ const MultipleRoomsMeetingDropdown = ({ meetingId, meetingName, multipleRoomsQua
         }
     };
 
-    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-    const roomsNumbersArr = getNumberArr(multipleRoomsQuantity);
+    const roomsNumbersArr = getNumberRangeArray(1, multipleRoomsQuantity);
 
     const roomNumber = meetingId.split('-')[1];
 

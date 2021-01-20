@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 import { connect } from '../../../base/redux';
 import { deleteMeeting, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { formatDurationTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
 
 import { ConfirmationDialogRaw } from './Dialog';
 
@@ -32,7 +32,6 @@ const useStyles = makeStyles(() => {
         }
     };
 });
-
 
 const MenuProps = {
     PaperProps: {
@@ -79,7 +78,7 @@ const MeetingsRow = ({
     const onDeleteDialogClose = value => {
         if (value === 'Delete all recurring meetings') {
             return removeMeetingsRecurring(meeting.roomId);
-        } else if (value === 'Delete one meeting' || value === 'Delete groupped meetings') {
+        } else if (value === 'Delete one meeting') {
             return removeMeeting(meeting._id);
         }
         setisOpenDeleteDialog(false);
@@ -96,9 +95,7 @@ const MeetingsRow = ({
         history.push(`${ROUTES.MEETINGS}/${id}`);
     };
 
-    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
     return (
         <TableRow
@@ -175,10 +172,10 @@ const MeetingsRow = ({
 
 
 MeetingsRow.propTypes = {
-    groupName: PropTypes.string,
+    deleteLoading: PropTypes.bool,
 
     // groupName - external prop for separate group (harvard), disable 'delete', 'edit' buttons, fetch groupped meeting.
-    deleteLoading: PropTypes.bool,
+    groupName: PropTypes.string,
     meeting: PropTypes.object,
     removeMeeting: PropTypes.func,
     removeMeetingsRecurring: PropTypes.func

@@ -4,7 +4,6 @@
 
 import {
     Button,
-    CircularProgress,
     Grid,
     Typography,
     Box,
@@ -25,7 +24,8 @@ import { getMeetingById, meetingReset } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { formatDurationTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
+import Loader from '../Loader';
 import { ConfirmationDialogRaw } from '../Meetings/Dialog';
 import StyledPaper from '../StyledPaper';
 
@@ -105,13 +105,6 @@ const getRecurrenceDesc = (recurring = {}) => {
 
     return `${intervalPart}${daysOfWeekPart}${daysOfMonthPart}${endDatePart}${occurrencePart}`;
 };
-
-
-const loader = (<Grid
-    container = { true }
-    item = { true }
-    justify = 'center'
-    xs = { 12 }><CircularProgress /></Grid>);
 
 const errorMessage = err => (<Grid
     container = { true }
@@ -216,15 +209,12 @@ function Meeting({
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
-
-    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 
     if (loading) {
-        return loader;
+        return <Loader />;
     }
 
     if (error) {
