@@ -209,7 +209,7 @@ function Meeting({
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
-    const roomsNumbersArr = meeting.multipleRoomsQuantity && getNumberRangeArray(1, meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 

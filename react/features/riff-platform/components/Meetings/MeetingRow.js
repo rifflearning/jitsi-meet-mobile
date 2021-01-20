@@ -95,7 +95,7 @@ const MeetingsRow = ({
         history.push(`${ROUTES.MEETINGS}/${id}`);
     };
 
-    const roomsNumbersArr = meeting.multipleRoomsQuantity && getNumberRangeArray(1, meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
     return (
         <TableRow
