@@ -17,7 +17,7 @@ import MainListItems from './ListItems';
 
 export const drawerWidth = 240;
 
-const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
+const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ADMIN_USER_ID;
 
 const useStyles = makeStyles(theme => {
     return {

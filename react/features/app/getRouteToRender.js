@@ -8,7 +8,7 @@ import { isMobileBrowser } from '../base/environment/utils';
 import { toState } from '../base/redux';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
-import { maybeRedirectToLoginPage, maybeRedirectToWaitingRoom } from '../riff-platform/actions/jitsiActions';
+import { shouldRedirectToRiff } from '../riff-platform/actions/jitsiActions';
 import RiffPlatform from '../riff-platform/components';
 import UnsupportedMobileBrowser from '../riff-platform/components/UnsupportedBrowser';
 import { isRiffPlatformCurrentPath } from '../riff-platform/functions';
@@ -44,44 +44,39 @@ export type Route = {
 export async function _getRouteToRender(stateful: Function | Object): Promise<Route> {
     const state = toState(stateful);
 
-    await maybeRedirectToLoginPage();
-    await maybeRedirectToWaitingRoom();
+    if (await shouldRedirectToRiff()) {
+        const route = {
+            component: RiffPlatform,
+            href: undefined
+        };
+
+        return Promise.resolve(route);
+    }
 
     if (navigator.product === 'ReactNative') {
         return _getMobileRoute(state);
     }
 
-    return _getRiffPlatformRoute(state) || _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
+    return _getRiffPlatformRoute() || _getWebConferenceRoute(state) || _getWebWelcomePageRoute(state);
 }
 
 /**
  * Returns the {@code Route} to display when trying to access a conference if
  * a valid conference is being joined.
  *
- * @param {Object} state - The redux state.
  * @returns {Promise<Route>|undefined}
  */
-function _getRiffPlatformRoute(state): ?Promise<Route> {
-    if (!isRiffPlatformCurrentPath()) {
-        return;
+function _getRiffPlatformRoute(): ?Promise<Route> {
+    if (isRiffPlatformCurrentPath()) {
+        const route = {
+            component: RiffPlatform,
+            href: undefined
+        };
+
+        return Promise.resolve(route);
     }
 
-    const route = {
-        component: RiffPlatform,
-        href: undefined
-    };
-
-    // Update the location if it doesn't match. This happens when a room is
-    // joined from the welcome page. The reason for doing this instead of using
-    // the history API is that we want to load the config.js which takes the
-    // room into account.
-    const { locationURL } = state['features/base/connection'];
-
-    if (window.location.href !== locationURL.href) {
-        route.href = locationURL.href;
-    }
-
-    return Promise.resolve(route);
+    return undefined;
 }
 
 /**
@@ -157,11 +152,7 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
 function _getWebWelcomePageRoute(state): Promise<Route> {
     const route = _getEmptyRoute();
 
-    const redirectToRiffPlatformLobby = true; // maybe externalize this flag
-
-    if (redirectToRiffPlatformLobby) {
-        route.component = RiffPlatform;
-    } else if (isWelcomePageUserEnabled(state)) {
+    if (isWelcomePageUserEnabled(state)) {
         if (isSupportedBrowser()) {
             route.component = WelcomePage;
         } else {
