@@ -24,7 +24,7 @@ import { getMeetingById, meetingReset } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { formatDurationTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
 import Loader from '../Loader';
 import { ConfirmationDialogRaw } from '../Meetings/Dialog';
 import StyledPaper from '../StyledPaper';
@@ -209,10 +209,7 @@ function Meeting({
     const dialogEditValues = [ 'Edit one meeting',
         meeting.recurringParentMeetingId ? 'Edit all recurring meetings' : undefined ];
 
-
-    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity && getNumberRangeArray(1, meeting.multipleRoomsQuantity);
 
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
 

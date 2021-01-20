@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 import { connect } from '../../../base/redux';
 import { deleteMeeting, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { formatDurationTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
 
 import { ConfirmationDialogRaw } from './Dialog';
 
@@ -95,9 +95,7 @@ const MeetingsRow = ({
         history.push(`${ROUTES.MEETINGS}/${id}`);
     };
 
-    const getNumberArr = length => Array.from(Array(length).keys(), n => n + 1);
-
-    const roomsNumbersArr = getNumberArr(meeting.multipleRoomsQuantity);
+    const roomsNumbersArr = meeting.multipleRoomsQuantity && getNumberRangeArray(1, meeting.multipleRoomsQuantity);
 
     return (
         <TableRow
