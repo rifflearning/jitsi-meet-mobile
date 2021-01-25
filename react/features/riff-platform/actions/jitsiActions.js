@@ -1,4 +1,4 @@
-/* global config, APP */
+/* global config, APP, process */
 import ObjectID from 'bson-objectid';
 import { createBrowserHistory } from 'history';
 
@@ -33,6 +33,12 @@ export const navigateWithoutReload = (component, route) => {
  * @returns {boolean}
 */
 export async function shouldRedirectToRiff() {
+    if (process.env.MATTERMOST_EMBEDDED_ONLY === 'true') {
+        setMatterMostUserFromLink();
+
+        return false;
+    }
+
     if (await shouldRedirectToLoginPage()) {
         return true;
     }
@@ -136,6 +142,36 @@ export async function isAnonymousUsersAllowed() {
     previousLocationRoomName.set(window.location.pathname);
 
     return false;
+}
+
+/**
+ * Sets user and meeting data from link for mattermost app.
+ *
+ * @returns {boolean}
+*/
+export async function setMatterMostUserFromLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const userMock = {
+        uid: urlParams.get('uid') || ObjectID.generate(),
+        displayName: urlParams.get('name') || 'No name',
+        email: '',
+        context: urlParams.get('context') || ''
+    };
+    const meetingMock = {
+        _id: ObjectID.generate(),
+        name: urlParams.get('title') || 'No meeting title'
+    };
+
+    APP.store.dispatch({
+        type: actionTypes.LOGIN_SUCCESS,
+        user: userMock
+    });
+    APP.store.dispatch({
+        type: actionTypes.MEETING_SUCCESS,
+        meeting: meetingMock
+    });
+    setLocalDisplayNameAndEmail(userMock);
 }
 
 /**

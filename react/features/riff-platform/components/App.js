@@ -1,3 +1,4 @@
+/* global process */
 /* eslint-disable react/jsx-sort-props */
 /* eslint-disable react/jsx-no-bind */
 
@@ -10,6 +11,7 @@ import { connect } from '../../base/redux';
 
 import Header from './Header';
 import Main from './Main';
+import MeetingEndedPage from './MeetingEndedPage';
 import Sidebar from './Sidebar';
 
 const useStyles = makeStyles(() => {
@@ -31,6 +33,13 @@ const App = ({ user }) => {
     const handleSidebarClose = () => {
         setIsOpen(false);
     };
+
+    if (process.env.MATTERMOST_EMBEDDED_ONLY === 'true') {
+        return (<div className = { classes.root }>
+            <CssBaseline />
+            <MeetingEndedPage />
+        </div>);
+    }
 
     return (
         <div className = { classes.root }>
