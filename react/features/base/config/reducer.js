@@ -18,6 +18,10 @@ import { _cleanupConfig } from './functions';
  * @type {Object}
  */
 const INITIAL_NON_RN_STATE = {
+    localRecording: {
+        enabled: true,
+        format: 'ogg'
+    }
 };
 
 /**

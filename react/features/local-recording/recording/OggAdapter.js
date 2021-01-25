@@ -1,6 +1,7 @@
 import logger from '../logger';
 
 import { RecordingAdapter } from './RecordingAdapter';
+import  {getCombinedStream } from '../../riff-platform/components/Local-Recorder/helpers';
 
 /**
  * Recording adapter that uses {@code MediaRecorder} (default browser encoding
@@ -65,9 +66,12 @@ export class OggAdapter extends RecordingAdapter {
      */
     exportRecordedData() {
         if (this._recordedData !== null) {
+           // console.log('this._recordedData ', this._recordedData);
+
             return Promise.resolve({
                 data: this._recordedData,
-                format: 'ogg'
+               // format: 'ogg'.
+               format: 'webm'
             });
         }
 
@@ -81,6 +85,8 @@ export class OggAdapter extends RecordingAdapter {
      */
     setMuted(muted) {
         const shouldEnable = !muted;
+
+       // console.log('this._stream', this._stream)
 
         if (!this._stream) {
             return Promise.resolve();
@@ -116,9 +122,12 @@ export class OggAdapter extends RecordingAdapter {
 
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
-            .then(stream => {
+            .then(async stream => {
                 this._stream = stream;
-                this._mediaRecorder = new MediaRecorder(stream);
+                const recorderStream = await getCombinedStream(stream);
+
+                 //this._mediaRecorder = new MediaRecorder(stream);
+                this._mediaRecorder = recorderStream;
                 this._mediaRecorder.ondataavailable
                     = e => this._saveMediaData(e.data);
                 resolve();
