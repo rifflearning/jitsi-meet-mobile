@@ -1,6 +1,3 @@
-/* eslint-disable react-native/no-color-literals */
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react/jsx-no-bind */
 /* eslint-disable require-jsdoc */
 import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -12,6 +9,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Dialog } from '../../../base/dialog';
+import {
+    PARTICIPANT_ROLE,
+    getLocalParticipant
+} from '../../../base/participants';
+import { connect } from '../../../base/redux';
+import { recordingController } from '../../../local-recording/controller';
 
 const useStyles = makeStyles(() => {
     return {
@@ -35,8 +38,13 @@ const recordingSteps = [ 'To start recording click on start recording',
 ];
 
 
-export function LocalRecordingDialog(props) {
-    const { onClose, handleStartRecording, open, ...other } = props;
+function LocalRecordingDialog(props) {
+    const { onClose, handleStartRecording, open,
+        isModerator,
+        isEngaged,
+        recordingEngagedAt } = props;
+
+    console.log('isEngaged', isEngaged);
 
     const classes = useStyles();
 
@@ -45,24 +53,42 @@ export function LocalRecordingDialog(props) {
     };
 
     const handleStart = () => {
-        handleStartRecording();
-        onClose();
+        // handleStartRecording();
+        recordingController.startRecording();
+
+        // onClose();
     };
 
+
+    const handleStop = () => {
+        recordingController.stopRecording();
+    };
+
+    const onSubmit = () => {
+        if (!isEngaged) {
+            return handleStart();
+        }
+        handleStop();
+    };
+
+
+    if (!open || !isModerator) {
+        return null;
+    }
+
     return (
-        <>
-            {/* <Dialog
+        <Dialog
             className = { classes.root }
             maxWidth = 'md'
-            okKey = 'Start Recording'
-            onCancel = { handleCancel }
-            onEscapeKeyDown = { handleCancel }
-            onSubmit = { handleStart }
-            open = { open }
-        { ...other }>*/}
-            <Typography >
-                <span style = {{ fontSize: '1.5rem' }}>Local Recording</span>
-            </Typography>
+            okKey = { !isEngaged ? 'Start Recording' : 'Stop Recording' }
+            onSubmit = { onSubmit }
+
+            // onCancel = { handleCancel }
+            cancelKey = { 'dialog.close' }
+
+            // onEscapeKeyDown = { handleCancel }
+            open = { open }>
+            <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
                 <Typography>Follow the below steps to do screen recording:</Typography>
                 <List>
@@ -77,13 +103,30 @@ export function LocalRecordingDialog(props) {
                     ))}
                 </List>
             </DialogContent>
-            {/* </Dialog>*/}
-       </>
+        </Dialog>
     );
 }
 
 LocalRecordingDialog.propTypes = {
 };
 
+const mapStateToProps = state => {
+    const {
+        isEngaged,
+        recordingEngagedAt
+    } = state['features/local-recording'];
+    const isModerator
+        = getLocalParticipant(state).role === PARTICIPANT_ROLE.MODERATOR;
 
-export default LocalRecordingDialog;
+    return {
+        isModerator,
+        isEngaged,
+        recordingEngagedAt
+    };
+};
+const mapDispatchToProps = () => {
+    return { };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(LocalRecordingDialog);

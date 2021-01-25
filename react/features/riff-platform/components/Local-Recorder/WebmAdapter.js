@@ -178,5 +178,15 @@ export default class WebmAdapter extends RecordingAdapter {
         console.log('data', data);
         this._recordedData = data;
     }
+
+    /**
+     * Implements {@link RecordingAdapter#setMicDevice()}.
+     *
+     * @inheritdoc
+     */
+    setMicDevice(micDeviceId) {
+        console.log('chnage micDeviceId', micDeviceId)
+        return this._replaceMic(micDeviceId);
+    }
 }
 

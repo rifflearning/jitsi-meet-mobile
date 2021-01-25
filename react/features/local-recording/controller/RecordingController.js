@@ -345,6 +345,7 @@ class RecordingController {
      * @returns {void}
      */
     setMicDevice(micDeviceId: string) {
+        console.log('micDeviceId', micDeviceId)
         if (micDeviceId !== this._micDeviceId) {
             this._micDeviceId = String(micDeviceId);
 
@@ -611,7 +612,7 @@ class RecordingController {
                     if (this._conference.isModerator()) {
                         this.downloadRecordedData(token);
                     }
-
+//TODO: change messages
                     const messageKey
                         = this._conference.isModerator()
                             ? 'localRecording.messages.finishedModerator'
