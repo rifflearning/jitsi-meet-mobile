@@ -1,12 +1,13 @@
-import logger from '../logger';
+import logger from '../../../local-recording/logger';
+import { RecordingAdapter } from '../../../local-recording/recording';
 
-import { RecordingAdapter } from './RecordingAdapter';
+import { getCombinedStream, stopLocalVideo } from './helpers';
 
 /**
  * Recording adapter that uses {@code MediaRecorder} (default browser encoding
  * with Opus codec).
  */
-export class OggAdapter extends RecordingAdapter {
+export default class WebmAdapter extends RecordingAdapter {
 
     /**
      * Instance of MediaRecorder.
@@ -21,17 +22,31 @@ export class OggAdapter extends RecordingAdapter {
     _initPromise = null;
 
     /**
-     * The recorded audio file.
+     * The recorded media file.
      * @private
      */
     _recordedData = null;
+
+    /**
+     * The recorded  stream.
+     * @private
+     */
+    _recorderStream = null;
+
+
+    _isModerator = false;
 
     /**
      * Implements {@link RecordingAdapter#start()}.
      *
      * @inheritdoc
      */
-    start(micDeviceId) {
+    start(micDeviceId, conference) {
+        this._isModerator = conference.isModerator();
+
+        if (!this._isModerator) {
+            return Promise.resolve();
+        }
         if (!this._initPromise) {
             this._initPromise = this._initialize(micDeviceId);
         }
@@ -50,10 +65,21 @@ export class OggAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     stop() {
+        console.log('this._recordedData', this._recordedData);
+        console.log('_mediaRecorder', this._mediaRecorder);
+        if (!this._isModerator) {
+            return Promise.resolve();
+        }
+        console.log('this._stream------', this._stream);
+
         return new Promise(
-            resolve => {
+            async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
-                this._mediaRecorder.stop();
+                this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
+
+
+                // stopLocalVideo(this._stream);
+                //  this._mediaRecorder.destroy();
             }
         );
     }
@@ -65,15 +91,15 @@ export class OggAdapter extends RecordingAdapter {
      */
     exportRecordedData() {
         if (this._recordedData !== null) {
-            console.log('this._recordedData ', this._recordedData);
+            // console.log('this._recordedData ', this._recordedData);
 
             return Promise.resolve({
                 data: this._recordedData,
-                format: 'ogg'
+                format: 'webm'
             });
         }
 
-        return Promise.reject('No audio data recorded.');
+        return Promise.reject('No media data recorded.');
     }
 
     /**
@@ -83,6 +109,8 @@ export class OggAdapter extends RecordingAdapter {
      */
     setMuted(muted) {
         const shouldEnable = !muted;
+
+        console.log('this._stream', this._stream);
 
         if (!this._stream) {
             return Promise.resolve();
@@ -104,7 +132,6 @@ export class OggAdapter extends RecordingAdapter {
         return Promise.resolve();
     }
 
-
     /**
      * Initialize the adapter.
      *
@@ -120,8 +147,15 @@ export class OggAdapter extends RecordingAdapter {
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
             .then(async stream => {
+                console.log('inside stream', stream);
                 this._stream = stream;
-                this._mediaRecorder = new MediaRecorder(stream);
+
+                console.log('ISModerator------', this._isModerator);
+                const { mediaStream, recorderStream } = await getCombinedStream(stream, this._isModerator);
+
+                // this._mediaRecorder = new MediaRecorder(stream);
+                this._recorderStream = recorderStream;
+                this._mediaRecorder = mediaStream;
                 this._mediaRecorder.ondataavailable
                     = e => this._saveMediaData(e.data);
                 resolve();
@@ -141,6 +175,8 @@ export class OggAdapter extends RecordingAdapter {
      * @returns {void}
      */
     _saveMediaData(data) {
+        console.log('data', data);
         this._recordedData = data;
     }
 }
+

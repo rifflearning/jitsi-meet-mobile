@@ -18,21 +18,25 @@ const streamsMixer = (audioStream, videoStream) => {
 
 };
 
-export const getCombinedStream = async audioStream => {
-    const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
-        audio: false });
+export const getCombinedStream = async (audioStream, isModerator) => {
+    let recorderStream = audioStream;
 
-    const recorderStream = audioStream ? streamsMixer(audioStream, videoStream) : videoStream;
+    if (isModerator) {
+        const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
+            audio: true });
+
+        recorderStream = streamsMixer(audioStream, videoStream);
+    }
 
     // console.log('recorderStream', recorderStream);
 
-    return new MediaRecorder(recorderStream, { mimeType: 'video/webm' });
+    return { mediaStream: new MediaRecorder(recorderStream, { mimeType: 'video/webm' }),
+        recorderStream };
 };
 
-export const stopLocalVideo = async streams => {
-    streams.forEach(async stream => {
-        stream.getTracks().forEach(async track => {
-            track.stop();
-        });
+export const stopLocalVideo = async recorderStream => {
+    console.log('recorderStream', recorderStream);
+    recorderStream.getTracks().forEach(async track => {
+        track.stop();
     });
 };

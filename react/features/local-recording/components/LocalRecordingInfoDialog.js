@@ -11,6 +11,7 @@ import {
     getLocalParticipant
 } from '../../base/participants';
 import { connect } from '../../base/redux';
+import LocalRecordingDialog from '../../riff-platform/components/Local-Recorder/LocalRecordingDialog';
 import { statsUpdate } from '../actions';
 import { recordingController } from '../controller';
 
@@ -162,6 +163,7 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
                             : t('localRecording.no') }
                     </span>
                 </div>
+                <LocalRecordingDialog open = { true } />
                 { this._renderModeratorControls() }
                 { this._renderDurationAndFormat() }
             </Dialog>

@@ -1,6 +1,7 @@
 /* @flow */
 
 import { i18next } from '../../base/i18n';
+import WebmAdapter from '../../riff-platform/components/Local-Recorder/WebmAdapter';
 import logger from '../logger';
 import {
     FlacAdapter,
@@ -44,7 +45,7 @@ const PROPERTY_STATS = 'localRecStats';
 /**
  * Supported recording formats.
  */
-const RECORDING_FORMATS = new Set([ 'flac', 'wav', 'ogg' ]);
+const RECORDING_FORMATS = new Set([ 'flac', 'wav', 'ogg', 'webm' ]);
 
 /**
  * Default recording format.
@@ -566,7 +567,7 @@ class RecordingController {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapters[this._currentSessionToken];
 
-            delegate.start(this._micDeviceId)
+            delegate.start(this._micDeviceId, this._conference)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
@@ -607,7 +608,9 @@ class RecordingController {
                     this._changeState(ControllerState.IDLE);
                     sessionManager.endSegment(this._currentSessionToken);
                     logger.log('Local recording unengaged.');
-                    this.downloadRecordedData(token);
+                    if (this._conference.isModerator()) {
+                        this.downloadRecordedData(token);
+                    }
 
                     const messageKey
                         = this._conference.isModerator()
@@ -673,6 +676,8 @@ class RecordingController {
             return new FlacAdapter();
         case 'wav':
             return new WavAdapter();
+        case 'webm':
+            return new WebmAdapter();
         default:
             throw new Error(`Unknown format: ${this._format}`);
         }

@@ -20,7 +20,8 @@ import { _cleanupConfig } from './functions';
 const INITIAL_NON_RN_STATE = {
     localRecording: {
         enabled: true,
-        format: 'ogg'
+        //video format 
+        format: 'webm'
     }
 };
 
