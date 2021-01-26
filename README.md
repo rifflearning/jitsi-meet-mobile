@@ -12,43 +12,48 @@ make dev
 
 ---
 ## Development with Riff features:
-### Run client:
-1. Clone repository, checkout to `develop` or `integration-riff-platform` branch and install dependencies:
-    ```
-    git clone https://github.com/rifflearning/jitsi-meet.git
-    git checkout integration-riff-platform
-    npm install
-    ```
-2. Create `.env` file in root dir (*ask colleagues for the `.env`*):
-    ```
-    ### Uncomment variables for specific instance deployment:
 
-    ## Deployment to rif-poc instance:
-    API_GATEWAY=/api-gateway
-    RIFF_SERVER_URL=/
-    NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
-    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-    AWS_NAME=ubuntu@riff-poc.riffplatform.com
+Clone repository, checkout to `develop` or `integration-riff-platform` branch and install dependencies:
 
-    ## Deployment to hls-negotiations instance:
-    # API_GATEWAY=/api-gateway
-    # RIFF_SERVER_URL=/
-    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
-    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-    # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+```
+git clone https://github.com/rifflearning/jitsi-meet.git
+git checkout integration-riff-platform
+npm install
+```
 
-    ## Deployment to mattermost instance:
-    # API_GATEWAY=
-    # RIFF_SERVER_URL=/
-    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=
-    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-    # AWS_NAME=ubuntu@meet.staging.riffedu.com
-    # MATTERMOST_EMBEDDED_ONLY=true
-    ```
-3. Run dev server:
-    ```
-    make dev
-    ```
+Create `.env` file in root dir (*ask colleagues for the `.env`*):
+
+```
+### Uncomment variables for specific instance deployment:
+
+## Deployment to rif-poc instance:
+API_GATEWAY=/api-gateway
+RIFF_SERVER_URL=/
+NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
+PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+AWS_NAME=ubuntu@riff-poc.riffplatform.com
+
+## Deployment to hls-negotiations instance:
+# API_GATEWAY=/api-gateway
+# RIFF_SERVER_URL=/
+# NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
+# PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+# AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+
+## Deployment to mattermost instance:
+# API_GATEWAY=
+# RIFF_SERVER_URL=/
+# NEGOTIATIONS_GROUP_ADMIN_USER_ID=
+# PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+# AWS_NAME=ubuntu@meet.staging.riffedu.com
+# MATTERMOST_EMBEDDED_ONLY=true
+```
+
+Run dev server:
+
+```
+make dev
+```
 ---
 ## Customization and deployment to AWS
 In order to customize *jitsi-meet* with riff theme, all features and set up a new enviroment please follow next steps:
