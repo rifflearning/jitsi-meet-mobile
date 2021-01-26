@@ -1,260 +1,165 @@
 <p align="center"><img align="center" src="images/jitsilogo.png" /></p>
 
-
 # Jitsi Meet
-
 ## Development:
 Running with webpack-dev-server for development:
 ```
 clone https://github.com/rifflearning/jitsi-meet.git
-git checkout develop
 npm install
 make dev
 ```
-Also see official guide here [here](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-web).
+*Also see official guide here [here](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-web)*.
 
-## Customization and deployment to AWS
-In order to customize **jitsi-meet** with riff theme, all features and set up a new enviroment please follow next steps:
-
-1. Install Jitsi-Meet to **AWS** following the [installation guide](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart).
-
-2. On your local dev machine clone _*rifflearning/jitsi-meet*_ (branch) *develop* branch:
+---
+## Development with Riff features:
+### Run client:
+1. Clone repository, checkout to `develop` or `integration-riff-platform` branch and install dependencies:
     ```
     git clone https://github.com/rifflearning/jitsi-meet.git
-    git checkout develop
-    git pull develop
     git checkout integration-riff-platform
-    git pull integration-riff-platform
     npm install
     ```
-    Add enviroment variables `.env` file (*ask colleagues for the config file*) with appropriate variables for deployment:
+2. Create `.env` file in root dir (*ask colleagues for the `.env`*):
     ```
-    ### Firebase for riff login
-    API_KEY=example_value
-    AUTH_DOMAIN=example_value
-    DATABASE_URL=example_value
-    PROJECT_ID=example_value
-    STORAGE_BUCKET=example_value
-    MESSAGING_SENDER_ID=example_value
+    ### Uncomment variables for specific instance deployment:
 
-    ### AWS deployment
-    # Path to key.pem for aws deployment:
-    PEM_PATH=~/example/path/to/key.pem
+    ## Deployment to rif-poc instance:
+    API_GATEWAY=/api-gateway
+    RIFF_SERVER_URL=/
+    NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
+    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    AWS_NAME=ubuntu@riff-poc.riffplatform.com
 
-    # Aws instance name for deployment:
-    AWS_NAME=example_aws_name@0.0.0.0
+    ## Deployment to hls-negotiations instance:
+    # API_GATEWAY=/api-gateway
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
 
-    # Riff-server url for sibilant:
-    RIFF_SERVER_URL=https://example-riff-server.com
+    ## Deployment to mattermost instance:
+    # API_GATEWAY=
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@meet.staging.riffedu.com
+    # MATTERMOST_EMBEDDED_ONLY=true
+    ```
+3. Run dev server:
+    ```
+    make dev
+    ```
+---
+## Customization and deployment to AWS
+In order to customize *jitsi-meet* with riff theme, all features and set up a new enviroment please follow next steps:
+
+1. Install Jitsi-Meet to aws with [official guide](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart).
+
+2. Deploy *develop* or *integration-riff-platform* branch to the instance:
+    ```
+    git clone https://github.com/rifflearning/jitsi-meet.git
+    git checkout integration-riff-platform
+    npm install
+    ```
+    Add appropriate variables `.env` for deployment and put `.pem` file to `~/.ssh/riffdev_1_useast2_key.pem` (*ask colleagues for the `.env` and `.pem` files*):
+    ```
+    ### Uncomment variables for specific instance deployment:
+
+    ## Deployment to rif-poc instance:
+    API_GATEWAY=/api-gateway
+    RIFF_SERVER_URL=/
+    NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
+    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    AWS_NAME=ubuntu@riff-poc.riffplatform.com
+
+    ## Deployment to hls-negotiations instance:
+    # API_GATEWAY=/api-gateway
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+
+    ## Deployment to mattermost instance:
+    # API_GATEWAY=
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@meet.staging.riffedu.com
+    # MATTERMOST_EMBEDDED_ONLY=true
     ```
     Build and deploy with:
     ```
-    ./deploy-aws.sh
+    make deploy-aws
     ```
+3. Deploy and run [api-gateway](https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway) on aws instance.
+4. Add nginx configs to `/etc/nginx/sites-available/riff-poc.riffplatform.com.conf`:
 
-## Add emotional intelligence detection (optional)
-Open **http port 4455** on aws for connecting facial recognition server to nodejs-emotions server over the `http`.
-
-### Install nodejs-emotions server
-- download [nodejs-emotions.zip socket.io server](https://github.com/rifflearning/nodejs-emotions/archive/main.zip)
-
-- copy from local machine to aws instance:
+    Add to the top of the file:
     ```
-    scp -i ~/path_to/key.pem ~/path_to/nodejs-emotions.zip example-aws-name@0.0.0.0:/home/ubuntu
-    ```
-- connect to aws instance via `ssh` using `key.pem` and run nodejs-emotions:
-    ```
-    ssh -i ~/example_path_to/key.pem example_aws_name@0.0.0.0
-
-    # install nodejs and unzip:
-    sudo apt-get update
-    sudo apt-get install nodejs
-    sudo apt-get install unzip
-
-    # unzip:
-    unzip nodejs-emotions.zip
-    rm nodejs-emotions.zip
-
-    # run nodejs-emotions in background:
-    cd nodejs-emotions
-    npm i
-    node index.js &
-    ```
-    You can check if app is running:
-    ```
-    sudo netstat -nlp | grep :4455
-    ```
-### Add nginx config to redirect socket.io to nodejs-emotions server
-- find this part in the nginx config `/etc/nginx/sites-available/[domain].conf` on aws:
-    ```
-    #ensure all static content can always be found first
-    location ~ ^/(libs|css|static|images|fonts|lang|sounds|connection_optimization|.well-known)/(.*)$
+    map $http_upgrade $connection_upgrade
     {
-        add_header 'Access-Control-Allow-Origin' '*';
-        alias /usr/share/jitsi-meet/$1/$2;
-
-        # cache all versioned files
-        if ($arg_v) {
-          expires 1y;
-        }
+        default upgrade;
+        '' close;
     }
     ```
-    After that paste config for nodejs-emotions:
-
+    Insert after `gzip_min_length 512;`:
     ```
-    # config for socket.io for nodejs-emotions server
-    location ^~ /emotions-server/ {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-NginX-Proxy false;
+    
+    # blocks iOS native client
+    if ($http_user_agent ~* "^jitsi-meet\/101*") {
+        return   403;
+    }
 
-        proxy_pass http://localhost:4455/emotions-server/;
-        proxy_redirect off;
-
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+    # blocks android native client
+    if ($http_user_agent ~* "^okhttp\/*") {
+        return   403;
     }
     ```
-    Add nginx to api-gateway redirects to allow tunneling rest calls through nginx to api-gateway
+    Insert after `# BOSH location = /http-bind { ... }`:
+    
+    (*you may need to set up a new riff-data server instance*)
     ```
     # config for api-gateway for Riff-Jitsi-Platform
     location ^~ /api-gateway/ {
         proxy_pass https://localhost:4445/api/;
     }
-    ```
-    
-    and restart nginx:
-    ```
-    sudo systemctl restart nginx
-    ```
-### Add EMOTIONS_SERVER_URL url to the `.env` file
-```
-### Firebase for riff login
-API_KEY=example_value
-AUTH_DOMAIN=example_value
-DATABASE_URL=example_value
-PROJECT_ID=example_value
-STORAGE_BUCKET=example_value
-MESSAGING_SENDER_ID=example_value
 
-### AWS deployment
-# Path to key.pem for aws deployment:
-PEM_PATH=~/example/path/to/key.pem
+    # config for riff-data server:
+    location ^~ /api/videodata/socket.io/ {
+        proxy_pass http://172.31.6.19:3000/socket.io/;
 
-# Aws instance name for deployment:
-AWS_NAME=example_aws_name@0.0.0.0
-
-# Riff-server url for sibilant:
-RIFF_SERVER_URL=https://example-riff-server.com
-
-# Emotions-server url for emotion-intelligence:
-EMOTIONS_SERVER_URL=/
-```
-> **Warning:** *Don't forget to remove `EMOTIONS_SERVER_URL` in `.env` file when deploying to other aws instance without running nodejs-emotions server.*
-
-Now we have running nodejs-emotions server and nginx config, and .env file confugured so you can deploy the app:
-```
-make deploy-aws
-```
----
-## Add logs for browser usage
-You can run nodejs-browser-stats server on aws and pipe it to the `.log` file to see stats on every disconnect. You will be able to see:
-- browser name and version;
-- user info: id, firebaseId, name, email;
-- network stats: after 30 sec, every 5 minutes, onHangup.
-
-### Install nodejs-browser-stats server
-- download [nodejs-browser-stats.zip socket.io server](https://github.com/rifflearning/nodejs-browser-stats/archive/main.zip)
-
-- copy from local machine to aws instance:
-    ```
-    scp -i ~/path_to/key.pem ~/path_to/nodejs-browser-stats.zip example-aws-name@0.0.0.0:/home/ubuntu
-    ```
-- connect to aws instance via `ssh` using `key.pem` and run nodejs-browser-stats:
-    ```
-    ssh -i ~/example_path_to/key.pem example_aws_name@0.0.0.0
-
-    # unzip:
-    unzip nodejs-browser-stats.zip
-    rm nodejs-browser-stats.zip
-
-    # run nodejs-browser-stats in background and pipe it to `.log` file:
-    cd nodejs-browser-stats
-    npm i
-    node index.js >> browser-logs.log &
-    ```
-    you can check if app is running:
-    ```
-    sudo netstat -nlp | grep :4454
-    ```
-### Add nginx config to redirect socket.io to nodejs-browser-stats server
-- find this part in the nginx config `/etc/nginx/sites-available/[domain].conf`:
-    ```
-    #ensure all static content can always be found first
-    location ~ ^/(libs|css|static|images|fonts|lang|sounds|connection_optimization|.well-known)/(.*)$
-    {
-        add_header 'Access-Control-Allow-Origin' '*';
-        alias /usr/share/jitsi-meet/$1/$2;
-
-        # cache all versioned files
-        if ($arg_v) {
-          expires 1y;
-        }
-    }
-    ```
-    After that paste config for nodejs-browser-stats:
-
-    ```
-    # config for socket.io for nodejs-browser-stats
-    location ^~ /api/nodejs-browser-stats/ {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-NginX-Proxy false;
-
-        proxy_pass http://localhost:4454/;
-        proxy_redirect off;
-
+        # proxy_websocket_params
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+        proxy_set_header Connection $connection_upgrade;
+        proxy_cache_bypass $http_upgrade;
+
+        # cors_params
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified>
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
     }
+
     ```
-    and restart nginx:
+5. Change flags in aws instance file `/etc/jitsi/meet/[host]-config.js`:
     ```
-    sudo systemctl restart nginx
+    prejoinPageEnabled: true,
+    p2p:{
+        enabled: false
+    }
+    disableDeepLinking: true,
     ```
-### Add EMOTIONS_SERVER_URL to `.env` file:
-```
-### Firebase for riff login
-API_KEY=example_value
-AUTH_DOMAIN=example_value
-DATABASE_URL=example_value
-PROJECT_ID=example_value
-STORAGE_BUCKET=example_value
-MESSAGING_SENDER_ID=example_value
+    Also optional flags:
+    ```
+    disableSimulcast: true,
 
-### AWS deployment
-# Path to key.pem for aws deployment:
-PEM_PATH=~/example/path/to/key.pem
+    // in case meetings recording by jibri is needed
+    fileRecordingsEnabled: true, 
 
-# Aws instance name for deployment:
-AWS_NAME=example_aws_name@0.0.0.0
+    // depends on videobridge configuration
+    openBridgeChannel: 'websocket',
 
-# Riff-server url for sibilant:
-RIFF_SERVER_URL=https://example-riff-server.com
-
-# Emotions-server url for emotion-intelligence:
-# EMOTIONS_SERVER_URL=/
-
-# Browser-stats server url for logging browser usage:
-BROWSER_STATS_SERVER_URL=/
-```
-> **Warning:** *Don't forget to remove `BROWSER_STATS_SERVER_URL` in `.env` file when deploying to other aws instance without running nodejs-browser-stats server.*
-
-Now we have running nodejs-browser-stats server and nginx config, and .env file confugured so you can deploy the app:
-```
-make deploy-aws
-```
+    // in case we want jibri, but value itself different for every domain
+    hiddenDomain: 'recorder.example-domain.com',
+    ```
