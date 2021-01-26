@@ -21,17 +21,12 @@ make dev
     ```
     ### Uncomment variables for specific instance deployment:
 
-    ## development mode with webpack:
-    API_GATEWAY=https://localhost:4445/api
-    RIFF_SERVER_URL=https://riff-poc.riffplatform.com
-    NEGOTIATIONS_GROUP_ADMIN_USER_ID=5fbc1698db819207288110d2
-
     ## Deployment to rif-poc instance:
-    # API_GATEWAY=/api-gateway
-    # RIFF_SERVER_URL=/
-    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
-    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-    # AWS_NAME=ubuntu@riff-poc.riffplatform.com
+    API_GATEWAY=/api-gateway
+    RIFF_SERVER_URL=/
+    NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
+    PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    AWS_NAME=ubuntu@riff-poc.riffplatform.com
 
     ## Deployment to hls-negotiations instance:
     # API_GATEWAY=/api-gateway
@@ -39,13 +34,19 @@ make dev
     # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
     # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
     # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+
+    ## Deployment to mattermost instance:
+    # API_GATEWAY=
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@meet.staging.riffedu.com
+    # MATTERMOST_EMBEDDED_ONLY=true
     ```
 3. Run dev server:
     ```
     make dev
     ```
-4. Run api-gateway and mongo locally:
-https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway
 ---
 ## Customization and deployment to AWS
 In order to customize *jitsi-meet* with riff theme, all features and set up a new enviroment please follow next steps:
@@ -62,11 +63,6 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     ```
     ### Uncomment variables for specific instance deployment:
 
-    ## development mode with webpack:
-    # API_GATEWAY=https://localhost:4445/api
-    # RIFF_SERVER_URL=https://riff-poc.riffplatform.com
-    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5fbc1698db819207288110d2
-
     ## Deployment to rif-poc instance:
     API_GATEWAY=/api-gateway
     RIFF_SERVER_URL=/
@@ -80,13 +76,30 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     # NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
     # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
     # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+
+    ## Deployment to mattermost instance:
+    # API_GATEWAY=
+    # RIFF_SERVER_URL=/
+    # NEGOTIATIONS_GROUP_ADMIN_USER_ID=
+    # PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+    # AWS_NAME=ubuntu@meet.staging.riffedu.com
+    # MATTERMOST_EMBEDDED_ONLY=true
     ```
     Build and deploy with:
     ```
     make deploy-aws
     ```
-3. Deploy and run [api-gateway](https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway) to aws instance.
+3. Deploy and run [api-gateway](https://github.com/rifflearning/riff-jitsi-platform/tree/main/api-gateway) on aws instance.
 4. Add nginx configs to `/etc/nginx/sites-available/riff-poc.riffplatform.com.conf`:
+
+    Add to the top of the file:
+    ```
+    map $http_upgrade $connection_upgrade
+    {
+        default upgrade;
+        '' close;
+    }
+    ```
     Insert after `gzip_min_length 512;`:
     ```
     
