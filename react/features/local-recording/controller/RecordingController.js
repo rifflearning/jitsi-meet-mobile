@@ -345,7 +345,6 @@ class RecordingController {
      * @returns {void}
      */
     setMicDevice(micDeviceId: string) {
-        console.log('micDeviceId', micDeviceId)
         if (micDeviceId !== this._micDeviceId) {
             this._micDeviceId = String(micDeviceId);
 

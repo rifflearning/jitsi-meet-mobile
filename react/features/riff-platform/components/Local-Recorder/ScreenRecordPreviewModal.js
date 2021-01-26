@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 import React from 'react';
-import { Modal, ModalBody, ModalHeader, Button } from 'reactstrap';
+//import { Modal, ModalBody, ModalHeader, Button } from 'reactstrap';
 import RecordRTC from 'recordrtc';
 
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

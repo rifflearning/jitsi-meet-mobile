@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable require-jsdoc */
 import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -78,13 +79,14 @@ function LocalRecordingDialog(props) {
 
     return (
         <Dialog
+            cancelKey = { 'dialog.close' }
             className = { classes.root }
             maxWidth = 'md'
+            // eslint-disable-next-line no-negated-condition
             okKey = { !isEngaged ? 'Start Recording' : 'Stop Recording' }
             onSubmit = { onSubmit }
 
             // onCancel = { handleCancel }
-            cancelKey = { 'dialog.close' }
 
             // onEscapeKeyDown = { handleCancel }
             open = { open }>

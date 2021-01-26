@@ -65,17 +65,15 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     stop() {
-        console.log('this._recordedData', this._recordedData);
-        console.log('_mediaRecorder', this._mediaRecorder);
         if (!this._isModerator) {
             return Promise.resolve();
         }
-        console.log('this._stream------', this._stream);
 
         return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
+                //this._mediaRecorder.getVideoTracks()[0].onended = () => resolve();
 
 
                 // stopLocalVideo(this._stream);
@@ -159,6 +157,11 @@ export default class WebmAdapter extends RecordingAdapter {
                 this._mediaRecorder.ondataavailable
                     = e => this._saveMediaData(e.data);
                 resolve();
+
+                this._mediaRecorder.onended = e => {
+                    console.log('Capture stream inactive');
+                    stop();
+                };
             })
             .catch(err => {
                 logger.error(`Error calling getUserMedia(): ${err}`);

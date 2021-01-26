@@ -1,3 +1,31 @@
+const addStreamStopListener = (stream, callback) => {
+    stream.addEventListener('ended', () => {
+        callback();
+
+        // callback = () => { };
+    }, false);
+    stream.addEventListener('inactive', () => {
+        callback();
+
+        // callback = () => { };
+    }, false);
+    stream.getTracks().forEach(track => {
+        track.addEventListener('ended', () => {
+            callback();
+
+            //  callback = () => { };
+        }, false);
+        track.addEventListener('inactive', () => {
+            callback();
+
+            // callback = () => { };
+        }, false);
+    });
+    stream.getVideoTracks()[0].onended = () => {
+        stop();
+    };
+};
+
 const streamsMixer = (audioStream, videoStream) => {
     const ctx = new AudioContext();
     const dest = ctx.createMediaStreamDestination();
@@ -18,14 +46,33 @@ const streamsMixer = (audioStream, videoStream) => {
 
 };
 
+const invokeGetDisplayMedia = (success, error) => {
+    const displaymediastreamconstraints = {
+        video: { displaySurface: 'browser' },
+        audio: true
+    };
+
+    if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices.getDisplayMedia(displaymediastreamconstraints).then(success)
+  .catch(error);
+    } else {
+        navigator.getDisplayMedia(displaymediastreamconstraints).then(success)
+  .catch(error);
+    }
+};
+
 export const getCombinedStream = async (audioStream, isModerator) => {
-    let recorderStream = audioStream;
+    const auSteam = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false
+    });
+    let recorderStream = auSteam;
 
     if (isModerator) {
         const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
             audio: true });
 
-        recorderStream = streamsMixer(audioStream, videoStream);
+        recorderStream = streamsMixer(auSteam, videoStream);
     }
 
     // console.log('recorderStream', recorderStream);
