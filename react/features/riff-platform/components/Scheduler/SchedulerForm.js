@@ -27,10 +27,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import 'moment-recur';
 import { useHistory } from 'react-router';
-import { useParams } from 'react-router-dom';
 
 import { connect } from '../../../base/redux';
-import { getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
@@ -38,7 +36,6 @@ import { schedule,
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
 import { getNumberRangeArray } from '../../functions';
-import Loader from '../Loader';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -84,12 +81,6 @@ const MenuProps = {
         }
     }
 };
-
-const errorMessage = err => (<Grid
-    container = { true }
-    item = { true }
-    justify = 'center'
-    xs = { 12 }><Typography color = 'error'>{err}</Typography></Grid>);
 
 const hoursArray = getNumberRangeArray(0, 9);
 const minutesArray = getNumberRangeArray(0, 45, 15);
@@ -268,10 +259,7 @@ const SchedulerForm = ({
     error,
     scheduleMeeting,
     isEditing,
-    fetchMeetingById,
     meeting,
-    meetingError,
-    meetingLoading,
     updateScheduleMeetingsRecurring,
     updateScheduleMeeting,
     updateScheduleMeetingRecurringSingleOccurrence,
@@ -321,7 +309,6 @@ const SchedulerForm = ({
 
     const [ changesMadeByUserActions, setChangesMadeByUserActions ] = useState(false);
 
-    const { meetingId } = useParams();
     const history = useHistory();
 
     const defineEditMode = () => {
@@ -332,12 +319,6 @@ const SchedulerForm = ({
 
     const isEditAllMeetingsRecurring = defineEditMode() === 'all';
     const isEditOneOccurrence = defineEditMode() === 'one';
-
-    useEffect(() => {
-        if (isEditing) {
-            fetchMeetingById(meetingId);
-        }
-    }, [ meetingId ]);
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -664,14 +645,6 @@ const SchedulerForm = ({
                 : moment()
             : moment();
     };
-
-    if (meetingError) {
-        return errorMessage(meetingError);
-    }
-
-    if (meetingLoading) {
-        return <Loader />;
-    }
 
     return (
         <form
@@ -1245,13 +1218,10 @@ const SchedulerForm = ({
 SchedulerForm.propTypes = {
     doLogout: PropTypes.func,
     error: PropTypes.string,
-    fetchMeetingById: PropTypes.func,
     isAnon: PropTypes.bool,
     isEditing: PropTypes.bool,
     loading: PropTypes.bool,
     meeting: PropTypes.any,
-    meetingError: PropTypes.string,
-    meetingLoading: PropTypes.bool,
     scheduleMeeting: PropTypes.func,
     updateError: PropTypes.string,
     updateLoading: PropTypes.bool,
@@ -1267,11 +1237,8 @@ const mapStateToProps = state => {
         isAnon: Boolean(state['features/riff-platform'].signIn.user?.isAnon),
         loading: state['features/riff-platform'].scheduler.loading,
         error: state['features/riff-platform'].scheduler.error,
-        meeting: state['features/riff-platform'].meeting.meeting,
         updateError: state['features/riff-platform'].scheduler.updateError,
-        updateLoading: state['features/riff-platform'].scheduler.updateLoading,
-        meetingError: state['features/riff-platform'].meeting.error,
-        meetingLoading: state['features/riff-platform'].meeting.loading
+        updateLoading: state['features/riff-platform'].scheduler.updateLoading
     };
 };
 
@@ -1279,7 +1246,6 @@ const mapDispatchToProps = dispatch => {
     return {
         doLogout: () => dispatch(logout()),
         scheduleMeeting: (meeting, history) => dispatch(schedule(meeting, history)),
-        fetchMeetingById: id => dispatch(getMeetingById(id)),
         updateScheduleMeeting: (id, meeting, history) => dispatch(updateSchedule(id, meeting, history)),
         updateScheduleMeetingsRecurring: (roomId, meeting, history) =>
             dispatch(updateScheduleRecurring(roomId, meeting, history)),

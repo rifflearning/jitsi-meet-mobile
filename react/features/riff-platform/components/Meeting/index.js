@@ -136,13 +136,13 @@ function Meeting({
     const [ isOpenDeleteDialog, setisOpenDeleteDialog ] = useState(false);
     const [ isOpenEditDialog, setIsOpenEditDialog ] = useState(false);
 
+    useEffect(() => () => resetMeeting(), []);
+
     useEffect(() => {
         if (meetingId) {
             fetchMeeting(meetingId);
         }
     }, [ meetingId ]);
-
-    useEffect(() => () => resetMeeting(), []);
 
     const handleLinkCopy = () => {
         const id = meeting.multipleRoomsQuantity
