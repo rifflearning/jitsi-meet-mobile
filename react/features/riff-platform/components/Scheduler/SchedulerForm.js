@@ -29,7 +29,6 @@ import 'moment-recur';
 import { useHistory } from 'react-router';
 
 import { connect } from '../../../base/redux';
-import { getMeetingById } from '../../actions/meeting';
 import { schedule,
     updateSchedule,
     updateScheduleRecurring,
