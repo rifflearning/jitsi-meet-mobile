@@ -69,8 +69,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
 
         const { conference } = getState()['features/base/conference'];
+        const participantsStream = getState()['features/base/tracks'];
 
-        recordingController.registerEvents(conference);
+        recordingController.registerEvents(conference, participantsStream);
 
         break;
     }

@@ -34,19 +34,22 @@ export default class WebmAdapter extends RecordingAdapter {
     _recorderStream = null;
 
 
-    _isModerator = false;
+   // _isModerator = false;
+
+   _participatsStream = [];
 
     /**
      * Implements {@link RecordingAdapter#start()}.
      *
      * @inheritdoc
      */
-    start(micDeviceId, conference) {
-        this._isModerator = conference.isModerator();
-
-        if (!this._isModerator) {
-            return Promise.resolve();
-        }
+    start(micDeviceId, participatsStream) {
+        //this._isModerator = conference.isModerator();
+this._participatsStream = participatsStream;
+console.log('participantStreams', this._participatsStream)
+       // if (!this._isModerator) {
+            //return Promise.resolve();
+     //   }
         if (!this._initPromise) {
             this._initPromise = this._initialize(micDeviceId);
         }
@@ -65,9 +68,9 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     stop() {
-        if (!this._isModerator) {
-            return Promise.resolve();
-        }
+       // if (!this._isModerator) {
+         //   return Promise.resolve();
+        ///}
 
         return new Promise(
             async resolve => {
@@ -148,8 +151,8 @@ export default class WebmAdapter extends RecordingAdapter {
                 console.log('inside stream', stream);
                 this._stream = stream;
 
-                console.log('ISModerator------', this._isModerator);
-                const { mediaStream, recorderStream } = await getCombinedStream(stream, this._isModerator);
+                //console.log('ISModerator------', this._isModerator);
+               const { mediaStream, recorderStream } = await getCombinedStream(stream, this._participatsStream);
 
                 // this._mediaRecorder = new MediaRecorder(stream);
                 this._recorderStream = recorderStream;
@@ -188,7 +191,7 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     setMicDevice(micDeviceId) {
-        console.log('chnage micDeviceId', micDeviceId)
+       // console.log('chnage micDeviceId', micDeviceId)
         return this._replaceMic(micDeviceId);
     }
 }

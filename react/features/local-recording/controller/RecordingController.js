@@ -178,6 +178,8 @@ class RecordingController {
      */
     _registered = false;
 
+    _participatsStream = [];
+
     /**
      * FIXME: callback function for the {@code RecordingController} to notify
      * UI it wants to display a notice. Keeps {@code RecordingController}
@@ -223,9 +225,10 @@ class RecordingController {
      * @param {JitsiConference} conference - A {@code JitsiConference} instance.
      * @returns {void}
      */
-    registerEvents(conference: Object) {
+    registerEvents(conference: Object, participatsStream) {
         if (!this._registered) {
             this._conference = conference;
+            this.__participatsStream = participatsStream;
             if (this._conference) {
                 this._conference
                     .addCommandListener(COMMAND_STOP, this._onStopCommand);
@@ -566,8 +569,9 @@ class RecordingController {
     _doStartRecording() {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapters[this._currentSessionToken];
+            console.log('this.__participatsStream', this.__participatsStream)
 
-            delegate.start(this._micDeviceId, this._conference)
+            delegate.start(this._micDeviceId, this.__participatsStream)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
