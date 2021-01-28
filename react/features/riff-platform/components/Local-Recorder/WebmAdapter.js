@@ -34,125 +34,127 @@ export default class WebmAdapter extends RecordingAdapter {
     _recorderStream = null;
 
 
-   // _isModerator = false;
+    // _isModerator = false;
 
    _participatsStream = [];
 
-    /**
+   /**
      * Implements {@link RecordingAdapter#start()}.
      *
      * @inheritdoc
      */
-    start(micDeviceId, participatsStream) {
-        //this._isModerator = conference.isModerator();
-this._participatsStream = participatsStream;
-console.log('participantStreams', this._participatsStream)
+   start(micDeviceId, participatsStream) {
+       // this._isModerator = conference.isModerator();
+       this._participatsStream = participatsStream;
+       console.log('participantStreams', this._participatsStream);
+
        // if (!this._isModerator) {
-            //return Promise.resolve();
-     //   }
-        if (!this._initPromise) {
-            this._initPromise = this._initialize(micDeviceId);
-        }
+       // return Promise.resolve();
+       //   }
+       if (!this._initPromise) {
+           this._initPromise = this._initialize(micDeviceId);
+       }
 
-        return this._initPromise.then(() =>
-            new Promise(resolve => {
-                this._mediaRecorder.start();
-                resolve();
-            })
-        );
-    }
+       return this._initPromise.then(() =>
+           new Promise(resolve => {
+               this._mediaRecorder.start();
+               resolve();
+           })
+       );
+   }
 
-    /**
+   /**
      * Implements {@link RecordingAdapter#stop()}.
      *
      * @inheritdoc
      */
-    stop() {
+   stop() {
        // if (!this._isModerator) {
-         //   return Promise.resolve();
-        ///}
+       //   return Promise.resolve();
+       // /}
 
-        return new Promise(
+       return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
-                //this._mediaRecorder.getVideoTracks()[0].onended = () => resolve();
+
+                // this._mediaRecorder.getVideoTracks()[0].onended = () => resolve();
 
 
                 // stopLocalVideo(this._stream);
                 //  this._mediaRecorder.destroy();
             }
-        );
-    }
+       );
+   }
 
-    /**
+   /**
      * Implements {@link RecordingAdapter#exportRecordedData()}.
      *
      * @inheritdoc
      */
-    exportRecordedData() {
-        if (this._recordedData !== null) {
-            // console.log('this._recordedData ', this._recordedData);
+   exportRecordedData() {
+       if (this._recordedData !== null) {
+           // console.log('this._recordedData ', this._recordedData);
 
-            return Promise.resolve({
-                data: this._recordedData,
-                format: 'webm'
-            });
-        }
+           return Promise.resolve({
+               data: this._recordedData,
+               format: 'webm'
+           });
+       }
 
-        return Promise.reject('No media data recorded.');
-    }
+       return Promise.reject('No media data recorded.');
+   }
 
-    /**
+   /**
      * Implements {@link RecordingAdapter#setMuted()}.
      *
      * @inheritdoc
      */
-    setMuted(muted) {
-        const shouldEnable = !muted;
+   setMuted(muted) {
+       const shouldEnable = !muted;
 
-        console.log('this._stream', this._stream);
+       console.log('this._stream', this._stream);
 
-        if (!this._stream) {
-            return Promise.resolve();
-        }
+       if (!this._stream) {
+           return Promise.resolve();
+       }
 
-        const track = this._stream.getAudioTracks()[0];
+       const track = this._stream.getAudioTracks()[0];
 
-        if (!track) {
-            logger.error('Cannot mute/unmute. Track not found!');
+       if (!track) {
+           logger.error('Cannot mute/unmute. Track not found!');
 
-            return Promise.resolve();
-        }
+           return Promise.resolve();
+       }
 
-        if (track.enabled !== shouldEnable) {
-            track.enabled = shouldEnable;
-            logger.log(muted ? 'Mute' : 'Unmute');
-        }
+       if (track.enabled !== shouldEnable) {
+           track.enabled = shouldEnable;
+           logger.log(muted ? 'Mute' : 'Unmute');
+       }
 
-        return Promise.resolve();
-    }
+       return Promise.resolve();
+   }
 
-    /**
+   /**
      * Initialize the adapter.
      *
      * @private
      * @param {string} micDeviceId - The current microphone device ID.
      * @returns {Promise}
      */
-    _initialize(micDeviceId) {
-        if (this._mediaRecorder) {
-            return Promise.resolve();
-        }
+   _initialize(micDeviceId) {
+       if (this._mediaRecorder) {
+           return Promise.resolve();
+       }
 
-        return new Promise((resolve, error) => {
-            this._getAudioStream(micDeviceId)
+       return new Promise((resolve, error) => {
+           this._getAudioStream(micDeviceId)
             .then(async stream => {
-                console.log('inside stream', stream);
-                this._stream = stream;
+                 console.log('inside stream', stream);
+                  this._stream = stream;
 
-                //console.log('ISModerator------', this._isModerator);
-               const { mediaStream, recorderStream } = await getCombinedStream(stream, this._participatsStream);
+                // console.log('ISModerator------', this._isModerator);
+                const { mediaStream, recorderStream } = await getCombinedStream(stream ,this._participatsStream);
 
                 // this._mediaRecorder = new MediaRecorder(stream);
                 this._recorderStream = recorderStream;
@@ -170,29 +172,29 @@ console.log('participantStreams', this._participatsStream)
                 logger.error(`Error calling getUserMedia(): ${err}`);
                 error();
             });
-        });
-    }
+       });
+   }
 
-    /**
+   /**
      * Callback for storing the encoded data.
      *
      * @private
      * @param {Blob} data - Encoded data.
      * @returns {void}
      */
-    _saveMediaData(data) {
-        console.log('data', data);
-        this._recordedData = data;
-    }
+   _saveMediaData(data) {
+       console.log('data', data);
+       this._recordedData = data;
+   }
 
-    /**
+   /**
      * Implements {@link RecordingAdapter#setMicDevice()}.
      *
      * @inheritdoc
      */
-    setMicDevice(micDeviceId) {
+   setMicDevice(micDeviceId) {
        // console.log('chnage micDeviceId', micDeviceId)
-        return this._replaceMic(micDeviceId);
-    }
+       return this._replaceMic(micDeviceId);
+   }
 }
 

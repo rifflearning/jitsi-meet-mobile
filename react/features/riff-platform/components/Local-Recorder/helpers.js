@@ -61,14 +61,18 @@ const invokeGetDisplayMedia = (success, error) => {
     }
 };
 
-const getUserAudioTracks = participantsTrack => participantsTrack.map(tracks => tracks.jitsiTrack.stream);
+const getUserAudioTracks = participantsTrack => participantsTrack && participantsTrack.length ? participantsTrack.map(tracks => tracks.jitsiTrack.stream) : [];
 
 const mixer = streamsArr => {
 
     const ctx = new AudioContext();
     const dest = ctx.createMediaStreamDestination();
 
-    streamsArr.map(s => ctx.createMediaStreamSource(s).connect(dest)
+    streamsArr.length && streamsArr.map(s => {
+        if (s.getAudioTracks().length) {
+            ctx.createMediaStreamSource(s).connect(dest);
+        }
+    }
     );
 
     return dest.stream.getAudioTracks();
@@ -86,10 +90,10 @@ export const getCombinedStream = async (audioStream, participantStreams) => {
 
 
     // console.log('recorderStream', recorderStream);
-    const tracks = new MediaStream([ ...videoStream.getVideoTracks(), ...mixer(getUserAudioTracks(participantStreams)) ]);
+    const tracks = new MediaStream([ ...videoStream.getVideoTracks(), ...mixer([ audioStream ].concat(getUserAudioTracks(participantStreams))) ]);
 
     return { mediaStream: new MediaRecorder(tracks, { mimeType: 'video/webm' }),
-    recorderStream: tracks };
+        recorderStream: tracks };
 };
 
 export const stopLocalVideo = async recorderStream => {
