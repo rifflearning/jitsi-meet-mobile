@@ -149,12 +149,17 @@ export default class WebmAdapter extends RecordingAdapter {
 
        return new Promise((resolve, error) => {
            this._getAudioStream(micDeviceId)
-            .then(async stream => {
-                 console.log('inside stream', stream);
-                  this._stream = stream;
+        .then(userStream => {
+            const compereStreams = this._participatsStream.concat(userStream);
+
+            getCombinedStream(compereStreams)
+            .then(stream => {
+                console.log('inside stream', stream);
+
+                this._stream = userStream;
 
                 // console.log('ISModerator------', this._isModerator);
-                const { mediaStream, recorderStream } = await getCombinedStream(stream ,this._participatsStream);
+                const { mediaStream, recorderStream } = stream;
 
                 // this._mediaRecorder = new MediaRecorder(stream);
                 this._recorderStream = recorderStream;
@@ -172,6 +177,7 @@ export default class WebmAdapter extends RecordingAdapter {
                 logger.error(`Error calling getUserMedia(): ${err}`);
                 error();
             });
+        });
        });
    }
 

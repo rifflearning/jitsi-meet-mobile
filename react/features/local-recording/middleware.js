@@ -10,6 +10,7 @@ import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
 import { showNotification } from '../notifications/actions';
 
+import { LOCAL_RECORDING_ENGAGED } from './actionTypes';
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 import { LocalRecordingInfoDialog } from './components';
 import { recordingController } from './controller';
@@ -21,6 +22,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
 
     switch (action.type) {
     case CONFERENCE_JOINED: {
+        console.log('start join conference')
         const { localRecording } = getState()['features/base/config'];
         const isLocalRecordingEnabled = Boolean(
             localRecording
@@ -71,6 +73,8 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { conference } = getState()['features/base/conference'];
         const participantsStream = getState()['features/base/tracks'];
 
+        console.log('participantsStreaminside', participantsStream);
+
         recordingController.registerEvents(conference, participantsStream);
 
         break;
@@ -90,6 +94,13 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             recordingController.setMicDevice(micDeviceId);
         }
         break;
+    }
+    case LOCAL_RECORDING_ENGAGED: {
+        const participantsStream = getState()['features/base/tracks'];
+
+        console.log('recordingController', recordingController)
+
+       // recordingController.onParticipantStaremChange(participantsStream);
     }
     }
 

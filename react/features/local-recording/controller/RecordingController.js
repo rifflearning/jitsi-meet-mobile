@@ -215,6 +215,7 @@ class RecordingController {
         this._doStopRecording = this._doStopRecording.bind(this);
         this._updateStats = this._updateStats.bind(this);
         this._switchToNewSession = this._switchToNewSession.bind(this);
+        this.onParticipantStaremChange = this.onParticipantStaremChange.bind(this);
     }
 
     registerEvents: () => void;
@@ -228,7 +229,7 @@ class RecordingController {
     registerEvents(conference: Object, participatsStream) {
         if (!this._registered) {
             this._conference = conference;
-            this.__participatsStream = participatsStream;
+            this._participatsStream = participatsStream && participatsStream.length ? participatsStream.map(tracks => tracks.jitsiTrack.stream) : [];
             if (this._conference) {
                 this._conference
                     .addCommandListener(COMMAND_STOP, this._onStopCommand);
@@ -427,6 +428,8 @@ class RecordingController {
         const members
             = this._conference.getParticipants()
             .map(member => {
+                console.log('members', members);
+
                 return {
                     id: member.getId(),
                     displayName: member.getDisplayName(),
@@ -452,6 +455,30 @@ class RecordingController {
         };
 
         return result;
+    }
+
+    memberGetStream(member) {
+        console.log('memeber', member);
+        if (member._tracks.length) {
+            return member._tracks[0].stream;
+        }
+    }
+
+    onParticipantStaremChange: () => void;
+
+    /**
+     * Returns the remote participants' local recording stats.
+     *
+     *@Private
+     *@param {Symbol} participatsStream - The new state.
+     *
+     * @returns {*}
+     */
+    onParticipantStaremChange() {
+        const participantsData = this._conference.getParticipants()
+        .map(member => this.memberGetStream(member));
+
+        this._participatsStream = participantsData;
     }
 
     _changeState: (Symbol) => void;
@@ -569,9 +596,11 @@ class RecordingController {
     _doStartRecording() {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapters[this._currentSessionToken];
-            console.log('this.__participatsStream', this.__participatsStream)
 
-            delegate.start(this._micDeviceId, this.__participatsStream)
+            console.log('this.__participatsStream', this._conference);
+            this.onParticipantStaremChange();
+
+            delegate.start(this._micDeviceId, this._participatsStream)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
@@ -615,7 +644,8 @@ class RecordingController {
                     if (this._conference.isModerator()) {
                         this.downloadRecordedData(token);
                     }
-//TODO: change messages
+
+                    // TODO: change messages
                     const messageKey
                         = this._conference.isModerator()
                             ? 'localRecording.messages.finishedModerator'

@@ -61,7 +61,7 @@ const invokeGetDisplayMedia = (success, error) => {
     }
 };
 
-const getUserAudioTracks = participantsTrack => participantsTrack && participantsTrack.length ? participantsTrack.map(tracks => tracks.jitsiTrack.stream) : [];
+const getUserAudioTracks = participantsTrack => participantsTrack && participantsTrack.length ? participantsTrack.map(tracks => tracks) : [];
 
 const mixer = streamsArr => {
 
@@ -78,23 +78,23 @@ const mixer = streamsArr => {
     return dest.stream.getAudioTracks();
 };
 
-export const getCombinedStream = async (audioStream, participantStreams) => {
-    /* const auSteam = await navigator.mediaDevices.getUserMedia({
+export const getCombinedStream = participantStreams =>
+
+/* const auSteam = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: false
     });
     let recorderStream = auSteam;*/
 
-    const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
-        audio: false });
+    navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
+        audio: false }).then(videoStream => {
+        const tracks = new MediaStream([ ...videoStream.getVideoTracks(), ...mixer(participantStreams) ]);
 
+        return { mediaStream: new MediaRecorder(tracks, { mimeType: 'video/webm' }),
+            recorderStream: tracks };
 
-    // console.log('recorderStream', recorderStream);
-    const tracks = new MediaStream([ ...videoStream.getVideoTracks(), ...mixer([ audioStream ].concat(getUserAudioTracks(participantStreams))) ]);
-
-    return { mediaStream: new MediaRecorder(tracks, { mimeType: 'video/webm' }),
-        recorderStream: tracks };
-};
+    })
+;
 
 export const stopLocalVideo = async recorderStream => {
     console.log('recorderStream', recorderStream);
