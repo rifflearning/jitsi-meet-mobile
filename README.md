@@ -1,3 +1,5 @@
+<p align="center"><img align="center" src="images/jitsilogo.png" /></p>
+
 # Jitsi Meet
 ## Development:
 Running with webpack-dev-server for development:

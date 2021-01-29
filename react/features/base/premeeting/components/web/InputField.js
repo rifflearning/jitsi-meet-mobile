@@ -9,7 +9,7 @@ type Props = {
     /**
      * Class name to be appended to the default class list.
      */
-    autofocus?: Boolean,
+    autofocus?: boolean,
 
     /**
      * Class name to be appended to the default class list.
