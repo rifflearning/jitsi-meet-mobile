@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 const addStreamStopListener = (stream, callback) => {
     stream.addEventListener('ended', () => {
         callback();
@@ -26,7 +27,7 @@ const addStreamStopListener = (stream, callback) => {
     };
 };
 
-const streamsMixer = (audioStream, videoStream) => {
+/*const streamsMixer = (audioStream, videoStream) => {
     const ctx = new AudioContext();
     const dest = ctx.createMediaStreamDestination();
 
@@ -44,7 +45,7 @@ const streamsMixer = (audioStream, videoStream) => {
 
     return new MediaStream(tracks);
 
-};
+};*/
 
 const invokeGetDisplayMedia = (success, error) => {
     const displaymediastreamconstraints = {
@@ -61,13 +62,43 @@ const invokeGetDisplayMedia = (success, error) => {
     }
 };
 
-const getUserAudioTracks = participantsTrack => participantsTrack && participantsTrack.length ? participantsTrack.map(tracks => tracks) : [];
+// const ctx = new AudioContext();
+// const dest = ctx.createMediaStreamDestination();
+
+
+class Mixer {
+
+    initialize(streamsArr) {
+        this.ctx = new AudioContext();
+        this.dest = this.ctx.createMediaStreamDestination();
+        console.log('streamsArr', streamsArr)
+        streamsArr.length && streamsArr.map(s => {
+            if (s.getAudioTracks().length) {
+                this.ctx.createMediaStreamSource(s).connect(this.dest);
+            }
+        });
+
+        return this.dest.stream.getAudioTracks();
+    }
+
+    addNewStream(newUserStream) {
+        if (newUserStream.getAudioTracks().length) {
+            console.log(this)
+             this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
+        }
+
+    }
+}
+
+const audioStreamsMixer = new Mixer();
+
+
+
 
 const mixer = streamsArr => {
 
     const ctx = new AudioContext();
     const dest = ctx.createMediaStreamDestination();
-
     streamsArr.length && streamsArr.map(s => {
         if (s.getAudioTracks().length) {
             ctx.createMediaStreamSource(s).connect(dest);
@@ -78,23 +109,74 @@ const mixer = streamsArr => {
     return dest.stream.getAudioTracks();
 };
 
-export const getCombinedStream = participantStreams =>
 
-/* const auSteam = await navigator.mediaDevices.getUserMedia({
+export const updateAudio = newUserStream => {
+    console.log('newUserStream', newUserStream);
+    audioStreamsMixer.addNewStream(newUserStream);
+};
+
+
+export const getCombinedStream = async participantStreams => {
+
+
+    /* const auSteam = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: false
     });
     let recorderStream = auSteam;*/
 
-    navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
-        audio: false }).then(videoStream => {
-        const tracks = new MediaStream([ ...videoStream.getVideoTracks(), ...mixer(participantStreams) ]);
+    const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
+        audio: false });
 
-        return { mediaStream: new MediaRecorder(tracks, { mimeType: 'video/webm' }),
-            recorderStream: tracks };
+    const audioTrack = audioStreamsMixer.initialize(participantStreams);
+    const mediaStream = new MediaStream([ ...videoStream.getVideoTracks(), ...audioTrack ]);
 
-    })
-;
+    //  mediaStream.getTracks().forEach(track => {
+    // pc.addTrack(track, mediaStream);
+    // });
+
+    // const audioTracks = mediaStream.getAudioTracks()[0];
+
+    // console.log('audioTrack', audioTrack)
+
+    //  const fromLocalPeerConnection = new RTCPeerConnection();
+    //  const toLocalPeerConnection = new RTCPeerConnection();
+
+    //  const audioSender = fromLocalPeerConnection.addTrack(audioTrack, mediaStream);
+
+    // const [ playlistAudioTrack ] = audioTrack.getAudioTracks();
+
+    // const audioSender = peerConnection.addStream(mediaStream);
+
+    // await audioSender.replaceTrack(audioTrack);
+
+
+    return { mediaStream: new MediaRecorder(mediaStream, { mimeType: 'video/webm' }),
+        recorderStream: mediaStream };
+
+};
+
+function newParticipantAdded(stream) {
+    console.log('adding');
+    console.log('sharing screen');
+    const newStream = stream;
+
+    // replace video
+    const audioTracks = newStream.getAudioTracks();
+    const audioTrack = audioTracks[0];
+
+    const senders = pc.getSenders();
+
+    // console.log(senders);
+    const sender = senders.find(s => s.track.kind === audioTrack.kind);
+
+    sender.replaceTrack(audioTrack); // this is where we get issues
+
+    // localVideo.srcObject = screenShareStream;
+
+    return true;
+}
+
 
 export const stopLocalVideo = async recorderStream => {
     console.log('recorderStream', recorderStream);

@@ -9,6 +9,7 @@ import { SET_AUDIO_MUTED } from '../base/media/actionTypes';
 import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
 import { showNotification } from '../notifications/actions';
+import { JitsiConferenceEvents } from '../../../react/features/base/lib-jitsi-meet'
 
 import { LOCAL_RECORDING_ENGAGED } from './actionTypes';
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
@@ -98,9 +99,14 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     case LOCAL_RECORDING_ENGAGED: {
         const participantsStream = getState()['features/base/tracks'];
 
-        console.log('recordingController', recordingController)
+        console.log('check is work')
+        const { conference } = getState()['features/base/conference'];
 
-       // recordingController.onParticipantStaremChange(participantsStream);
+
+        console.log('participantsStreaminside', participantsStream);
+
+        recordingController.registerEvents(conference, participantsStream);
+        break;
     }
     }
 

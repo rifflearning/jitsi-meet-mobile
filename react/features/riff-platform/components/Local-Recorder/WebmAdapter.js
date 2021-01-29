@@ -1,7 +1,7 @@
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
-import { getCombinedStream, stopLocalVideo } from './helpers';
+import { getCombinedStream, stopLocalVideo, updateAudio } from './helpers';
 
 /**
  * Recording adapter that uses {@code MediaRecorder} (default browser encoding
@@ -87,6 +87,11 @@ export default class WebmAdapter extends RecordingAdapter {
        );
    }
 
+   // eslint-disable-next-line require-jsdoc
+   addNewPaticipantStream(newStream) {
+       updateAudio(newStream);
+   }
+
    /**
      * Implements {@link RecordingAdapter#exportRecordedData()}.
      *
@@ -114,6 +119,7 @@ export default class WebmAdapter extends RecordingAdapter {
        const shouldEnable = !muted;
 
        console.log('this._stream', this._stream);
+       this._initialize();
 
        if (!this._stream) {
            return Promise.resolve();
@@ -151,6 +157,8 @@ export default class WebmAdapter extends RecordingAdapter {
            this._getAudioStream(micDeviceId)
         .then(userStream => {
             const compereStreams = this._participatsStream.concat(userStream);
+
+            console.log('compereStreams---', compereStreams);
 
             getCombinedStream(compereStreams)
             .then(stream => {

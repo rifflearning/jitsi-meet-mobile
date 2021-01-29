@@ -693,6 +693,11 @@ class RecordingController {
         sessionManager.createSession(sessionToken, this._format);
     }
 
+    // eslint-disable-next-line require-jsdoc
+    _addNewParticipant(stream){
+        this._adapters[this._currentSessionToken].addNewPaticipantStream(stream);
+    }
+
     /**
      * Creates a recording adapter according to the current recording format.
      *
@@ -717,6 +722,7 @@ class RecordingController {
         }
     }
 }
+
 
 /**
  * Global singleton of {@code RecordingController}.

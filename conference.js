@@ -115,6 +115,7 @@ import {
     maybeOpenFeedbackDialog,
     submitFeedback
 } from './react/features/feedback';
+import { recordingController } from './react/features/local-recording/controller';
 import { showNotification } from './react/features/notifications';
 import { mediaPermissionPromptVisibilityChanged } from './react/features/overlay';
 import { suspendDetected } from './react/features/power-monitor';
@@ -133,6 +134,7 @@ import { endpointMessageReceived } from './react/features/subtitles';
 import UIEvents from './service/UI/UIEvents';
 import * as RemoteControlEvents
     from './service/remotecontrol/RemoteControlEvents';
+
 
 const logger = Logger.getLogger(__filename);
 
@@ -2026,6 +2028,9 @@ export default {
             if (!track || track.isLocal()) {
                 return;
             }
+            console.log('new user', track);
+
+            recordingController._addNewParticipant(track.stream);
 
             APP.store.dispatch(trackAdded(track));
         });
