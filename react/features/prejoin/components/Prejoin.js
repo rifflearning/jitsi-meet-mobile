@@ -291,6 +291,7 @@ class Prejoin extends Component<Props, State> {
                     <div className = 'prejoin-input-area-container'>
                         <div className = 'prejoin-input-area'>
                             <InputField
+                                autofocus = { Boolean(isAnon) }
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onChange = { value => {
                                     if (isAnon) {
@@ -333,11 +334,11 @@ class Prejoin extends Component<Props, State> {
                                         onClick = { joinConference }
                                         onOptionsClick = { _onOptionsClick }
                                         type = 'primary'>
-                                        {`${t('prejoin.joinMeeting')}`}{isAnon && ' anonymously' }
+                                        {isAnon ? 'Join as a guest' : `${t('prejoin.joinMeeting')}`}
                                     </ActionButton>
                                 </InlineDialog>
                                 {isAnon
-                                && <>or
+                                && <><br />or
                                     <ActionButton
                                         disabled = { joinButtonDisabled }
                                         onClick = { () => {
