@@ -9,6 +9,11 @@ type Props = {
     /**
      * Class name to be appended to the default class list.
      */
+    autofocus?: boolean,
+
+    /**
+     * Class name to be appended to the default class list.
+     */
     className?: string,
 
     /**
@@ -68,7 +73,7 @@ export default class InputField extends PureComponent<Props, State> {
         super(props);
 
         this.state = {
-            focused: false,
+            focused: Boolean(props.autofocus) || false,
             value: props.value || ''
         };
 
@@ -104,6 +109,7 @@ export default class InputField extends PureComponent<Props, State> {
     render() {
         return (
             <input
+                autoFocus = { Boolean(this.props.autofocus) }
                 className = { `field ${this.state.focused ? 'focused' : ''} ${this.props.className || ''}` }
                 onBlur = { this._onBlur }
                 onChange = { this._onChange }

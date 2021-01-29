@@ -76,7 +76,7 @@ export function getMeetingById(meetingId) {
 export function checkIsMeetingAllowed(meetingId) {
     return async (dispatch, getState) => {
         try {
-            const myUid = getState()['features/riff-platform'].signIn.user.uid;
+            const { uid: myUid, isAnon } = getState()['features/riff-platform'].signIn.user;
             const meeting = await dispatch(getMeeting(meetingId));
             const meetingError = errorType => {
                 return { meeting, error: errorType };
@@ -98,7 +98,7 @@ export function checkIsMeetingAllowed(meetingId) {
                 return meetingError(errorTypes.NOT_JOIN_NEW_USER_TO_ENDED_MEETING);
             }
 
-            if (!didIVisitMeeting) await sendAddParticipantToMeeting(meeting);
+            if (!didIVisitMeeting && !isAnon) await sendAddParticipantToMeeting(meeting);
 
             // if waitForHost required, check if host entered
             // eslint-disable-next-line max-len

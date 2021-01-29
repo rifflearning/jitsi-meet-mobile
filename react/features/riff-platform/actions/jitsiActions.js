@@ -96,7 +96,8 @@ export async function shouldRedirectToLoginPage() {
     const user = await api.isAuth();
 
     if (user === null) {
-        if (await isAnonymousUsersAllowed()) {
+        // if meetingId path and if allowed anon user
+        if (!isRiffPlatformCurrentPath() && await isAnonymousUsersAllowed()) {
             return false;
         }
 
