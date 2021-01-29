@@ -120,7 +120,7 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
         return   403;
     }
     ```
-    Insert after `# BOSH location = /http-bind { ... }`:
+    Insert after `# BOSH location = /http-bind { ... }` and replace `RIFF_DATA_IP`:
     
     (*you may need to set up a new riff-data server instance*)
     ```
@@ -131,7 +131,7 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
 
     # config for riff-data server:
     location ^~ /api/videodata/socket.io/ {
-        proxy_pass http://172.31.6.19:3000/socket.io/;
+        proxy_pass http://RIFF_DATA_IP:3000/socket.io/;
 
         # proxy_websocket_params
         proxy_http_version 1.1;
@@ -142,7 +142,7 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
         # cors_params
         add_header 'Access-Control-Allow-Origin' '*';
         add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified>
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
         add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
     }
 
