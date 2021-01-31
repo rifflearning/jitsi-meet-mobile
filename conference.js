@@ -115,7 +115,6 @@ import {
     maybeOpenFeedbackDialog,
     submitFeedback
 } from './react/features/feedback';
-import { recordingController } from './react/features/local-recording/controller';
 import { showNotification } from './react/features/notifications';
 import { mediaPermissionPromptVisibilityChanged } from './react/features/overlay';
 import { suspendDetected } from './react/features/power-monitor';
@@ -2028,9 +2027,6 @@ export default {
             if (!track || track.isLocal()) {
                 return;
             }
-            console.log('new user', track);
-
-            recordingController._addNewParticipant(track.stream);
 
             APP.store.dispatch(trackAdded(track));
         });

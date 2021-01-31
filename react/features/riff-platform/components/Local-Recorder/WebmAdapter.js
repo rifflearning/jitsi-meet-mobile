@@ -1,7 +1,8 @@
+/* eslint-disable require-jsdoc */
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
-import { getCombinedStream, stopLocalVideo, updateAudio } from './helpers';
+import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
 
 /**
  * Recording adapter that uses {@code MediaRecorder} (default browser encoding
@@ -33,182 +34,210 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _recorderStream = null;
 
-
-    // _isModerator = false;
-
+    /**
+     * The array of participant streams.
+     * @private
+     */
    _participatsStream = [];
 
-   /**
+    /**
+     * The {@code JitsiConference} instance.
+     *
+     * @private
+     */
+    _conference: * = null;
+
+    /**
      * Implements {@link RecordingAdapter#start()}.
      *
      * @inheritdoc
      */
-   start(micDeviceId, participatsStream) {
-       // this._isModerator = conference.isModerator();
-       this._participatsStream = participatsStream;
-       console.log('participantStreams', this._participatsStream);
+    start(micDeviceId, conference) {
+        this._conference = conference;
+        this._participatsStream = this._getAudioParticipantsStream();
 
-       // if (!this._isModerator) {
-       // return Promise.resolve();
-       //   }
-       if (!this._initPromise) {
-           this._initPromise = this._initialize(micDeviceId);
-       }
+        // if (!this._isModerator) {
+        // return Promise.resolve();
+        //   }
+        if (!this._initPromise) {
+            this._initPromise = this._initialize(micDeviceId);
+        }
 
-       return this._initPromise.then(() =>
-           new Promise(resolve => {
-               this._mediaRecorder.start();
-               resolve();
-           })
-       );
-   }
+        return this._initPromise.then(() =>
+            new Promise(resolve => {
+                this._mediaRecorder.start();
+                resolve();
+            })
+        );
+    }
 
-   /**
+    /**
      * Implements {@link RecordingAdapter#stop()}.
      *
      * @inheritdoc
      */
-   stop() {
-       // if (!this._isModerator) {
-       //   return Promise.resolve();
-       // /}
+    stop() {
+        // if (!this._isModerator) {
+        //   return Promise.resolve();
+        // /}
 
-       return new Promise(
+        return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
-
-                // this._mediaRecorder.getVideoTracks()[0].onended = () => resolve();
-
-
-                // stopLocalVideo(this._stream);
-                //  this._mediaRecorder.destroy();
             }
-       );
-   }
+        );
+    }
 
-   // eslint-disable-next-line require-jsdoc
-   addNewPaticipantStream(newStream) {
-       updateAudio(newStream);
-   }
+    /**
+     * Returns the remote participant audio stream.
+     *
+     * @param {Object} participant - The participant object.
+     * @returns {*}
+     */
+    _getAudioParticipantStream(participant) {
+        if (participant._tracks?.length) {
 
-   /**
+            return participant._tracks.find(t => t.mediaType === 'audio').stream;
+        }
+    }
+
+    /**
+     * Returns array of remote participants audio stream.
+     *
+     * @returns {*}
+     */
+    _getAudioParticipantsStream() {
+        const participantsAudioStreamArray = this._conference.getParticipants()
+          .map(participant => this._getAudioParticipantStream(participant));
+
+        return participantsAudioStreamArray.length || [];
+    }
+
+    /**
      * Implements {@link RecordingAdapter#exportRecordedData()}.
      *
      * @inheritdoc
      */
-   exportRecordedData() {
-       if (this._recordedData !== null) {
-           // console.log('this._recordedData ', this._recordedData);
+    exportRecordedData() {
+        if (this._recordedData !== null) {
 
-           return Promise.resolve({
-               data: this._recordedData,
-               format: 'webm'
-           });
-       }
+            return Promise.resolve({
+                data: this._recordedData,
+                format: 'webm'
+            });
+        }
 
-       return Promise.reject('No media data recorded.');
-   }
+        return Promise.reject('No media data recorded.');
+    }
 
-   /**
+    /**
      * Implements {@link RecordingAdapter#setMuted()}.
      *
      * @inheritdoc
      */
-   setMuted(muted) {
-       const shouldEnable = !muted;
+    setMuted(muted) {
+        const shouldEnable = !muted;
 
-       console.log('this._stream', this._stream);
-       this._initialize();
+        this._initialize();
 
-       if (!this._stream) {
-           return Promise.resolve();
-       }
+        if (!this._stream) {
+            return Promise.resolve();
+        }
 
-       const track = this._stream.getAudioTracks()[0];
+        const track = this._stream.getAudioTracks()[0];
 
-       if (!track) {
-           logger.error('Cannot mute/unmute. Track not found!');
+        if (!track) {
+            logger.error('Cannot mute/unmute. Track not found!');
 
-           return Promise.resolve();
-       }
+            return Promise.resolve();
+        }
 
-       if (track.enabled !== shouldEnable) {
-           track.enabled = shouldEnable;
-           logger.log(muted ? 'Mute' : 'Unmute');
-       }
+        if (track.enabled !== shouldEnable) {
+            track.enabled = shouldEnable;
+            logger.log(muted ? 'Mute' : 'Unmute');
+        }
 
-       return Promise.resolve();
-   }
+        return Promise.resolve();
+    }
 
-   /**
+    /**
+     * Add new audio stream to AudioContext.
+     *
+     * @private
+     * @param {MediaStream} newAudioStream - The new participant audio stream.
+     * @returns {void}
+     */
+
+    _addNewParticipantAudioStream(newAudioStream) {
+        if (newAudioStream.getAudioTracks().length) {
+            addNewAudioStream(newAudioStream);
+        }
+    }
+
+    /**
      * Initialize the adapter.
      *
      * @private
      * @param {string} micDeviceId - The current microphone device ID.
      * @returns {Promise}
      */
-   _initialize(micDeviceId) {
-       if (this._mediaRecorder) {
-           return Promise.resolve();
-       }
+    _initialize(micDeviceId) {
+        if (this._mediaRecorder) {
+            return Promise.resolve();
+        }
 
-       return new Promise((resolve, error) => {
-           this._getAudioStream(micDeviceId)
-        .then(userStream => {
-            const compereStreams = this._participatsStream.concat(userStream);
+        return new Promise((resolve, error) => {
+            this._getAudioStream(micDeviceId)
+              .then(userAudioStream => {
+                  const allParticipatsAudioStreams = this._participatsStream.concat(userAudioStream);
 
-            console.log('compereStreams---', compereStreams);
+                  getCombinedStream(allParticipatsAudioStreams)
+                     .then(mediaStream => {
 
-            getCombinedStream(compereStreams)
-            .then(stream => {
-                console.log('inside stream', stream);
+                         this._stream = userAudioStream;
 
-                this._stream = userStream;
+                         this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
+                         this._recorderStream = mediaStream;
+                         this._mediaRecorder.ondataavailable
+                        = e => this._saveMediaData(e.data);
+                         resolve();
 
-                // console.log('ISModerator------', this._isModerator);
-                const { mediaStream, recorderStream } = stream;
-
-                // this._mediaRecorder = new MediaRecorder(stream);
-                this._recorderStream = recorderStream;
-                this._mediaRecorder = mediaStream;
-                this._mediaRecorder.ondataavailable
-                    = e => this._saveMediaData(e.data);
-                resolve();
-
-                this._mediaRecorder.onended = e => {
-                    console.log('Capture stream inactive');
-                    stop();
-                };
-            })
+                         this._mediaRecorder.onended = e => {
+                             console.log('Capture stream inactive');
+                             stop();
+                         };
+                     })
             .catch(err => {
                 logger.error(`Error calling getUserMedia(): ${err}`);
                 error();
             });
+              })
+        .catch(err => {
+            logger.error(`Error calling getUserMedia(): ${err}`);
+            error();
         });
-       });
-   }
+        });
+    }
 
-   /**
+    /**
      * Callback for storing the encoded data.
      *
      * @private
      * @param {Blob} data - Encoded data.
      * @returns {void}
      */
-   _saveMediaData(data) {
-       console.log('data', data);
-       this._recordedData = data;
-   }
+    _saveMediaData(data) {
+        this._recordedData = data;
+    }
 
-   /**
+    /**
      * Implements {@link RecordingAdapter#setMicDevice()}.
      *
      * @inheritdoc
      */
-   setMicDevice(micDeviceId) {
-       // console.log('chnage micDeviceId', micDeviceId)
-       return this._replaceMic(micDeviceId);
-   }
+    setMicDevice(micDeviceId) {
+        return this._replaceMic(micDeviceId);
+    }
 }
 

@@ -178,8 +178,6 @@ class RecordingController {
      */
     _registered = false;
 
-    _participatsStream = [];
-
     /**
      * FIXME: callback function for the {@code RecordingController} to notify
      * UI it wants to display a notice. Keeps {@code RecordingController}
@@ -215,7 +213,6 @@ class RecordingController {
         this._doStopRecording = this._doStopRecording.bind(this);
         this._updateStats = this._updateStats.bind(this);
         this._switchToNewSession = this._switchToNewSession.bind(this);
-        this.onParticipantStaremChange = this.onParticipantStaremChange.bind(this);
     }
 
     registerEvents: () => void;
@@ -226,10 +223,9 @@ class RecordingController {
      * @param {JitsiConference} conference - A {@code JitsiConference} instance.
      * @returns {void}
      */
-    registerEvents(conference: Object, participatsStream) {
+    registerEvents(conference: Object) {
         if (!this._registered) {
             this._conference = conference;
-            this._participatsStream = participatsStream && participatsStream.length ? participatsStream.map(tracks => tracks.jitsiTrack.stream) : [];
             if (this._conference) {
                 this._conference
                     .addCommandListener(COMMAND_STOP, this._onStopCommand);
@@ -428,8 +424,6 @@ class RecordingController {
         const members
             = this._conference.getParticipants()
             .map(member => {
-                console.log('members', members);
-
                 return {
                     id: member.getId(),
                     displayName: member.getDisplayName(),
@@ -455,30 +449,6 @@ class RecordingController {
         };
 
         return result;
-    }
-
-    memberGetStream(member) {
-        console.log('memeber', member);
-        if (member._tracks.length) {
-            return member._tracks[0].stream;
-        }
-    }
-
-    onParticipantStaremChange: () => void;
-
-    /**
-     * Returns the remote participants' local recording stats.
-     *
-     *@Private
-     *@param {Symbol} participatsStream - The new state.
-     *
-     * @returns {*}
-     */
-    onParticipantStaremChange() {
-        const participantsData = this._conference.getParticipants()
-        .map(member => this.memberGetStream(member));
-
-        this._participatsStream = participantsData;
     }
 
     _changeState: (Symbol) => void;
@@ -597,10 +567,7 @@ class RecordingController {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapters[this._currentSessionToken];
 
-            console.log('this.__participatsStream', this._conference);
-            this.onParticipantStaremChange();
-
-            delegate.start(this._micDeviceId, this._participatsStream)
+            delegate.start(this._micDeviceId, this._conference)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
@@ -641,11 +608,8 @@ class RecordingController {
                     this._changeState(ControllerState.IDLE);
                     sessionManager.endSegment(this._currentSessionToken);
                     logger.log('Local recording unengaged.');
-                    if (this._conference.isModerator()) {
-                        this.downloadRecordedData(token);
-                    }
+                    this.downloadRecordedData(token);
 
-                    // TODO: change messages
                     const messageKey
                         = this._conference.isModerator()
                             ? 'localRecording.messages.finishedModerator'
@@ -693,11 +657,6 @@ class RecordingController {
         sessionManager.createSession(sessionToken, this._format);
     }
 
-    // eslint-disable-next-line require-jsdoc
-    _addNewParticipant(stream){
-        this._adapters[this._currentSessionToken].addNewPaticipantStream(stream);
-    }
-
     /**
      * Creates a recording adapter according to the current recording format.
      *
@@ -722,7 +681,6 @@ class RecordingController {
         }
     }
 }
-
 
 /**
  * Global singleton of {@code RecordingController}.

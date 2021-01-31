@@ -8,13 +8,14 @@ import { i18next } from '../base/i18n';
 import { SET_AUDIO_MUTED } from '../base/media/actionTypes';
 import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
+import { TRACK_ADDED } from '../base/tracks/actionTypes';
 import { showNotification } from '../notifications/actions';
-import { JitsiConferenceEvents } from '../../../react/features/base/lib-jitsi-meet'
+import WebmAdapter from '../riff-platform/components/Local-Recorder/WebmAdapter';
 
-import { LOCAL_RECORDING_ENGAGED } from './actionTypes';
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 import { LocalRecordingInfoDialog } from './components';
 import { recordingController } from './controller';
+
 
 declare var APP: Object;
 
@@ -23,7 +24,6 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
 
     switch (action.type) {
     case CONFERENCE_JOINED: {
-        console.log('start join conference')
         const { localRecording } = getState()['features/base/config'];
         const isLocalRecordingEnabled = Boolean(
             localRecording
@@ -72,11 +72,8 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
 
         const { conference } = getState()['features/base/conference'];
-        const participantsStream = getState()['features/base/tracks'];
 
-        console.log('participantsStreaminside', participantsStream);
-
-        recordingController.registerEvents(conference, participantsStream);
+        recordingController.registerEvents(conference);
 
         break;
     }
@@ -96,16 +93,18 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
         break;
     }
-    case LOCAL_RECORDING_ENGAGED: {
-        const participantsStream = getState()['features/base/tracks'];
+    case TRACK_ADDED: {
+        const { track } = action;
 
-        console.log('check is work')
-        const { conference } = getState()['features/base/conference'];
+        if (!track || track.local) {
+            return;
+        }
 
+        if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
+            const webmRecordingController = new WebmAdapter();
 
-        console.log('participantsStreaminside', participantsStream);
-
-        recordingController.registerEvents(conference, participantsStream);
+            webmRecordingController._addNewParticipantAudioStream(track.jitsiTrack.stream);
+        }
         break;
     }
     }
