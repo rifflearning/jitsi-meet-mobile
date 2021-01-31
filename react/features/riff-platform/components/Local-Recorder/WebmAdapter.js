@@ -53,7 +53,7 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     start(micDeviceId, conference) {
         this._conference = conference;
-        this._participatsStream = this._getAudioParticipantsStream();
+        this._participatsStream = this._getAudioParticipantsStream() || [];
 
         // if (!this._isModerator) {
         // return Promise.resolve();
@@ -97,7 +97,7 @@ export default class WebmAdapter extends RecordingAdapter {
     _getAudioParticipantStream(participant) {
         if (participant._tracks?.length) {
 
-            return participant._tracks.find(t => t.mediaType === 'audio').stream;
+            return participant._tracks.find(t => t.mediaType === 'audio')?.stream;
         }
     }
 
@@ -108,7 +108,7 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _getAudioParticipantsStream() {
         const participantsAudioStreamArray = this._conference.getParticipants()
-          .map(participant => this._getAudioParticipantStream(participant));
+          .filter(participant => this._getAudioParticipantStream(participant));
 
         return participantsAudioStreamArray.length || [];
     }
