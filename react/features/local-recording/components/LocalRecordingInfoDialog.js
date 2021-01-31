@@ -151,9 +151,7 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
         return (
             <>
                 {format === 'webm'
-                    ? <LocalRecordingDialog
-                        isModerator = { isModerator }
-                        open = { true } />
+                    ? <LocalRecordingDialog open = { true } />
                     : <Dialog
                         cancelKey = { 'dialog.close' }
                         submitDisabled = { true }
@@ -386,7 +384,8 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
  *     isModerator: boolean,
  *     isEngaged: boolean,
  *     recordingEngagedAt: Date,
- *     stats: Object
+ *     stats: Object,
+ *     format: string
  * }}
  */
 function _mapStateToProps(state) {

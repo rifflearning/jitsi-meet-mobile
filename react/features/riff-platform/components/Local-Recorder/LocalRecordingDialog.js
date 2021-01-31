@@ -2,11 +2,8 @@
 /* eslint-disable require-jsdoc */
 import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Dialog } from '../../../base/dialog';
