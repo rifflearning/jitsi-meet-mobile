@@ -54,10 +54,7 @@ function LocalRecordingDialog(props) {
     };
 
     const handleStart = () => {
-        // handleStartRecording();
         recordingController.startRecording();
-
-        // onClose();
     };
 
 

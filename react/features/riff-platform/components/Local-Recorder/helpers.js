@@ -32,7 +32,6 @@ export const addNewAudioStream = newParticipantStream => {
 
 export const getCombinedStream = async participantStreams => {
 
-
     const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
         audio: false });
 

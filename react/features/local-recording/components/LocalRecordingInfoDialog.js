@@ -146,27 +146,33 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
      * @returns {ReactElement}
      */
     render() {
-        const { isModerator, t } = this.props;
+        const { isModerator, t, format } = this.props;
 
         return (
-            <Dialog
-                cancelKey = { 'dialog.close' }
-                submitDisabled = { true }
-                titleKey = 'localRecording.dialogTitle'>
-                <div className = 'localrec-control'>
-                    <span className = 'localrec-control-info-label'>
-                        {`${t('localRecording.moderator')}:`}
-                    </span>
-                    <span className = 'info-value'>
-                        { isModerator
-                            ? t('localRecording.yes')
-                            : t('localRecording.no') }
-                    </span>
-                </div>
-                <LocalRecordingDialog open = { true } />
-                { this._renderModeratorControls() }
-                { this._renderDurationAndFormat() }
-            </Dialog>
+            <>
+                {format === 'webm'
+                    ? <LocalRecordingDialog
+                        isModerator = { isModerator }
+                        open = { true } />
+                    : <Dialog
+                        cancelKey = { 'dialog.close' }
+                        submitDisabled = { true }
+                        titleKey = 'localRecording.dialogTitle'>
+                        <div className = 'localrec-control'>
+                            <span className = 'localrec-control-info-label'>
+                                {`${t('localRecording.moderator')}:`}
+                            </span>
+                            <span className = 'info-value'>
+                                { isModerator
+                                    ? t('localRecording.yes')
+                                    : t('localRecording.no') }
+                            </span>
+                        </div>
+                        { this._renderModeratorControls() }
+                        { this._renderDurationAndFormat() }
+                    </Dialog>
+                }
+            </>
         );
     }
 
@@ -390,15 +396,19 @@ function _mapStateToProps(state) {
         recordingEngagedAt,
         stats
     } = state['features/local-recording'];
+
     const isModerator
         = getLocalParticipant(state).role === PARTICIPANT_ROLE.MODERATOR;
+
+    const { format } = state['features/base/config']?.localRecording;
 
     return {
         encodingFormat,
         isModerator,
         isEngaged,
         recordingEngagedAt,
-        stats
+        stats,
+        format
     };
 }
 

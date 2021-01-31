@@ -94,6 +94,11 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case TRACK_ADDED: {
+        const { isEngaged } = getState()['features/local-recording'];
+
+        if (!isEngaged) {
+            return;
+        }
         const { track } = action;
 
         if (!track || track.local) {

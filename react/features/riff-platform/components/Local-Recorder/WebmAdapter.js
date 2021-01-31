@@ -5,8 +5,7 @@ import { RecordingAdapter } from '../../../local-recording/recording';
 import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
 
 /**
- * Recording adapter that uses {@code MediaRecorder} (default browser encoding
- * with Opus codec).
+ * Recording adapter that uses {@code MediaRecorder}
  */
 export default class WebmAdapter extends RecordingAdapter {
 
@@ -189,34 +188,34 @@ export default class WebmAdapter extends RecordingAdapter {
 
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
-              .then(userAudioStream => {
-                  const allParticipatsAudioStreams = this._participatsStream.concat(userAudioStream);
+            .then(async userAudioStream => {
 
-                  getCombinedStream(allParticipatsAudioStreams)
-                     .then(mediaStream => {
+                const allParticipatsAudioStreams = this._participatsStream.concat(userAudioStream);
 
-                         this._stream = userAudioStream;
+                getCombinedStream(allParticipatsAudioStreams)
+                .then(mediaStream => {
+                    this._stream = userAudioStream;
+                    this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
+                    this._recorderStream = mediaStream;
+                    this._mediaRecorder.ondataavailable
+                   = e => this._saveMediaData(e.data);
+                    resolve();
 
-                         this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
-                         this._recorderStream = mediaStream;
-                         this._mediaRecorder.ondataavailable
-                        = e => this._saveMediaData(e.data);
-                         resolve();
+                    this._mediaRecorder.onended = e => {
+                        console.log('Capture stream inactive');
+                        stop();
+                    };
 
-                         this._mediaRecorder.onended = e => {
-                             console.log('Capture stream inactive');
-                             stop();
-                         };
-                     })
+                })
+                .catch(err => {
+                    logger.error(`Error calling getUserMedia(): ${err}`);
+                    error();
+                });
+            })
             .catch(err => {
                 logger.error(`Error calling getUserMedia(): ${err}`);
                 error();
             });
-              })
-        .catch(err => {
-            logger.error(`Error calling getUserMedia(): ${err}`);
-            error();
-        });
         });
     }
 
