@@ -319,6 +319,7 @@ class RecordingController {
      * @returns {void}
      */
     downloadRecordedData(sessionToken: number) {
+        console.log('download')
         if (this._adapters[sessionToken]) {
             this._adapters[sessionToken].exportRecordedData()
                 .then(args => {
@@ -584,6 +585,7 @@ class RecordingController {
                 this._updateStats();
             })
             .catch(err => {
+                console.log('errr', err)
                 logger.error('Failed to start local recording.', err);
             });
         }

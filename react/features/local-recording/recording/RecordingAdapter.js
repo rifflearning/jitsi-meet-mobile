@@ -66,7 +66,7 @@ export class RecordingAdapter {
      */
     _getAudioStream(micDeviceId) {
         return JitsiMeetJS.createLocalTracks({
-            devices: [ 'audio'],
+            devices: [ 'audio' ],
             micDeviceId
         }).then(result => {
             if (result.length !== 1) {

@@ -1,4 +1,5 @@
 /* eslint-disable require-jsdoc */
+import { recordingController } from '../../../local-recording/controller';
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
@@ -83,7 +84,12 @@ export default class WebmAdapter extends RecordingAdapter {
 
         return new Promise(
             async resolve => {
-                this._mediaRecorder.onstop = () => resolve();
+                console.log('skdghgdgk');
+                this._mediaRecorder.onstop = () => {
+                    console.log('stop inside');
+
+                    return resolve();
+                };
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
             }
         );
@@ -202,11 +208,12 @@ export default class WebmAdapter extends RecordingAdapter {
                    = e => this._saveMediaData(e.data);
                     resolve();
 
-                    this._mediaRecorder.onended = e => {
+                    this._mediaRecorder.onended = () => {
                         console.log('Capture stream inactive');
-                        stop();
+                        recordingController.stopRecording();
                     };
-
+                    this._recorderStream.getVideoTracks()[0].addEventListener('ended',
+                        () => recordingController.stopRecording());
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);

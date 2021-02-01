@@ -1,4 +1,5 @@
 /* eslint-disable require-jsdoc */
+import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/libs/utils';
 
 class AudioStreamsMixer {
 
@@ -29,21 +30,34 @@ export const addNewAudioStream = newParticipantStream => {
     audioStreamsMixer.addNewStream(newParticipantStream);
 };
 
+const createDesktopTrack = () => {
 
-export const getCombinedStream = async participantStreams => {
-
-    const videoStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
+    const getDesktopStreamPromise = navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
         audio: false });
 
-    const audioTrack = audioStreamsMixer.initializeAudioContext(participantStreams);
-    const mediaStream = new MediaStream(videoStream.getVideoTracks().concat(audioTrack));
+    return getDesktopStreamPromise.then(desktopStream => desktopStream, error => {
+        throw error;
+    });
+};
 
-    return mediaStream;
+export const getCombinedStream = async participantStreams => {
+    if (!isScreenShareSourceAvailable()) {
+        return Promise.reject('Screen sharing is not supported in this browser.');
+    }
 
+    return createDesktopTrack().then(desktopStream => {
+        const audioTrack = audioStreamsMixer.initializeAudioContext(participantStreams);
+        const mediaStream = new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
+
+        return mediaStream;
+    })
+    .catch(error => Promise.reject(error));
 };
 
 export const stopLocalVideo = async recorderStream => {
+    console.log('stip local');
     recorderStream.getTracks().forEach(async track => {
+        console.log('track', track);
         track.stop();
     });
 };
