@@ -36,13 +36,13 @@ const createDesktopTrack = () => {
         audio: false });
 
     return getDesktopStreamPromise.then(desktopStream => desktopStream, error => {
-        throw error;
+        throw new Error(error);
     });
 };
 
 export const getCombinedStream = async participantStreams => {
     if (!isScreenShareSourceAvailable()) {
-        return Promise.reject('Screen sharing is not supported in this browser.');
+        throw new Error('Screen sharing is not supported in this browser.');
     }
 
     return createDesktopTrack().then(desktopStream => {
@@ -55,9 +55,7 @@ export const getCombinedStream = async participantStreams => {
 };
 
 export const stopLocalVideo = async recorderStream => {
-    console.log('stip local');
     recorderStream.getTracks().forEach(async track => {
-        console.log('track', track);
         track.stop();
     });
 };

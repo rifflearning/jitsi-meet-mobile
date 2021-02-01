@@ -84,12 +84,7 @@ export default class WebmAdapter extends RecordingAdapter {
 
         return new Promise(
             async resolve => {
-                console.log('skdghgdgk');
-                this._mediaRecorder.onstop = () => {
-                    console.log('stop inside');
-
-                    return resolve();
-                };
+                this._mediaRecorder.onstop = () => resolve();
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
             }
         );
