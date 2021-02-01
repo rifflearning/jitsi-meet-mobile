@@ -1,12 +1,13 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable require-jsdoc */
 import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
 import DialogContent from '@material-ui/core/DialogContent';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Dialog } from '../../../base/dialog';
+import { hideDialog, Dialog } from '../../../base/dialog';
 import {
     PARTICIPANT_ROLE,
     getLocalParticipant
@@ -36,11 +37,12 @@ const recordingSteps = [ 'To start recording click on start recording',
 ];
 
 
-function LocalRecordingDialog(props) {
-    const { onClose, handleStartRecording, open,
-        isModerator,
-        isEngaged,
-        recordingEngagedAt } = props;
+function LocalRecordingDialog({
+    onClose,
+    open,
+    isModerator,
+    isEngaged,
+    recordingEngagedAt }) {
 
     const classes = useStyles();
 
@@ -50,58 +52,77 @@ function LocalRecordingDialog(props) {
 
     const handleStart = () => {
         recordingController.startRecording();
+        handleCancel();
     };
 
 
     const handleStop = () => {
         recordingController.stopRecording();
+        handleCancel();
     };
 
     const onSubmit = () => {
-        if (!isEngaged) {
-            return handleStart();
+        if (isModerator) {
+            if (!isEngaged) {
+                return handleStart();
+            }
+            handleStop();
         }
-        handleStop();
+        handleCancel();
     };
 
 
-    if (!open || !isModerator) {
+    if (!open) {
         return null;
     }
+
+    const renderModeratorControls = (
+    <>
+        <Typography>Follow the below steps to do screen recording:</Typography>
+        <List>
+            {recordingSteps.map((el, i) => (
+                <ListItem
+                    dense = { true }
+                    disableGutters = { true }
+                    key = { i }>
+                    <ListItemText
+                        primary = { `*${el}` } />
+                </ListItem>
+            ))}
+        </List>
+    </>);
+
+    const renderNoModeratorControls
+        = <Typography>Only those with moderator access can turn on recordings in sessions</Typography>;
+
+    const defineSubmitButtonText = isModerator
+        // eslint-disable-next-line no-negated-condition
+        ? !isEngaged ? 'Start Recording' : 'Stop Recording'
+        : 'Ok';
 
     return (
         <Dialog
             cancelKey = { 'dialog.close' }
             className = { classes.root }
             maxWidth = 'md'
-            // eslint-disable-next-line no-negated-condition
-            okKey = { !isEngaged ? 'Start Recording' : 'Stop Recording' }
+            okKey = { defineSubmitButtonText }
+            onCancel = { handleCancel }
             onSubmit = { onSubmit }
-
-            // onCancel = { handleCancel }
-
-            // onEscapeKeyDown = { handleCancel }
             open = { open }>
             <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
-                <Typography>Follow the below steps to do screen recording:</Typography>
-                <List>
-                    {recordingSteps.map((el, i) => (
-                        <ListItem
-                            dense = { true }
-                            disableGutters = { true }
-                            key = { i }>
-                            <ListItemText
-                                primary = { `*${el}` } />
-                        </ListItem>
-                    ))}
-                </List>
+                {isModerator ? renderModeratorControls : renderNoModeratorControls}
             </DialogContent>
         </Dialog>
     );
 }
 
 LocalRecordingDialog.propTypes = {
+    isEngaged: PropTypes.bool,
+    isModerator: PropTypes.bool,
+    onClose: PropTypes.func,
+    open: PropTypes.bool,
+    recordingEngagedAt: PropTypes.any
 };
 
 const mapStateToProps = state => {
@@ -118,9 +139,10 @@ const mapStateToProps = state => {
         recordingEngagedAt
     };
 };
-const mapDispatchToProps = () => {
-    return { };
+const mapDispatchToProps = dispatch => {
+    return {
+        onClose: () => dispatch(hideDialog())
+    };
 };
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(LocalRecordingDialog);

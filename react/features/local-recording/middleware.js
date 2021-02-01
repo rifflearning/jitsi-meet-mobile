@@ -94,15 +94,13 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case TRACK_ADDED: {
-        console.log('kghdkghdfk added', getState()['features/local-recording'])
         const { isEngaged } = getState()['features/local-recording'];
+        const { conference } = getState()['features/base/conference'];
 
-        if (!isEngaged) {
-            return;
-        }
+
         const { track } = action;
 
-        if (!track || track.local) {
+        if (!track || track.local || !isEngaged || !conference.isModerator()) {
             return;
         }
 
