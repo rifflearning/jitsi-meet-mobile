@@ -6,7 +6,7 @@ class AudioStreamsMixer {
     initializeAudioContext(streamsArr) {
         this.ctx = new AudioContext();
         this.dest = this.ctx.createMediaStreamDestination();
-        streamsArr.length && streamsArr.map(stream => {
+        streamsArr.length && streamsArr.forEach(stream => {
             if (stream.getAudioTracks().length) {
                 this.ctx.createMediaStreamSource(stream).connect(this.dest);
             }

@@ -56,7 +56,12 @@ type Props = {
     /**
      * Invoked to obtain translated strings.
      */
-    t: Function
+    t: Function,
+
+    /**
+     * Current format.
+     */
+    format: string
 }
 
 /**

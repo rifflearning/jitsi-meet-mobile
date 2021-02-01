@@ -41,8 +41,7 @@ function LocalRecordingDialog({
     onClose,
     open,
     isModerator,
-    isEngaged,
-    recordingEngagedAt }) {
+    isEngaged }) {
 
     const classes = useStyles();
 

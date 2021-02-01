@@ -45,7 +45,7 @@ export default class WebmAdapter extends RecordingAdapter {
      *
      * @private
      */
-    _conference: * = null;
+    _conference = null;
 
     /**
      * Implements {@link RecordingAdapter#start()}.
