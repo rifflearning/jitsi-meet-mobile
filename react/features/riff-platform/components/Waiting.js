@@ -81,14 +81,14 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
     };
 
     const checkMeeting = () => {
-        checkIsMeetingAllowedProp(params.meetingId).then(m => {
-            switch (m.error) {
+        checkIsMeetingAllowedProp(params.meetingId).then(res => {
+            switch (res.error) {
             case errorTypes.NO_MEETING:
                 return history.push(ROUTES.JOIN);
             case errorTypes.NOT_A_MEETING_TIME:
-                return waitForMeeting(m.meeting);
+                return waitForMeeting(res.meeting);
             case errorTypes.NO_HOST_ERROR:
-                return waitForHost(m.meeting);
+                return waitForHost(res.meeting);
             case errorTypes.NOT_JOIN_NEW_USER_TO_ENDED_MEETING:
                 return setExpiredMeetingError(true);
             default:
@@ -148,7 +148,8 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
 
                 {/* host will be able to edit meeting, can go to meeting directly, can send invitation?' */}
                 <Typography color = 'error'>
-                    {Boolean(waitingTime) && `You can join the meeting 5 min before the start. You'll be able to join in ${time}`}
+                    {Boolean(waitingTime)
+                    && `You can join the meeting 5 min before the start. You'll be able to join in ${time}`}
                     {Boolean(noHostError) && 'No host, waiting for a host...'}
                     {Boolean(expiredMeetingError) && 'Meeting is expired. Please, join another meeting.'}
                 </Typography>

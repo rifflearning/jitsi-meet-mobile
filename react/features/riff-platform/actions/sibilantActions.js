@@ -20,10 +20,9 @@ export function attachSibilant(tracks) {
             const { accessToken } = await loginToServerForSibilant();
 
             const userData = getState()['features/riff-platform'].signIn.user;
-            const meetingUrl = getState()['features/recent-list'].pop()?.conference;
             const room = getState()['features/riff-platform'].meeting.meeting.name;
 
-            await riffAddUserToMeeting(userData, meetingUrl, room, accessToken);
+            await riffAddUserToMeeting(userData, room, accessToken);
 
             if (config.iAmRecorder) {
                 const mockData = {
@@ -54,7 +53,7 @@ export function attachSibilant(tracks) {
             // eslint-disable-next-line no-inner-declarations
             function reconnectSibilant(initialStream) {
                 // eslint-disable-next-line max-len
-                const newStream = initialStream || APP.store.getState()['features/base/conference'].conference.getLocalAudioTrack().stream;
+                const newStream = initialStream || APP.store.getState()['features/base/conference'].conference?.getLocalAudioTrack().stream;
 
                 if (newStream && newStream !== oldStream) {
                     oldStream = newStream;
@@ -72,17 +71,14 @@ export function attachSibilant(tracks) {
     };
 }
 
-async function riffAddUserToMeeting({ uid, displayName, email }, meetingUrl, room, token) {
+async function riffAddUserToMeeting({ uid, displayName, context = '' }, room, token) {
     try {
         socket.emit('meetingJoined', {
             participant: uid,
-            email,
             name: displayName,
             room,
-            description: 'default meeting description',
-            meetingUrl,
-            consent: true,
-            consentDate: new Date().toISOString(),
+            title: room,
+            context,
             token
         });
     } catch (error) {

@@ -2941,6 +2941,7 @@ const mockEmotionsData = [
     }
 ];
 
+// eslint-disable-next-line no-unused-vars
 export const mockFetchEmotions = meetingId => Promise.resolve(mockEmotionsData);
 
 export const mockFetchUserNames = arrUids => Promise.resolve(arrUids.map((id, i) => {

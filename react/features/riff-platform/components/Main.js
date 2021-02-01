@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => {
     };
 });
 
-const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ID;
+const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ADMIN_USER_ID;
 
 // eslint-disable-next-line require-jsdoc
 function Meetings() {
