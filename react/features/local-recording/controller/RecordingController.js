@@ -564,20 +564,7 @@ class RecordingController {
      * @returns {void}
      */
     _doStartRecording() {
-        console.log('this._state', this._state);
         if (this._state === ControllerState.STARTING) {
-
-            if (!this._conference.isModerator()) {
-                if (this._onNotify) {
-                    this._onNotify('localRecording.messages.engaged');
-                }
-
-                this._updateStats();
-                this._changeState(ControllerState.RECORDING);
-
-                return Promise.resolve();
-            }
-
             const delegate = this._adapters[this._currentSessionToken];
 
             delegate.start(this._micDeviceId, this._conference)
@@ -614,16 +601,6 @@ class RecordingController {
     _doStopRecording() {
         if (this._state === ControllerState.STOPPING) {
             const token = this._currentSessionToken;
-
-            if (!this._conference.isModerator()) {
-                if (this._onNotify) {
-                    this._onNotify('Recording session {{token}} finished');
-                }
-                this._changeState(ControllerState.IDLE);
-                this._updateStats();
-
-                return Promise.resolve();
-            }
 
             return this._adapters[this._currentSessionToken]
                 .stop()

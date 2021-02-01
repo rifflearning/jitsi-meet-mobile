@@ -42,8 +42,6 @@ function LocalRecordingDialog(props) {
         isEngaged,
         recordingEngagedAt } = props;
 
-    console.log('isEngaged', isEngaged);
-
     const classes = useStyles();
 
     const handleCancel = () => {

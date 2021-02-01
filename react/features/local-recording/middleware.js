@@ -35,15 +35,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             break;
         }
 
-        const conferenc = getState()['features/base/conference'];
-        console.log('conference', conferenc)
-
-        console.log('kghdkghdfk', getState()['features/local-recording'])
-
         // realize the delegates on recordingController, allowing the UI to
         // react to state changes in recordingController.
         recordingController.onStateChanged = isEngaged => {
-            console.log('skjgskgdgkj', isEngaged)
             if (isEngaged) {
                 const nowTime = new Date();
 

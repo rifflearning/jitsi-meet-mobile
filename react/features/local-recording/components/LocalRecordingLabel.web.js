@@ -42,8 +42,6 @@ class LocalRecordingLabel extends Component<Props> {
             return null;
         }
 
-        console.log('isEngaged------------------', this.props.isEngaged);
-
         return (
             <Tooltip
                 content = { this.props.t('localRecording.labelToolTip') }
