@@ -65,7 +65,6 @@ export class OggAdapter extends RecordingAdapter {
      */
     exportRecordedData() {
         if (this._recordedData !== null) {
-            console.log('this._recordedData ', this._recordedData);
 
             return Promise.resolve({
                 data: this._recordedData,
