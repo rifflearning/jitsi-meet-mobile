@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable require-jsdoc */
+/* global interfaceConfig */
+
 import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
 import DialogContent from '@material-ui/core/DialogContent';
 import { makeStyles } from '@material-ui/core/styles';
@@ -31,7 +33,8 @@ const useStyles = makeStyles(() => {
 
 
 const recordingSteps = [ 'To start recording click on start recording',
-    'Select the screen type to start recording',
+    // eslint-disable-next-line camelcase
+    `Select ${interfaceConfig.APP_NAME} screen type to start recording`,
     'Click on share button to confirm recording',
     'To stop recording click on stop recording'
 ];
