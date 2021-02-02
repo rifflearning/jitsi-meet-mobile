@@ -134,7 +134,6 @@ import UIEvents from './service/UI/UIEvents';
 import * as RemoteControlEvents
     from './service/remotecontrol/RemoteControlEvents';
 
-
 const logger = Logger.getLogger(__filename);
 
 const eventEmitter = new EventEmitter();

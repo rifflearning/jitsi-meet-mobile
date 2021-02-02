@@ -10,7 +10,7 @@ import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
 import { TRACK_ADDED } from '../base/tracks/actionTypes';
 import { showNotification } from '../notifications/actions';
-import WebmAdapter from '../riff-platform/components/Local-Recorder/WebmAdapter';
+import WebmAdapter from '../riff-platform/components/LocalRecorder/WebmAdapter';
 
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 import { LocalRecordingInfoDialog } from './components';

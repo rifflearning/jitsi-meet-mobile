@@ -2,7 +2,7 @@
 /* @flow */
 
 import { i18next } from '../../base/i18n';
-import WebmAdapter from '../../riff-platform/components/Local-Recorder/WebmAdapter';
+import WebmAdapter from '../../riff-platform/components/LocalRecorder/WebmAdapter';
 import logger from '../logger';
 import {
     FlacAdapter,

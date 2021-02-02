@@ -17,7 +17,6 @@ class AudioStreamsMixer {
 
     addNewStream(newUserStream) {
         if (newUserStream.getAudioTracks().length) {
-            console.log(this);
             this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
         }
 
