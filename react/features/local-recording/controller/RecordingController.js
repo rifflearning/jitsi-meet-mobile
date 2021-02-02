@@ -524,7 +524,9 @@ class RecordingController {
      */
     _onStopCommand(value) {
         if (this._state === ControllerState.RECORDING
-            && this._currentSessionToken === value.attributes.sessionToken) {
+        // FIX: comment temporary for stop recording on conference leave
+        // && this._currentSessionToken === value.attributes.sessionToken)
+        ) {
             this._changeState(ControllerState.STOPPING);
             this._doStopRecording();
         }

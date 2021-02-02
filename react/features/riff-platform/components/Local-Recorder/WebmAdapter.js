@@ -204,7 +204,7 @@ export default class WebmAdapter extends RecordingAdapter {
                     resolve();
 
                     this._mediaRecorder.onended = () => {
-                        console.log('Capture stream inactive');
+                        logger.log('Capture stream inactive');
                         recordingController.stopRecording();
                     };
                     this._recorderStream.getVideoTracks()[0].addEventListener('ended',

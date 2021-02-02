@@ -2,7 +2,7 @@
 
 import { createShortcutEvent, sendAnalytics } from '../analytics';
 import { APP_WILL_UNMOUNT } from '../base/app/actionTypes';
-import { CONFERENCE_JOINED } from '../base/conference/actionTypes';
+import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../base/conference/actionTypes';
 import { toggleDialog } from '../base/dialog/actions';
 import { i18next } from '../base/i18n';
 import { SET_AUDIO_MUTED } from '../base/media/actionTypes';
@@ -109,6 +109,16 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
 
             webmRecordingController._addNewParticipantAudioStream(track.jitsiTrack.stream);
         }
+        break;
+    }
+    case CONFERENCE_WILL_LEAVE: {
+        const { isEngaged } = getState()['features/local-recording'];
+        const { conference } = action;
+
+        if (!isEngaged || !conference.isModerator()) {
+            return;
+        }
+        recordingController._onStopCommand();
         break;
     }
     }
