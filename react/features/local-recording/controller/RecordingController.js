@@ -616,7 +616,7 @@ class RecordingController {
 
                     const messageKey
                         = this._conference.isModerator()
-                            ? 'Recording session {{token}} finished. The recording of the local track has been saved'
+                            ? 'Recording session {{token}} finished. The recording file has been saved'
                             : 'Recording session {{token}} finished.';
                     const messageParams = {
                         token
