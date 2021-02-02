@@ -2,17 +2,20 @@
 
 import { createShortcutEvent, sendAnalytics } from '../analytics';
 import { APP_WILL_UNMOUNT } from '../base/app/actionTypes';
-import { CONFERENCE_JOINED } from '../base/conference/actionTypes';
+import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../base/conference/actionTypes';
 import { toggleDialog } from '../base/dialog/actions';
 import { i18next } from '../base/i18n';
 import { SET_AUDIO_MUTED } from '../base/media/actionTypes';
 import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
+import { TRACK_ADDED } from '../base/tracks/actionTypes';
 import { showNotification } from '../notifications/actions';
+import WebmAdapter from '../riff-platform/components/LocalRecorder/WebmAdapter';
 
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 import { LocalRecordingInfoDialog } from './components';
 import { recordingController } from './controller';
+
 
 declare var APP: Object;
 
@@ -88,6 +91,34 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         if (micDeviceId) {
             recordingController.setMicDevice(micDeviceId);
         }
+        break;
+    }
+    case TRACK_ADDED: {
+        const { isEngaged } = getState()['features/local-recording'];
+        const { conference } = getState()['features/base/conference'];
+
+
+        const { track } = action;
+
+        if (!track || track.local || !isEngaged || !conference.isModerator()) {
+            return;
+        }
+
+        if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
+            const webmRecordingController = new WebmAdapter();
+
+            webmRecordingController._addNewParticipantAudioStream(track.jitsiTrack.stream);
+        }
+        break;
+    }
+    case CONFERENCE_WILL_LEAVE: {
+        const { isEngaged } = getState()['features/local-recording'];
+        const { conference } = action;
+
+        if (!isEngaged || !conference.isModerator()) {
+            return;
+        }
+        recordingController._onStopCommand();
         break;
     }
     }

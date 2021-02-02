@@ -65,6 +65,7 @@ export class OggAdapter extends RecordingAdapter {
      */
     exportRecordedData() {
         if (this._recordedData !== null) {
+
             return Promise.resolve({
                 data: this._recordedData,
                 format: 'ogg'
@@ -102,6 +103,7 @@ export class OggAdapter extends RecordingAdapter {
         return Promise.resolve();
     }
 
+
     /**
      * Initialize the adapter.
      *
@@ -116,7 +118,7 @@ export class OggAdapter extends RecordingAdapter {
 
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
-            .then(stream => {
+            .then(async stream => {
                 this._stream = stream;
                 this._mediaRecorder = new MediaRecorder(stream);
                 this._mediaRecorder.ondataavailable
