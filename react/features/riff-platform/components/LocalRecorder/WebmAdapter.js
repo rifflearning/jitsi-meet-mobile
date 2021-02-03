@@ -90,6 +90,24 @@ export default class WebmAdapter extends RecordingAdapter {
         );
     }
 
+    handleStopNoMaderator() {
+        recordingController._changeState('IDLE');
+        logger.log('Local recording unengaged.');
+
+        const messageKey = 'Recording session {{token}} finished.';
+        const messageParams = {
+            token: '000000'
+        };
+
+        if (recordingController._onNotify) {
+            recordingController._onNotify(messageKey, messageParams);
+        }
+        if (recordingController._onStateChanged) {
+            recordingController._onStateChanged(false);
+        }
+        recordingController._updateStats();
+    }
+
     /**
      * Returns the remote participant audio stream.
      *
@@ -242,4 +260,6 @@ export default class WebmAdapter extends RecordingAdapter {
         return this._replaceMic(micDeviceId);
     }
 }
+
+export const webmController = new WebmAdapter();
 

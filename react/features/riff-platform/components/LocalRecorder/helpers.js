@@ -1,5 +1,9 @@
 /* eslint-disable require-jsdoc */
+import { localRecordingUnengaged } from '../../../local-recording/actions';
+import { recordingController } from '../../../local-recording/controller';
 import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/libs/utils';
+
+import { webmController } from './WebmAdapter';
 
 class AudioStreamsMixer {
 
@@ -57,4 +61,12 @@ export const stopLocalVideo = async recorderStream => {
     recorderStream.getTracks().forEach(async track => {
         track.stop();
     });
+};
+
+export const stopLocalRecordingHandling = ({ dispatch, getState }, user) => {
+
+    if (getState()['features/local-recording'].isEngaged && user._role === 'moderator') {
+       // user._conference.removeCommand('localRecStart');
+        webmController.handleStopNoMaderator();
+    }
 };

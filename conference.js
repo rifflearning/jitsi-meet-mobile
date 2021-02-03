@@ -124,6 +124,7 @@ import {
     isPrejoinPageVisible
 } from './react/features/prejoin';
 import { startRiffServices } from './react/features/riff-platform/actions/jitsiActions';
+import { stopLocalRecordingHandling } from './react/features/riff-platform/components/LocalRecorder/helpers';
 import { createRnnoiseProcessorPromise } from './react/features/rnnoise';
 import { toggleScreenshotCaptureEffect } from './react/features/screenshot-capture';
 import { setSharedVideoStatus } from './react/features/shared-video';
@@ -1991,10 +1992,11 @@ export default {
         room.on(JitsiConferenceEvents.USER_LEFT, (id, user) => {
             // The logic shared between RN and web.
             commonUserLeftHandling(APP.store, room, user);
-
             if (user.isHidden()) {
                 return;
             }
+
+            stopLocalRecordingHandling(APP.store, user);
 
             logger.log(`USER ${id} LEFT:`, user);
 
