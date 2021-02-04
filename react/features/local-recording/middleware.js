@@ -10,11 +10,11 @@ import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
 import { TRACK_ADDED } from '../base/tracks/actionTypes';
 import { showNotification } from '../notifications/actions';
+import { recordingController } from '../riff-platform/components/LocalRecorder/LocalRecorderController';
 import WebmAdapter from '../riff-platform/components/LocalRecorder/WebmAdapter';
 
 import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 import { LocalRecordingInfoDialog } from './components';
-import { recordingController } from './controller';
 
 
 declare var APP: Object;

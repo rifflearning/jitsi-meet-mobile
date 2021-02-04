@@ -15,7 +15,8 @@ import {
     getLocalParticipant
 } from '../../../base/participants';
 import { connect } from '../../../base/redux';
-import { recordingController } from '../../../local-recording/controller';
+
+import { recordingController } from './LocalRecorderController';
 
 const useStyles = makeStyles(() => {
     return {
@@ -64,13 +65,10 @@ function LocalRecordingDialog({
     };
 
     const onSubmit = () => {
-        if (isModerator) {
-            if (!isEngaged) {
-                return handleStart();
-            }
-            handleStop();
+        if (!isEngaged) {
+            return handleStart();
         }
-        handleCancel();
+        handleStop();
     };
 
 
@@ -97,10 +95,8 @@ function LocalRecordingDialog({
     const renderNoModeratorControls
         = <Typography>Only those with moderator access can turn on recordings in sessions</Typography>;
 
-    const defineSubmitButtonText = isModerator
-        // eslint-disable-next-line no-negated-condition
-        ? !isEngaged ? 'Start Recording' : 'Stop Recording'
-        : 'Ok';
+    // eslint-disable-next-line no-negated-condition
+    const defineSubmitButtonText = !isEngaged ? 'Start Recording' : 'Stop Recording';
 
     return (
         <Dialog
