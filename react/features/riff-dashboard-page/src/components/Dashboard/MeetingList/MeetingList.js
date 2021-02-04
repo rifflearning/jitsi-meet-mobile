@@ -107,7 +107,7 @@ class MeetingList extends React.Component {
                 const selected = this.props.selectedMeeting !== null &&
                                  meeting._id === this.props.selectedMeeting._id;
 
-                const roomName = meeting.room;
+                const roomName = meeting.title;
 
                 return (
                     <MeetingListElement
