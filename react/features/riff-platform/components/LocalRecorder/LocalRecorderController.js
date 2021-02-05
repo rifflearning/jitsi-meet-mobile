@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-vars */
-/* @flow */
+/* eslint-disable flowtype/no-types-missing-file-annotation */
 
 import { i18next } from '../../../base/i18n';
-import { connect } from '../../../base/redux';
 import logger from '../../../local-recording/logger';
 import { downloadBlob } from '../../../local-recording/recording';
 import { sessionManager } from '../../../local-recording/session';
@@ -62,7 +61,7 @@ const ControllerState = Object.freeze({
     RECORDING: Symbol('RECORDING'),
 
     /**
-     * Stopping.
+     * Stopping."flowtype/no-types-missing-file-annotation": 0
      */
     STOPPING: Symbol('STOPPING'),
 
@@ -570,7 +569,7 @@ class LocalRecordingController {
         }
     }
 
-    _onStartNotification: (*) => void
+    _onStartNotification: (*) => void;
 
     /**
      * Callback function for XMPP event.
@@ -632,6 +631,7 @@ class LocalRecordingController {
 
     }
 
+    // eslint-disable-next-line flowtype/no-types-missing-file-annotation
     _stopRecordingNotificationHandler: () => void;
 
     /**
@@ -651,6 +651,7 @@ class LocalRecordingController {
         }
     }
 
+    // eslint-disable-next-line flowtype/no-types-missing-file-annotation
     _onStopNotification: (*) => void;
 
     /**
@@ -691,7 +692,7 @@ class LocalRecordingController {
         return isAnyLocalRecordingEnabled;
     }
 
-
+    // eslint-disable-next-line flowtype/no-types-missing-file-annotation
     _switchToNewSession: (string) => void;
 
     /**
