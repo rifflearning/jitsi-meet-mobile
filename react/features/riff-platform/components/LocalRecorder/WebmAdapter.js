@@ -8,12 +8,12 @@ import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers'
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
  */
-const MEDIARECORDER_TIMESLICE = 1000;
+const MEDIARECORDER_TIMESLICE = 180000;
 
 /**
  * Defined max size for blob(MB).
  */
-const MEDIARECORDER_MAX_SIZE = 2;
+const MEDIARECORDER_MAX_SIZE = 100;
 
 /**
  * Recording adapter that uses {@code MediaRecorder}
