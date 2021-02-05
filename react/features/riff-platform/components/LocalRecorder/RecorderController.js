@@ -1,24 +1,28 @@
 /* eslint-disable no-unused-vars */
 /* @flow */
 
-import { i18next } from '../../../base/i18n';
-import logger from '../../../local-recording/logger';
+import { i18next } from '../../base/i18n';
+import WebmAdapter from '../../riff-platform/components/LocalRecorder/WebmAdapter';
+import logger from '../logger';
 import {
+    FlacAdapter,
+    OggAdapter,
+    WavAdapter,
     downloadBlob
-} from '../../../local-recording/recording';
-import { sessionManager } from '../../../local-recording/session';
-
-import WebmAdapter from './WebmAdapter';
+} from '../recording';
+import { sessionManager } from '../session';
 
 /**
  * XMPP command for signaling the start of local recording to all clients.
+ * Should be sent by the moderator only.
  */
-export const COMMAND_START = 'localRecStart';
+const COMMAND_START = 'localRecStart';
 
 /**
  * XMPP command for signaling the stop of local recording to all clients.
+ * Should be sent by the moderator only.
  */
-export const COMMAND_STOP = 'localRecStop';
+const COMMAND_STOP = 'localRecStop';
 
 /**
  * One-time command used to trigger the moderator to resend the commands.
@@ -40,12 +44,17 @@ const COMMAND_PONG = 'localRecPong';
 const PROPERTY_STATS = 'localRecStats';
 
 /**
- * Default recording format.
+ * Supported recording formats.
  */
-const DEFAULT_RECORDING_FORMAT = 'webm';
+const RECORDING_FORMATS = new Set([ 'flac', 'wav', 'ogg', 'webm' ]);
 
 /**
- * States of the {@code LocalRecordingController}.
+ * Default recording format.
+ */
+const DEFAULT_RECORDING_FORMAT = 'flac';
+
+/**
+ * States of the {@code RecordingController}.
  */
 const ControllerState = Object.freeze({
     /**
@@ -77,7 +86,7 @@ const ControllerState = Object.freeze({
 /**
  * Type of the stats reported by each participant (client).
  */
-type LocalRecordingStats = {
+type RecordingStats = {
 
     /**
      * Current local recording session token used by the participant.
@@ -103,8 +112,10 @@ type LocalRecordingStats = {
 /**
  * The component responsible for the coordination of local recording, across
  * multiple participants.
+ * Current implementation requires that there is only one moderator in a room.
  */
-class LocalRecordingController {
+class RecordingController {
+
     /**
      * For each recording session, there is a separate @{code RecordingAdapter}
      * instance so that encoded bits from the previous sessions can still be
@@ -112,7 +123,7 @@ class LocalRecordingController {
      *
      * @private
      */
-    _adapter = {};
+    _adapters = {};
 
     /**
      * The {@code JitsiConference} instance.
@@ -131,7 +142,7 @@ class LocalRecordingController {
     _currentSessionToken: number = -1;
 
     /**
-     * Current state of {@code LocalRecordingController}.
+     * Current state of {@code RecordingController}.
      *
      * @private
      */
@@ -139,7 +150,7 @@ class LocalRecordingController {
 
     /**
      * Whether or not the audio is muted in the UI. This is stored as internal
-     * state of {@code LocalRecordingController} because we might have recording
+     * state of {@code RecordingController} because we might have recording
      * sessions that start muted.
      */
     _isMuted = false;
@@ -161,7 +172,7 @@ class LocalRecordingController {
     _format = DEFAULT_RECORDING_FORMAT;
 
     /**
-     * Whether or not the {@code LocalRecordingController} has registered for
+     * Whether or not the {@code RecordingController} has registered for
      * XMPP events. Prevents initialization from happening multiple times.
      *
      * @private
@@ -169,21 +180,21 @@ class LocalRecordingController {
     _registered = false;
 
     /**
-     * FIXME: callback function for the {@code LocalRecordingController} to notify
-     * UI it wants to display a notice. Keeps {@code LocalRecordingController}
+     * FIXME: callback function for the {@code RecordingController} to notify
+     * UI it wants to display a notice. Keeps {@code RecordingController}
      * decoupled from UI.
      */
     _onNotify: ?(messageKey: string, messageParams?: Object) => void;
 
     /**
-     * FIXME: callback function for the {@code LocalRecordingController} to notify
-     * UI it wants to display a warning. Keeps {@code LocalRecordingController}
+     * FIXME: callback function for the {@code RecordingController} to notify
+     * UI it wants to display a warning. Keeps {@code RecordingController}
      * decoupled from UI.
      */
     _onWarning: ?(messageKey: string, messageParams?: Object) => void;
 
     /**
-     * FIXME: callback function for the {@code LocalRecordingController} to notify
+     * FIXME: callback function for the {@code RecordingController} to notify
      * UI that the local recording state has changed.
      */
     _onStateChanged: ?(boolean) => void;
@@ -203,11 +214,10 @@ class LocalRecordingController {
         this._doStopRecording = this._doStopRecording.bind(this);
         this._updateStats = this._updateStats.bind(this);
         this._switchToNewSession = this._switchToNewSession.bind(this);
-
-        this._startRecordingNotificationHandler = this._startRecordingNotificationHandler.bind(this);
-        this._onStartNotification = this._onStartNotification.bind(this);
-        this._stopRecordingNotificationHandler = this._stopRecordingNotificationHandler.bind(this);
-        this._onStopNotification = this._onStopNotification.bind(this);
+        this._startRecordingEventHandler = this._startRecordingEventHandler.bind(this);
+        this._onStartRecording = this._onStartRecording.bind(this);
+        this._stopRecordingEventHandler = this._stopRecordingEventHandler.bind(this);
+        this._onStopRecording = this._onStopRecording.bind(this);
     }
 
     registerEvents: () => void;
@@ -222,10 +232,15 @@ class LocalRecordingController {
         if (!this._registered) {
             this._conference = conference;
             if (this._conference) {
-                this._conference
-                    .addCommandListener(COMMAND_STOP, this._onStopNotification);
-                this._conference
-                    .addCommandListener(COMMAND_START, this._onStartNotification);
+                //this._conference
+                   // .addCommandListener(COMMAND_STOP, this._onStopCommand);
+                    this._conference
+                    .addCommandListener(COMMAND_STOP, this._onStopRecording);
+              //  this._conference
+                  //  .addCommandListener(COMMAND_START, this._onStartCommand);
+                  this._conference
+                    .addCommandListener(COMMAND_START, this._onStartRecording);
+                    
                 this._conference
                     .addCommandListener(COMMAND_PING, this._onPingCommand);
                 this._registered = true;
@@ -267,26 +282,54 @@ class LocalRecordingController {
     }
 
     /**
-     * Signals the participant to start local recording.
+     * Signals the participants to start local recording.
      *
      * @returns {void}
      */
     startRecording() {
         this.registerEvents();
+       /* if (this._conference && this._conference.isModerator()) {
+            this._conference.removeCommand(COMMAND_STOP);
+            this._conference.sendCommand(COMMAND_START, {
+                attributes: {
+                    sessionToken: this._getRandomToken(),
+                    format: this._format
+                }
+            });
+        } else if (this._onWarning) {
+            this._onWarning('localRecording.messages.notModerator');
+        }*/
         this._onStartCommand({
-            sessionToken: this._getRandomToken()
+            attributes: {
+                sessionToken: this._getRandomToken(),
+                format: this._format
+            }
         });
     }
 
     /**
-     * Signals the participant to stop local recording.
+     * Signals the participants to stop local recording.
      *
-     * @param {number} sessionToken - The token of the session to stop.
      * @returns {void}
      */
-    stopRecording(sessionToken) {
-        this.getParticipantsStats();
-        this._onStopCommand({ sessionToken: this.currentSessionToken });
+    stopRecording() {
+       /* if (this._conference) {
+            if (this._conference.isModerator()) {
+                this._conference.removeCommand(COMMAND_START);
+                this._conference.sendCommand(COMMAND_STOP, {
+                    attributes: {
+                        sessionToken: this._currentSessionToken
+                    }
+                });
+            } else if (this._onWarning) {
+                this._onWarning('localRecording.messages.notModerator');
+            }
+        }*/
+        this._onStopCommand({
+            attributes: {
+                sessionToken: this.currentSessionToken
+            }
+        });
     }
 
     /**
@@ -297,8 +340,8 @@ class LocalRecordingController {
      * @returns {void}
      */
     downloadRecordedData(sessionToken: number) {
-        if (this._adapter) {
-            this._adapter.exportRecordedData()
+        if (this._adapters[sessionToken]) {
+            this._adapters[sessionToken].exportRecordedData()
                 .then(args => {
                     const { data, format } = args;
 
@@ -308,7 +351,7 @@ class LocalRecordingController {
                     downloadBlob(data, filename);
                 })
                 .catch(error => {
-                    logger.error('Failed to download media for'
+                    logger.error('Failed to download audio for'
                         + ` session ${sessionToken}. Error: ${error}`);
                 });
         } else {
@@ -327,13 +370,14 @@ class LocalRecordingController {
             this._micDeviceId = String(micDeviceId);
 
             if (this._state === ControllerState.RECORDING) {
-
+                // sessionManager.endSegment(this._currentSessionToken);
                 logger.log('Before switching microphone...');
-                this._adapter
+                this._adapters[this._currentSessionToken]
                     .setMicDevice(this._micDeviceId)
                     .then(() => {
                         logger.log('Finished switching microphone.');
 
+                        // sessionManager.beginSegment(this._currentSesoken);
                     })
                     .catch(() => {
                         logger.error('Failed to switch microphone');
@@ -354,7 +398,7 @@ class LocalRecordingController {
         this._isMuted = Boolean(muted);
 
         if (this._state === ControllerState.RECORDING) {
-            this._adapter.setMuted(this._isMuted);
+            this._adapters[this._currentSessionToken].setMuted(this._isMuted);
         }
     }
 
@@ -365,6 +409,11 @@ class LocalRecordingController {
      * @returns {void}
      */
     switchFormat(newFormat: string) {
+        if (!RECORDING_FORMATS.has(newFormat)) {
+            logger.log(`Unknown format ${newFormat}. Ignoring...`);
+
+            return;
+        }
         this._format = newFormat;
         logger.log(`Recording format switched to ${newFormat}`);
 
@@ -426,7 +475,7 @@ class LocalRecordingController {
     _changeState: (Symbol) => void;
 
     /**
-     * Changes the current state of {@code LocalRecordingController}.
+     * Changes the current state of {@code RecordingController}.
      *
      * @private
      * @param {Symbol} newState - The new state.
@@ -449,6 +498,7 @@ class LocalRecordingController {
      * @returns {void}
      */
     _updateStats() {
+        console.log('this.getLocalStats()', this.getLocalStats());
         if (this._conference) {
             this._conference.setLocalParticipantProperty(PROPERTY_STATS,
                 JSON.stringify(this.getLocalStats()));
@@ -458,26 +508,30 @@ class LocalRecordingController {
     _onStartCommand: (*) => void;
 
     /**
-     * Function for start local recording.
+     * Callback function for XMPP event.
      *
      * @private
-     * @param {*} sessionToken - The session token.
+     * @param {*} value - The event args.
      * @returns {void}
      */
-    _onStartCommand({ sessionToken }) {
+    _onStartCommand(value) {
+        const { sessionToken, format } = value.attributes;
+
+        console.log('this._state', this._state)
 
         if (this._state === ControllerState.IDLE) {
             this._changeState(ControllerState.STARTING);
-            this._switchToNewSession(sessionToken);
+            this._switchToNewSession(sessionToken, format);
             this._doStartRecording();
         } else if (this._state === ControllerState.RECORDING
             && this._currentSessionToken !== sessionToken) {
             // There is local recording going on, but not for the same session.
-            // , so we need to restart the recording.
+            // This means the current state might be out-of-sync with the
+            // moderator's, so we need to restart the recording.
             this._changeState(ControllerState.STOPPING);
             this._doStopRecording().then(() => {
                 this._changeState(ControllerState.STARTING);
-                this._switchToNewSession(sessionToken);
+                this._switchToNewSession(sessionToken, format);
                 this._doStartRecording();
             });
         }
@@ -486,16 +540,17 @@ class LocalRecordingController {
     _onStopCommand: (*) => void;
 
     /**
-     * Function for stop local recording.
+     * Callback function for XMPP event.
      *
      * @private
-     * @param {*} sessionToken - The session token.
+     * @param {*} value - The event args.
      * @returns {void}
      */
-    _onStopCommand({ sessionToken }) {
-        if (this._state === ControllerState.RECORDING) {
-        // && this._currentSessionToken === sessionToken)
-
+    _onStopCommand(value) {
+        if (this._state === ControllerState.RECORDING
+        // FIX: comment temporary for stop recording on conference leave
+        // && this._currentSessionToken === value.attributes.sessionToken)
+        ) {
             this._changeState(ControllerState.STOPPING);
             this._doStopRecording();
         }
@@ -510,7 +565,7 @@ class LocalRecordingController {
      * @returns {void}
      */
     _onPingCommand() {
-        if (this._conference) {
+        if (this._conference.isModerator()) {
             logger.log('Received ping, sending pong.');
             this._conference.sendCommandOnce(COMMAND_PONG, {});
         }
@@ -535,60 +590,71 @@ class LocalRecordingController {
      * @returns {void}
      */
     _doStartRecording() {
+        console.log('do start')
         if (this._state === ControllerState.STARTING) {
-            const delegate = this._adapter;
+            const delegate = this._adapters[this._currentSessionToken];
 
             delegate.start(this._micDeviceId, this._conference)
             .then(() => {
-                this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
                 logger.log('Local recording engaged.');
+                //this._changeState(ControllerState.RECORDING);
 
-                if (this._onNotify) {
-                    this._onNotify('Local recording engaged.');
-                }
-                this._startRecordingNotificationHandler();
+                //if (this._onNotify) {
+                //    this._onNotify('localRecording.messages.engaged');
+               // }
+              //  if (this._onStateChanged) {
+                //    this._onStateChanged(true);
+               // }
 
-                delegate.setMuted(this._isMuted);
                 this._updateStats();
+                this._startRecordingEventHandler();
+                delegate.setMuted(this._isMuted);
             })
             .catch(err => {
                 this._changeState(ControllerState.IDLE);
+                this._onStateChanged(false);
+                //this._updateStats();
                 logger.error('Failed to start local recording.', err);
             });
         }
 
     }
-
-    /**
-     * Signals the all participants to start local recording.
-     *
-     * @returns {void}
-     */
-    _startRecordingNotificationHandler() {
-        if (this._conference) {
+    _startRecordingEventHandler() {
+        console.log('this._state ev handler', this._state)
+        if (this._conference && this._conference.isModerator()) {
             this._conference.removeCommand(COMMAND_STOP);
             this._conference.sendCommand(COMMAND_START, {
-                attributes: { sessionToken: this._currentSessionToken }
+                attributes: {
+                    sessionToken: this._currentSessionToken,
+                    format: this._format
+                }
             });
         } else if (this._onWarning) {
-            this._onWarning('Failed to send command');
+            this._onWarning('localRecording.messages.notModerator');
         }
     }
 
-    /**
-     * Callback function for XMPP event.
-     *
-     * @private
-     * @param {*} value - The event args.
-     * @returns {void}
-     */
-    _onStartNotification(value) {
-        //  const { sessionToken } = value.attributes;
+    _onStartRecording(value) {
+        console.log('this._state from locstart ev', this._state)
+        console.log('on COMMAND_START')
+        const { sessionToken, format } = value.attributes;
+       // const delegate = this._adapters[this._currentSessionToken];
+        console.log('_onStartRecording')
+        this._changeState(ControllerState.RECORDING);
+              //  sessionManager.beginSegment(this._currentSessionToken);
+                //logger.log('Local recording engaged.');
 
-        if (this._onStateChanged) {
-            this._onStateChanged(true);
-        }
+                if (this._onNotify) {
+                    this._onNotify('localRecording.messages.engaged');
+                }
+                if (this._onStateChanged) {
+                    this._onStateChanged(true);
+                }
+                //console.log('delegate', delegate)
+
+              //  delegate.setMuted(this._isMuted);
+                //this._updateStats();
     }
 
     _doStopRecording: () => Promise<void>;
@@ -603,25 +669,19 @@ class LocalRecordingController {
         if (this._state === ControllerState.STOPPING) {
             const token = this._currentSessionToken;
 
-            return this._adapter
+            return this._adapters[this._currentSessionToken]
                 .stop()
                 .then(() => {
-                    this._changeState(ControllerState.IDLE);
+                   // this._changeState(ControllerState.IDLE);
                     sessionManager.endSegment(this._currentSessionToken);
                     logger.log('Local recording unengaged.');
                     this.downloadRecordedData(token);
 
-                    const messageKey = 'Recording session {{token}} finished.';
-                    const messageParams = {
-                        token: this._currentSessionToken
-                    };
+                    this._stopRecordingEventHandler();
 
-                    if (this._onNotify) {
-                        this._onNotify(messageKey, messageParams);
-                    }
-
-                    this._stopRecordingNotificationHandler();
-
+                   // if (this._onStateChanged) {
+                      //  this._onStateChanged(false);
+                    //}
                     this._updateStats();
                 })
                 .catch(err => {
@@ -636,61 +696,41 @@ class LocalRecordingController {
 
     }
 
-    /**
-     * Signals the all participants to stop local recording.
-     *
-     * @returns {void}
-     */
-    _stopRecordingNotificationHandler() {
-        this.registerEvents();
-        if (this._conference) {
+    _stopRecordingEventHandler() {
+        if (this._conference && this._conference.isModerator()) {
             this._conference.removeCommand(COMMAND_START);
             this._conference.sendCommand(COMMAND_STOP, {
-                attributes: { sessionToken: this._currentSessionToken }
+                attributes: {
+                    sessionToken: this._currentSessionToken
+                }
             });
         } else if (this._onWarning) {
-            this._onWarning('Failed to send command');
+            this._onWarning('localRecording.messages.notModerator');
         }
     }
 
-    /**
-     * Callback function for XMPP event.
-     *
-     * @private
-     * @param {*} value - The event args.
-     * @returns {void}
-     */
-    _onStopNotification(value) {
-        const { sessionToken } = value.attributes;
-        const isAnyLocalRecordingSessionEngaged = this._checkIsAnyLocalRecordingSessionEngaged(sessionToken);
+    _onStopRecording(value) {
+        const { sessionToken, format } = value.attributes;
+        this._changeState(ControllerState.IDLE);
+        //sessionManager.endSegment(this._currentSessionToken);
+        //logger.log('Local recording unengaged.');
+        //this.downloadRecordedData(token);
 
-        if (this._onStateChanged && isAnyLocalRecordingSessionEngaged) {
+        const messageKey
+            = this._conference.isModerator()
+                ? 'Recording session {{token}} finished. The recording file has been saved'
+                : 'Recording session {{token}} finished.';
+        const messageParams = {
+            token: sessionToken
+        };
+
+        if (this._onNotify) {
+            this._onNotify(messageKey, messageParams);
+        }
+        if (this._onStateChanged) {
             this._onStateChanged(false);
         }
     }
-
-    /**
-     * Checks if local recording sessions is engaged after some participant(by currentSessionToken) stopped recording .
-     *
-     * @param {string} currentSessionToken - The current session Token.
-     * @returns {boolean}
-     */
-    _checkIsAnyLocalRecordingSessionEngaged(currentSessionToken) {
-
-        const participantIdLocalRecordingEngaged = Object.values(this.getParticipantsStats())
-            .filter(participant => participant.recordingStats?.isRecording);
-        let isAnyLocalRecordingEnabled = true;
-
-        participantIdLocalRecordingEngaged.forEach(participant => {
-            if (participant.recordingStats?.currentSessionToken
-                     && participant.recordingStats?.currentSessionToken !== parseInt(currentSessionToken, 10)) {
-                isAnyLocalRecordingEnabled = false;
-            }
-        });
-
-        return isAnyLocalRecordingEnabled;
-    }
-
 
     _switchToNewSession: (string, string) => void;
 
@@ -701,18 +741,43 @@ class LocalRecordingController {
      * @param {string} format - The recording format for the session.
      * @returns {void}
      */
-    _switchToNewSession(sessionToken) {
+    _switchToNewSession(sessionToken, format) {
+        console.log('sessionToken'), sessionToken
+        this._format = format;
         this._currentSessionToken = sessionToken;
         logger.log(`New session: ${this._currentSessionToken}, `
             + `format: ${this._format}`);
-        this._adapter = new WebmAdapter();
+        this._adapters[sessionToken]
+             = this._createRecordingAdapter();
         sessionManager.createSession(sessionToken, this._format);
     }
 
+    /**
+     * Creates a recording adapter according to the current recording format.
+     *
+     * @private
+     * @returns {RecordingAdapter}
+     */
+    _createRecordingAdapter() {
+        logger.debug('[RecordingController] creating recording'
+            + ` adapter for ${this._format} format.`);
+
+        switch (this._format) {
+        case 'ogg':
+            return new OggAdapter();
+        case 'flac':
+            return new FlacAdapter();
+        case 'wav':
+            return new WavAdapter();
+        case 'webm':
+            return new WebmAdapter();
+        default:
+            throw new Error(`Unknown format: ${this._format}`);
+        }
+    }
 }
 
 /**
- * Global singleton of {@code LocalRecordingController}.
+ * Global singleton of {@code RecordingController}.
  */
-export const recordingController = new LocalRecordingController();
-
+export const recordingController = new RecordingController();

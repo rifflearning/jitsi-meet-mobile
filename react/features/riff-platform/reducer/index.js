@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 
 import { ReducerRegistry } from '../../base/redux';
 
+import localRecording from './localRecording';
 import meeting from './meeting';
 import meetingMediator from './meetingMediator';
 import meetings from './meetings';
@@ -20,6 +21,7 @@ ReducerRegistry.register('features/riff-platform',
       scheduler,
       riff,
       resetPassword,
-      meetingMediator
+      meetingMediator,
+      localRecording
   })
 );

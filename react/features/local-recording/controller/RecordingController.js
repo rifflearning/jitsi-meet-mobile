@@ -278,6 +278,7 @@ class RecordingController {
      * @returns {void}
      */
     startRecording() {
+        console.log('satrt firsn')
         this.registerEvents();
         if (this._conference && this._conference.isModerator()) {
             this._conference.removeCommand(COMMAND_STOP);

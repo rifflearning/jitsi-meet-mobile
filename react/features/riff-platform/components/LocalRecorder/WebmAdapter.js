@@ -1,8 +1,8 @@
 /* eslint-disable require-jsdoc */
-import { recordingController } from '../../../local-recording/controller';
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
+import { recordingController } from './LocalRecorderController';
 import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
 
 /**
@@ -55,9 +55,6 @@ export default class WebmAdapter extends RecordingAdapter {
     start(micDeviceId, conference) {
         this._conference = conference;
 
-        //if (!this._conference.isModerator()) {
-          //  return Promise.resolve();
-        //}
         this._participatsStream = this._getAudioParticipantsStream() || [];
 
         if (!this._initPromise) {
@@ -78,10 +75,6 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     stop() {
-        //if (!this._conference.isModerator()) {
-            //return Promise.resolve();
-       // }
-
         return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
@@ -202,9 +195,6 @@ export default class WebmAdapter extends RecordingAdapter {
      * @returns {Promise}
      */
     _initialize(micDeviceId) {
-        /*if (this._mediaRecorder || !this._conference.isModerator()) {
-            return Promise.resolve();
-        }*/
 
         if (this._mediaRecorder) {
             return Promise.resolve();
@@ -225,12 +215,13 @@ export default class WebmAdapter extends RecordingAdapter {
                    = e => this._saveMediaData(e.data);
                     resolve();
 
-                    this._mediaRecorder.onended = () => {
+                    this._recorderStream.getVideoTracks()[0].onended = () => {
                         logger.log('Capture stream inactive');
-                        recordingController.stopRecording();
+
+                        return recordingController.stopRecording();
                     };
-                    this._recorderStream.getVideoTracks()[0].addEventListener('ended',
-                        () => recordingController.stopRecording());
+
+                    //this._recorderStream.oninactive = () => recordingController.stopRecording();
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);

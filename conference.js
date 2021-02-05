@@ -1996,7 +1996,7 @@ export default {
                 return;
             }
 
-            stopLocalRecordingHandling(APP.store, user);
+            stopLocalRecordingHandling(user);
 
             logger.log(`USER ${id} LEFT:`, user);
 

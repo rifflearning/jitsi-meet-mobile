@@ -1,9 +1,7 @@
 /* eslint-disable require-jsdoc */
-import { localRecordingUnengaged } from '../../../local-recording/actions';
-import { recordingController } from '../../../local-recording/controller';
 import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/libs/utils';
 
-import { webmController } from './WebmAdapter';
+import { COMMAND_START, COMMAND_STOP } from './LocalRecorderController';
 
 class AudioStreamsMixer {
 
@@ -20,7 +18,7 @@ class AudioStreamsMixer {
     }
 
     addNewStream(newUserStream) {
-        if (newUserStream.getAudioTracks().length) {
+        if (this.ctx && newUserStream.getAudioTracks().length) {
             this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
         }
 
@@ -63,10 +61,16 @@ export const stopLocalVideo = async recorderStream => {
     });
 };
 
-export const stopLocalRecordingHandling = ({ dispatch, getState }, user) => {
+export const stopLocalRecordingHandling = user => {
+    const checkUserLocalRecordingStatus = JSON.parse(user._properties?.localRecStats || null);
 
-    if (getState()['features/local-recording'].isEngaged && user._role === 'moderator') {
-       // user._conference.removeCommand('localRecStart');
-        webmController.handleStopNoMaderator();
+    if (checkUserLocalRecordingStatus?.isRecording) {
+        user._conference.removeCommand(COMMAND_START);
+        user._conference.sendCommand(COMMAND_STOP, {
+            attributes: {
+                sessionToken: checkUserLocalRecordingStatus?.currentSessionToken,
+                participantName: user._id
+            }
+        });
     }
 };
