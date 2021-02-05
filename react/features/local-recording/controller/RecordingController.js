@@ -1,8 +1,6 @@
-/* eslint-disable no-unused-vars */
 /* @flow */
 
 import { i18next } from '../../base/i18n';
-import WebmAdapter from '../../riff-platform/components/LocalRecorder/WebmAdapter';
 import logger from '../logger';
 import {
     FlacAdapter,
@@ -46,7 +44,7 @@ const PROPERTY_STATS = 'localRecStats';
 /**
  * Supported recording formats.
  */
-const RECORDING_FORMATS = new Set([ 'flac', 'wav', 'ogg', 'webm' ]);
+const RECORDING_FORMATS = new Set([ 'flac', 'wav', 'ogg' ]);
 
 /**
  * Default recording format.
@@ -278,7 +276,6 @@ class RecordingController {
      * @returns {void}
      */
     startRecording() {
-        console.log('satrt firsn')
         this.registerEvents();
         if (this._conference && this._conference.isModerator()) {
             this._conference.removeCommand(COMMAND_STOP);
@@ -526,9 +523,7 @@ class RecordingController {
      */
     _onStopCommand(value) {
         if (this._state === ControllerState.RECORDING
-        // FIX: comment temporary for stop recording on conference leave
-        // && this._currentSessionToken === value.attributes.sessionToken)
-        ) {
+            && this._currentSessionToken === value.attributes.sessionToken) {
             this._changeState(ControllerState.STOPPING);
             this._doStopRecording();
         }
@@ -571,7 +566,7 @@ class RecordingController {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapters[this._currentSessionToken];
 
-            delegate.start(this._micDeviceId, this._conference)
+            delegate.start(this._micDeviceId)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
                 sessionManager.beginSegment(this._currentSessionToken);
@@ -588,7 +583,6 @@ class RecordingController {
                 this._updateStats();
             })
             .catch(err => {
-                this._changeState(ControllerState.IDLE);
                 logger.error('Failed to start local recording.', err);
             });
         }
@@ -617,8 +611,8 @@ class RecordingController {
 
                     const messageKey
                         = this._conference.isModerator()
-                            ? 'Recording session {{token}} finished. The recording file has been saved'
-                            : 'Recording session {{token}} finished.';
+                            ? 'localRecording.messages.finishedModerator'
+                            : 'localRecording.messages.finished';
                     const messageParams = {
                         token
                     };
@@ -679,8 +673,6 @@ class RecordingController {
             return new FlacAdapter();
         case 'wav':
             return new WavAdapter();
-        case 'webm':
-            return new WebmAdapter();
         default:
             throw new Error(`Unknown format: ${this._format}`);
         }
