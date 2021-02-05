@@ -2,6 +2,7 @@
 /* @flow */
 
 import { i18next } from '../../../base/i18n';
+import { connect } from '../../../base/redux';
 import logger from '../../../local-recording/logger';
 import { downloadBlob } from '../../../local-recording/recording';
 import { sessionManager } from '../../../local-recording/session';
@@ -389,6 +390,7 @@ class LocalRecordingController {
         const members
             = this._conference.getParticipants()
             .map(member => {
+                console.log('member--------', member)
                 return {
                     id: member.getId(),
                     displayName: member.getDisplayName(),
@@ -487,6 +489,7 @@ class LocalRecordingController {
      */
     _onStopCommand({ sessionToken }) {
         if (this._state === ControllerState.RECORDING) {
+            // FIX: comment temporary for stop recording on conference leave
         // && this._currentSessionToken === sessionToken)
 
             this._changeState(ControllerState.STOPPING);

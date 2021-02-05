@@ -40,10 +40,12 @@ const recordingSteps = [ 'To start recording click on start recording',
 
 function LocalRecordingDialog({
     onClose,
-    open,
-    localParticipant }) {
+    open }) {
 
     const classes = useStyles();
+
+    const isLocalRecordingEngaged = Object.values(recordingController.getParticipantsStats()).find(participant =>
+        participant.isSelf && participant.recordingStats?.isRecording);
 
     const handleCancel = () => {
         onClose();
@@ -60,11 +62,6 @@ function LocalRecordingDialog({
         handleCancel();
     };
 
-    const isLocalRecordingEngaged = Object.keys(recordingController.getParticipantsStats()).find(p => {
-        const participantStatus = recordingController.getParticipantsStats()[p];
-
-        return participantStatus.isSelf && participantStatus.recordingStats.isRecording;
-    });
 
     const onSubmit = () => {
         if (!isLocalRecordingEngaged) {
@@ -72,7 +69,6 @@ function LocalRecordingDialog({
         }
         handleStop();
     };
-
 
     if (!open) {
         return null;
@@ -115,8 +111,6 @@ function LocalRecordingDialog({
 }
 
 LocalRecordingDialog.propTypes = {
-    isEngaged: PropTypes.bool,
-    isModerator: PropTypes.bool,
     onClose: PropTypes.func,
     open: PropTypes.bool,
     recordingEngagedAt: PropTypes.any
@@ -126,11 +120,8 @@ const mapStateToProps = state => {
     const {
         recordingEngagedAt
     } = state['features/riff-platform'].localRecording;
-    const localParticipant
-        = getLocalParticipant(state);
 
     return {
-        localParticipant,
         recordingEngagedAt
     };
 };

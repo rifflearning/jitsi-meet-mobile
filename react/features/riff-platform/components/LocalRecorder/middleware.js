@@ -102,7 +102,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
 
         const { track } = action;
 
-        if (!track || track.local || !isEngaged || !conference.isModerator()) {
+        if (!track || track.local || !isEngaged) {
             return;
         }
 

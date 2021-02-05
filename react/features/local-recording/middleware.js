@@ -10,12 +10,10 @@ import { MiddlewareRegistry } from '../base/redux';
 import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
 import { TRACK_ADDED } from '../base/tracks/actionTypes';
 import { showNotification } from '../notifications/actions';
-import { statsUpdate, localRecordingEngaged, localRecordingUnengaged } from '../riff-platform/actions/localRecording';
 import { recordingController } from '../riff-platform/components/LocalRecorder/LocalRecorderController';
 import WebmAdapter from '../riff-platform/components/LocalRecorder/WebmAdapter';
 
-// import { localRecordingEngaged, localRecordingUnengaged } from './actions';
-import { LocalRecordingInfoDialog } from './components';
+import { localRecordingEngaged, localRecordingUnengaged } from './actions';
 
 
 declare var APP: Object;
@@ -43,10 +41,8 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
                 const nowTime = new Date();
 
                 dispatch(localRecordingEngaged(nowTime));
-                dispatch(statsUpdate(recordingController.getParticipantsStats()));
             } else {
                 dispatch(localRecordingUnengaged());
-                dispatch(statsUpdate(recordingController.getParticipantsStats()));
             }
         };
 
@@ -67,7 +63,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         typeof APP === 'object' && typeof APP.keyboardshortcut === 'object'
             && APP.keyboardshortcut.registerShortcut('L', null, () => {
                 sendAnalytics(createShortcutEvent('local.recording'));
-                dispatch(toggleDialog(LocalRecordingInfoDialog));
+               // dispatch(toggleDialog(LocalRecordingInfoDialog));
             }, 'keyboardShortcuts.localRecording');
 
         if (localRecording.format) {
@@ -77,7 +73,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { conference } = getState()['features/base/conference'];
 
         recordingController.registerEvents(conference);
-        dispatch(statsUpdate(recordingController.getParticipantsStats()));
+      //  dispatch(statsUpdate(recordingController.getParticipantsStats()));
 
         break;
     }
@@ -101,7 +97,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { isEngaged } = getState()['features/riff-platform'].localRecording;
         const { conference } = getState()['features/base/conference'];
 
-        conference && dispatch(statsUpdate(recordingController.getParticipantsStats()));
+       // conference && dispatch(statsUpdate(recordingController.getParticipantsStats()));
 
         const { track } = action;
 
