@@ -1,3 +1,5 @@
+/* @flow */
+
 import { createShortcutEvent, sendAnalytics } from '../../../analytics';
 import { APP_WILL_UNMOUNT } from '../../../base/app/actionTypes';
 import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../../../base/conference/actionTypes';
@@ -9,7 +11,7 @@ import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
 import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
-import { statsUpdate, localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
+import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
 
 import { recordingController } from './LocalRecorderController';
 import WebmAdapter from './WebmAdapter';

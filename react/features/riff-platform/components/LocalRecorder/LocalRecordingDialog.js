@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { hideDialog, Dialog } from '../../../base/dialog';
-import { getLocalParticipant } from '../../../base/participants';
 import { connect } from '../../../base/redux';
 
 import { recordingController } from './LocalRecorderController';

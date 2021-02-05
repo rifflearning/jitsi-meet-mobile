@@ -365,7 +365,6 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
      * @returns {void}
      */
     _onStart() {
-        console.log('check')
         recordingController.startRecording();
     }
 

@@ -204,7 +204,7 @@ class LocalRecordingController {
         this._onStopNotification = this._onStopNotification.bind(this);
     }
 
-    registerEvents: () => void;
+    registerEvents: (*) => void;
 
     /**
      * Registers listeners for XMPP events.
@@ -275,11 +275,10 @@ class LocalRecordingController {
     /**
      * Signals the participant to stop local recording.
      *
-     * @param {number} sessionToken - The token of the session to stop.
      * @returns {void}
      */
-    stopRecording(sessionToken) {
-        this._onStopCommand({ sessionToken: this.currentSessionToken });
+    stopRecording() {
+        this._onStopCommand({ sessionToken: this._currentSessionToken });
     }
 
     /**
@@ -387,7 +386,7 @@ class LocalRecordingController {
      */
     getParticipantsStats() {
         const members
-            = this._conference?.getParticipants() || []
+            = this._conference.getParticipants() || []
             .map(member => {
                 return {
                     id: member.getId(),
@@ -404,7 +403,7 @@ class LocalRecordingController {
         for (let i = 0; i < members.length; ++i) {
             result[members[i].id] = members[i];
         }
-        const localId = this._conference?.myUserId();
+        const localId = this._conference.myUserId();
 
         result[localId] = {
             id: localId,
@@ -553,6 +552,7 @@ class LocalRecordingController {
         }
 
     }
+    _startRecordingNotificationHandler: () => void;
 
     /**
      * Signals the all participants to start local recording.
@@ -569,6 +569,8 @@ class LocalRecordingController {
             this._onWarning('Failed to send command');
         }
     }
+
+    _onStartNotification: (*) => void
 
     /**
      * Callback function for XMPP event.
@@ -630,6 +632,8 @@ class LocalRecordingController {
 
     }
 
+    _stopRecordingNotificationHandler: () => void;
+
     /**
      * Signals the all participants to stop local recording.
      *
@@ -646,6 +650,8 @@ class LocalRecordingController {
             this._onWarning('Failed to send command');
         }
     }
+
+    _onStopNotification: (*) => void;
 
     /**
      * Callback function for XMPP event.
@@ -672,12 +678,12 @@ class LocalRecordingController {
     _checkIsAnyLocalRecordingSessionEngaged(currentSessionToken) {
 
         const participantIdLocalRecordingEngaged = Object.values(this.getParticipantsStats())
-            .filter(participant => participant.recordingStats?.isRecording);
+            .filter(participant => participant.recordingStats && participant.recordingStats.isRecording);
         let isAnyLocalRecordingEnabled = true;
 
         participantIdLocalRecordingEngaged.forEach(participant => {
-            if (participant.recordingStats?.currentSessionToken
-                     && participant.recordingStats?.currentSessionToken !== parseInt(currentSessionToken, 10)) {
+            if (participant.recordingStats && participant.recordingStats.currentSessionToken
+                     && participant.recordingStats.currentSessionToken !== parseInt(currentSessionToken, 10)) {
                 isAnyLocalRecordingEnabled = false;
             }
         });
@@ -686,13 +692,12 @@ class LocalRecordingController {
     }
 
 
-    _switchToNewSession: (string, string) => void;
+    _switchToNewSession: (string) => void;
 
     /**
      * Switches to a new local recording session.
-     *
+     *recordingController.registerEvents
      * @param {string} sessionToken - The session Token.
-     * @param {string} format - The recording format for the session.
      * @returns {void}
      */
     _switchToNewSession(sessionToken) {
