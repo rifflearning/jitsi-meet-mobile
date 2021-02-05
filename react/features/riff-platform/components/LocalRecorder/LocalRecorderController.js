@@ -696,7 +696,8 @@ class LocalRecordingController {
 
     /**
      * Switches to a new local recording session.
-     *recordingController.registerEvents
+     *rEcordingController.registerEvents.
+     *
      * @param {string} sessionToken - The session Token.
      * @returns {void}
      */
