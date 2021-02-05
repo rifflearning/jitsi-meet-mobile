@@ -374,9 +374,9 @@ class LocalRecordingController {
     /**
      * Returns the local recording stats.
      *
-     * @returns {RecordingStats}
+     * @returns {LocalRecordingStats}
      */
-    getLocalStats(): RecordingStats {
+    getLocalStats(): LocalRecordingStats {
         return {
             currentSessionToken: this._currentSessionToken,
             isRecording: this._state === ControllerState.RECORDING,
