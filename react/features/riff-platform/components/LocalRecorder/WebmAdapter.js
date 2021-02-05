@@ -6,6 +6,16 @@ import { recordingController } from './LocalRecorderController';
 import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
 
 /**
+ * The argument slices the recording into chunks, calling dataavailable every defined seconds.
+ */
+const MEDIARECORDER_TIMESLICE = 180000;
+
+/**
+ * Defined max size for blob(MB).
+ */
+const MEDIARECORDER_MAX_SIZE = 2;
+
+/**
  * Recording adapter that uses {@code MediaRecorder}
  */
 export default class WebmAdapter extends RecordingAdapter {
@@ -26,7 +36,7 @@ export default class WebmAdapter extends RecordingAdapter {
      * The recorded media file.
      * @private
      */
-    _recordedData = null;
+    _recordedData = [];
 
     /**
      * The recorded  stream.
@@ -63,7 +73,7 @@ export default class WebmAdapter extends RecordingAdapter {
 
         return this._initPromise.then(() =>
             new Promise(resolve => {
-                this._mediaRecorder.start();
+                this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);
                 resolve();
             })
         );
@@ -81,24 +91,6 @@ export default class WebmAdapter extends RecordingAdapter {
                 this._mediaRecorder.stop(stopLocalVideo(this._recorderStream));
             }
         );
-    }
-
-    handleStopNoMaderator() {
-        recordingController._changeState('IDLE');
-        logger.log('Local recording unengaged.');
-
-        const messageKey = 'Recording session {{token}} finished.';
-        const messageParams = {
-            token: '000000'
-        };
-
-        if (recordingController._onNotify) {
-            recordingController._onNotify(messageKey, messageParams);
-        }
-        if (recordingController._onStateChanged) {
-            recordingController._onStateChanged(false);
-        }
-        recordingController._updateStats();
     }
 
     /**
@@ -132,10 +124,11 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     exportRecordedData() {
-        if (this._recordedData !== null) {
+        if (this._recordedData.length) {
+            const blobData = new Blob(this._recordedData, { type: 'video/webm' });
 
             return Promise.resolve({
-                data: this._recordedData,
+                data: blobData,
                 format: 'webm'
             });
         }
@@ -211,8 +204,9 @@ export default class WebmAdapter extends RecordingAdapter {
                     this._stream = userAudioStream;
                     this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
                     this._recorderStream = mediaStream;
+
                     this._mediaRecorder.ondataavailable
-                   = e => this._saveMediaData(e.data);
+                   = e => this._onMediaDataAvailable(e.data);
                     resolve();
 
                     this._recorderStream.getVideoTracks()[0].onended = () => {
@@ -221,7 +215,7 @@ export default class WebmAdapter extends RecordingAdapter {
                         return recordingController.stopRecording();
                     };
 
-                    //this._recorderStream.oninactive = () => recordingController.stopRecording();
+                    // this._recorderStream.oninactive = () => recordingController.stopRecording();
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);
@@ -236,14 +230,36 @@ export default class WebmAdapter extends RecordingAdapter {
     }
 
     /**
-     * Callback for storing the encoded data.
+     * Callback for checking/storing the data.
+     *
+     * @private
+     * @param {Blob} data - Encoded data.
+     * @returns {void}
+     */
+    _onMediaDataAvailable(data) {
+        const currentRecordingBlob = new Blob(this._recordedData, { type: 'video/webm' });
+        const sizeInMB = currentRecordingBlob.size / (1024 * 1024);
+
+        if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
+            this._saveMediaData(data);
+        } else {
+            recordingController.stopRecording();
+            if (recordingController._onWarning) {
+                recordingController._onWarning('Memory limit exceeded. Please start local recording again.');
+            }
+        }
+    }
+
+
+    /**
+     * Callback for storing the data.
      *
      * @private
      * @param {Blob} data - Encoded data.
      * @returns {void}
      */
     _saveMediaData(data) {
-        this._recordedData = data;
+        this._recordedData.push(data);
     }
 
     /**

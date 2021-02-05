@@ -68,8 +68,7 @@ export const stopLocalRecordingHandling = user => {
         user._conference.removeCommand(COMMAND_START);
         user._conference.sendCommand(COMMAND_STOP, {
             attributes: {
-                sessionToken: checkUserLocalRecordingStatus?.currentSessionToken,
-                participantName: user._id
+                sessionToken: checkUserLocalRecordingStatus?.currentSessionToken
             }
         });
     }
