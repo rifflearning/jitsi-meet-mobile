@@ -8,7 +8,7 @@ import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers'
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
  */
-const MEDIARECORDER_TIMESLICE = 180000;
+const MEDIARECORDER_TIMESLICE = 1000;
 
 /**
  * Defined max size for blob(MB).
@@ -56,6 +56,8 @@ export default class WebmAdapter extends RecordingAdapter {
      * @private
      */
     _conference = null;
+
+    _called = 0;
 
     /**
      * Implements {@link RecordingAdapter#start()}.
@@ -205,8 +207,7 @@ export default class WebmAdapter extends RecordingAdapter {
                     this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
                     this._recorderStream = mediaStream;
 
-                    this._mediaRecorder.ondataavailable
-                   = e => this._onMediaDataAvailable(e.data);
+                    this._mediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
                     resolve();
 
                     this._recorderStream.getVideoTracks()[0].onended = () => {
@@ -242,11 +243,12 @@ export default class WebmAdapter extends RecordingAdapter {
 
         if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
             this._saveMediaData(data);
-        } else {
+        } else if (this._called === 0) {
             recordingController.stopRecording();
             if (recordingController._onWarning) {
                 recordingController._onWarning('Memory limit exceeded. Please start local recording again.');
             }
+            this._called = this._called + 1;
         }
     }
 

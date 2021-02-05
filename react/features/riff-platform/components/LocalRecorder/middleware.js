@@ -40,10 +40,8 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
                 const nowTime = new Date();
 
                 dispatch(localRecordingEngaged(nowTime));
-                dispatch(statsUpdate(recordingController.getParticipantsStats()));
             } else {
                 dispatch(localRecordingUnengaged());
-                dispatch(statsUpdate(recordingController.getParticipantsStats()));
             }
         };
 
@@ -74,7 +72,6 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { conference } = getState()['features/base/conference'];
 
         recordingController.registerEvents(conference);
-        dispatch(statsUpdate(recordingController.getParticipantsStats()));
 
         break;
     }
@@ -98,11 +95,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { isEngaged } = getState()['features/riff-platform'].localRecording;
         const { conference } = getState()['features/base/conference'];
 
-        conference && dispatch(statsUpdate(recordingController.getParticipantsStats()));
-
         const { track } = action;
 
-        if (!track || track.local || !isEngaged) {
+        if (!track || track.local || !isEngaged || !conference) {
             return;
         }
 

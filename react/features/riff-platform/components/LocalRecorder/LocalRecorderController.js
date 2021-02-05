@@ -279,7 +279,6 @@ class LocalRecordingController {
      * @returns {void}
      */
     stopRecording(sessionToken) {
-        this.getParticipantsStats();
         this._onStopCommand({ sessionToken: this.currentSessionToken });
     }
 
@@ -388,9 +387,8 @@ class LocalRecordingController {
      */
     getParticipantsStats() {
         const members
-            = this._conference.getParticipants()
+            = this._conference?.getParticipants() || []
             .map(member => {
-                console.log('member--------', member)
                 return {
                     id: member.getId(),
                     displayName: member.getDisplayName(),
@@ -406,7 +404,7 @@ class LocalRecordingController {
         for (let i = 0; i < members.length; ++i) {
             result[members[i].id] = members[i];
         }
-        const localId = this._conference.myUserId();
+        const localId = this._conference?.myUserId();
 
         result[localId] = {
             id: localId,

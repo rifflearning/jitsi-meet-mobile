@@ -57,7 +57,6 @@ class LocalRecordingButton extends Component<Props> {
      */
     render() {
         const { isDialogShown, t } = this.props;
-        console.log('isDialogShown', isDialogShown)
 
         return (
             <ToolbarButton
