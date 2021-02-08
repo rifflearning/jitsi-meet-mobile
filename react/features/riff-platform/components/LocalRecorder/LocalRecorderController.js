@@ -385,7 +385,7 @@ class LocalRecordingController {
      */
     getParticipantsStats() {
         const members
-            = this._conference.getParticipants() || []
+            = this._conference.getParticipants()
             .map(member => {
                 return {
                     id: member.getId(),
