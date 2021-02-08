@@ -10,12 +10,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { hideDialog, Dialog } from '../../../base/dialog';
-import {
-    PARTICIPANT_ROLE,
-    getLocalParticipant
-} from '../../../base/participants';
 import { connect } from '../../../base/redux';
-import { recordingController } from '../../../local-recording/controller';
+
+import { recordingController } from './LocalRecorderController';
 
 const useStyles = makeStyles(() => {
     return {
@@ -42,11 +39,12 @@ const recordingSteps = [ 'To start recording click on start recording',
 
 function LocalRecordingDialog({
     onClose,
-    open,
-    isModerator,
-    isEngaged }) {
+    open }) {
 
     const classes = useStyles();
+
+    const isLocalRecordingEngaged = Object.values(recordingController.getParticipantsStats()).find(participant =>
+        participant.isSelf && participant.recordingStats?.isRecording);
 
     const handleCancel = () => {
         onClose();
@@ -63,16 +61,13 @@ function LocalRecordingDialog({
         handleCancel();
     };
 
-    const onSubmit = () => {
-        if (isModerator) {
-            if (!isEngaged) {
-                return handleStart();
-            }
-            handleStop();
-        }
-        handleCancel();
-    };
 
+    const onSubmit = () => {
+        if (!isLocalRecordingEngaged) {
+            return handleStart();
+        }
+        handleStop();
+    };
 
     if (!open) {
         return null;
@@ -94,13 +89,8 @@ function LocalRecordingDialog({
         </List>
     </>);
 
-    const renderNoModeratorControls
-        = <Typography>Only those with moderator access can turn on recordings in sessions</Typography>;
-
-    const defineSubmitButtonText = isModerator
-        // eslint-disable-next-line no-negated-condition
-        ? !isEngaged ? 'Start Recording' : 'Stop Recording'
-        : 'Ok';
+    // eslint-disable-next-line no-negated-condition
+    const defineSubmitButtonText = !isLocalRecordingEngaged ? 'Start Recording' : 'Stop Recording';
 
     return (
         <Dialog
@@ -113,15 +103,13 @@ function LocalRecordingDialog({
             open = { open }>
             <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
-                {isModerator ? renderModeratorControls : renderNoModeratorControls}
+                {renderModeratorControls}
             </DialogContent>
         </Dialog>
     );
 }
 
 LocalRecordingDialog.propTypes = {
-    isEngaged: PropTypes.bool,
-    isModerator: PropTypes.bool,
     onClose: PropTypes.func,
     open: PropTypes.bool,
     recordingEngagedAt: PropTypes.any
@@ -129,15 +117,10 @@ LocalRecordingDialog.propTypes = {
 
 const mapStateToProps = state => {
     const {
-        isEngaged,
         recordingEngagedAt
-    } = state['features/local-recording'];
-    const isModerator
-        = getLocalParticipant(state).role === PARTICIPANT_ROLE.MODERATOR;
+    } = state['features/riff-platform'].localRecording;
 
     return {
-        isModerator,
-        isEngaged,
         recordingEngagedAt
     };
 };

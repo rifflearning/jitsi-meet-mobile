@@ -1,9 +1,19 @@
 /* eslint-disable require-jsdoc */
-import { recordingController } from '../../../local-recording/controller';
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
+import { recordingController } from './LocalRecorderController';
 import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
+
+/**
+ * The argument slices the recording into chunks, calling dataavailable every defined seconds.
+ */
+const MEDIARECORDER_TIMESLICE = 180000;
+
+/**
+ * Defined max size for blob(MB).
+ */
+const MEDIARECORDER_MAX_SIZE = 100;
 
 /**
  * Recording adapter that uses {@code MediaRecorder}
@@ -26,7 +36,7 @@ export default class WebmAdapter extends RecordingAdapter {
      * The recorded media file.
      * @private
      */
-    _recordedData = null;
+    _recordedData = [];
 
     /**
      * The recorded  stream.
@@ -47,6 +57,8 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _conference = null;
 
+    _called = 0;
+
     /**
      * Implements {@link RecordingAdapter#start()}.
      *
@@ -55,9 +67,6 @@ export default class WebmAdapter extends RecordingAdapter {
     start(micDeviceId, conference) {
         this._conference = conference;
 
-        if (!this._conference.isModerator()) {
-            return Promise.resolve();
-        }
         this._participatsStream = this._getAudioParticipantsStream() || [];
 
         if (!this._initPromise) {
@@ -66,7 +75,7 @@ export default class WebmAdapter extends RecordingAdapter {
 
         return this._initPromise.then(() =>
             new Promise(resolve => {
-                this._mediaRecorder.start();
+                this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);
                 resolve();
             })
         );
@@ -78,10 +87,6 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     stop() {
-        if (!this._conference.isModerator()) {
-            return Promise.resolve();
-        }
-
         return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
@@ -121,10 +126,11 @@ export default class WebmAdapter extends RecordingAdapter {
      * @inheritdoc
      */
     exportRecordedData() {
-        if (this._recordedData !== null) {
+        if (this._recordedData.length) {
+            const blobData = new Blob(this._recordedData, { type: 'video/webm' });
 
             return Promise.resolve({
-                data: this._recordedData,
+                data: blobData,
                 format: 'webm'
             });
         }
@@ -184,7 +190,8 @@ export default class WebmAdapter extends RecordingAdapter {
      * @returns {Promise}
      */
     _initialize(micDeviceId) {
-        if (this._mediaRecorder || !this._conference.isModerator()) {
+
+        if (this._mediaRecorder) {
             return Promise.resolve();
         }
 
@@ -199,16 +206,17 @@ export default class WebmAdapter extends RecordingAdapter {
                     this._stream = userAudioStream;
                     this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
                     this._recorderStream = mediaStream;
-                    this._mediaRecorder.ondataavailable
-                   = e => this._saveMediaData(e.data);
+
+                    this._mediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
                     resolve();
 
-                    this._mediaRecorder.onended = () => {
+                    this._recorderStream.getVideoTracks()[0].onended = () => {
                         logger.log('Capture stream inactive');
-                        recordingController.stopRecording();
+
+                        return recordingController.stopRecording();
                     };
-                    this._recorderStream.getVideoTracks()[0].addEventListener('ended',
-                        () => recordingController.stopRecording());
+
+                    // this._recorderStream.oninactive = () => recordingController.stopRecording();
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);
@@ -223,14 +231,37 @@ export default class WebmAdapter extends RecordingAdapter {
     }
 
     /**
-     * Callback for storing the encoded data.
+     * Callback for checking/storing the data.
+     *
+     * @private
+     * @param {Blob} data - Encoded data.
+     * @returns {void}
+     */
+    _onMediaDataAvailable(data) {
+        const currentRecordingBlob = new Blob(this._recordedData, { type: 'video/webm' });
+        const sizeInMB = currentRecordingBlob.size / (1024 * 1024);
+
+        if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
+            this._saveMediaData(data);
+        } else if (this._called === 0) {
+            recordingController.stopRecording();
+            if (recordingController._onWarning) {
+                recordingController._onWarning('Memory limit exceeded. Please start local recording again.');
+            }
+            this._called = this._called + 1;
+        }
+    }
+
+
+    /**
+     * Callback for storing the data.
      *
      * @private
      * @param {Blob} data - Encoded data.
      * @returns {void}
      */
     _saveMediaData(data) {
-        this._recordedData = data;
+        this._recordedData.push(data);
     }
 
     /**
@@ -242,4 +273,6 @@ export default class WebmAdapter extends RecordingAdapter {
         return this._replaceMic(micDeviceId);
     }
 }
+
+export const webmController = new WebmAdapter();
 

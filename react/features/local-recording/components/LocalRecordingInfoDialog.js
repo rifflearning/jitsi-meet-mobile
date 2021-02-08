@@ -11,9 +11,11 @@ import {
     getLocalParticipant
 } from '../../base/participants';
 import { connect } from '../../base/redux';
+import { recordingController } from '../../riff-platform/components/LocalRecorder/LocalRecorderController';
 import LocalRecordingDialog from '../../riff-platform/components/LocalRecorder/LocalRecordingDialog';
 import { statsUpdate } from '../actions';
-import { recordingController } from '../controller';
+
+// import { recordingController } from '../controller';
 
 
 /**

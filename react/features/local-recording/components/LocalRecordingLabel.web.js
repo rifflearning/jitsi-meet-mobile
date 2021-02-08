@@ -65,7 +65,8 @@ class LocalRecordingLabel extends Component<Props> {
  * }}
  */
 function _mapStateToProps(state) {
-    const { isEngaged } = state['features/local-recording'];
+    // const { isEngaged } = state['features/local-recording'];
+    const { isEngaged } = state['features/riff-platform'].localRecording;
 
     return {
         isEngaged

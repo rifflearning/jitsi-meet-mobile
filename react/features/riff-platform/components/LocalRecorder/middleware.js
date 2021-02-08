@@ -1,18 +1,21 @@
 /* @flow */
 
-/* import { createShortcutEvent, sendAnalytics } from '../analytics';
-import { APP_WILL_UNMOUNT } from '../base/app/actionTypes';
-import { CONFERENCE_JOINED } from '../base/conference/actionTypes';
-import { toggleDialog } from '../base/dialog/actions';
-import { i18next } from '../base/i18n';
-import { SET_AUDIO_MUTED } from '../base/media/actionTypes';
-import { MiddlewareRegistry } from '../base/redux';
-import { SETTINGS_UPDATED } from '../base/settings/actionTypes';
-import { showNotification } from '../notifications/actions';
+import { createShortcutEvent, sendAnalytics } from '../../../analytics';
+import { APP_WILL_UNMOUNT } from '../../../base/app/actionTypes';
+import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../../../base/conference/actionTypes';
+import { toggleDialog } from '../../../base/dialog/actions';
+import { i18next } from '../../../base/i18n';
+import { SET_AUDIO_MUTED } from '../../../base/media/actionTypes';
+import { MiddlewareRegistry } from '../../../base/redux';
+import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
+import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
+import { LocalRecordingInfoDialog } from '../../../local-recording/components';
+import { showNotification } from '../../../notifications/actions';
+import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
 
-import { localRecordingEngaged, localRecordingUnengaged } from './actions';
-import { LocalRecordingInfoDialog } from './components';
-import { recordingController } from './controller';
+import { recordingController } from './LocalRecorderController';
+import WebmAdapter from './WebmAdapter';
+
 
 declare var APP: Object;
 
@@ -90,7 +93,33 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
         break;
     }
+    case TRACK_ADDED: {
+        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+        const { conference } = getState()['features/base/conference'];
+
+        const { track } = action;
+
+        if (!track || track.local || !isEngaged || !conference) {
+            return;
+        }
+
+        if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
+            const webmRecordingController = new WebmAdapter();
+
+            webmRecordingController._addNewParticipantAudioStream(track.jitsiTrack.stream);
+        }
+        break;
+    }
+    case CONFERENCE_WILL_LEAVE: {
+        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+
+        if (!isEngaged) {
+            return;
+        }
+        recordingController.stopRecording();
+        break;
+    }
     }
 
     return result;
-});*/
+});

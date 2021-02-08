@@ -1,6 +1,8 @@
 /* eslint-disable require-jsdoc */
 import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/libs/utils';
 
+import { COMMAND_START, COMMAND_STOP } from './LocalRecorderController';
+
 class AudioStreamsMixer {
 
     initializeAudioContext(streamsArr) {
@@ -16,7 +18,7 @@ class AudioStreamsMixer {
     }
 
     addNewStream(newUserStream) {
-        if (newUserStream.getAudioTracks().length) {
+        if (this.ctx && newUserStream.getAudioTracks().length) {
             this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
         }
 
@@ -57,4 +59,17 @@ export const stopLocalVideo = async recorderStream => {
     recorderStream.getTracks().forEach(async track => {
         track.stop();
     });
+};
+
+export const stopLocalRecordingHandling = user => {
+    const checkUserLocalRecordingStatus = JSON.parse(user._properties?.localRecStats || null);
+
+    if (checkUserLocalRecordingStatus?.isRecording) {
+        user._conference.removeCommand(COMMAND_START);
+        user._conference.sendCommand(COMMAND_STOP, {
+            attributes: {
+                sessionToken: checkUserLocalRecordingStatus?.currentSessionToken
+            }
+        });
+    }
 };
