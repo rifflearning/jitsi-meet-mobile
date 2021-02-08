@@ -13,7 +13,7 @@ const MEDIARECORDER_TIMESLICE = 180000;
 /**
  * Defined max size for blob(MB).
  */
-const MEDIARECORDER_MAX_SIZE = 100;
+const MEDIARECORDER_MAX_SIZE = 1000;
 
 /**
  * Recording adapter that uses {@code MediaRecorder}
