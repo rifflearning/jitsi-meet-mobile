@@ -161,6 +161,7 @@ export async function setMatterMostUserFromLink() {
     };
     const meetingMock = {
         _id: ObjectID.generate(),
+        roomId: window.location.pathname.split('/')[1],
         name: urlParams.get('title') || 'No meeting title'
     };
 
