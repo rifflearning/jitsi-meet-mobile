@@ -27,6 +27,7 @@ import ResetPassword from './ResetPassword';
 import Scheduler from './Scheduler';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import Verify from './Verify';
 import Waiting from './Waiting';
 
 const useStyles = makeStyles(theme => {
@@ -115,6 +116,10 @@ const Main = ({ user }) => {
             <Route
                 path = { ROUTES.SIGNUP } >
                 <SignUp />
+            </Route>
+            <Route
+                path = { ROUTES.VERIFY } >
+                <Verify />
             </Route>
             <Route path = { ROUTES.RESETPASSWORD } >
                 <ResetPassword />

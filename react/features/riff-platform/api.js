@@ -38,10 +38,12 @@ class ApiService {
     // auth
     signIn = ({ email, password }) => this.postWithJwt('/login', { email, password });
     signUp = ({ name, email, password }) => this.postWithJwt('/register', { name, email, password });
+    signUpVerify = token => this.postWithJwt('/register/verify', { token });
     fetchProfile = () => this.fetchWithJwt('/profile');
     // eslint-disable-next-line prefer-template
     fetchUserNames = arrUids => this.fetchWithJwt(`/profiles?${arrUids.map(id => '&id=' + id).join('')}`);
-    resetPassword = ({ email, password }) => this.postWithJwt('/reset', { email, password });
+    resetPassword = ({ email }) => this.postWithJwt('/reset', { email });
+    resetPasswordVerify = ({ token, password }) => this.postWithJwt('/reset/verify', { token, password });
 
     // fetchUserNames = mockFetchUserNames;
 
