@@ -4,7 +4,7 @@ import {
     LOCAL_RECORDING_ENGAGED,
     LOCAL_RECORDING_UNENGAGED,
     LOCAL_RECORDING_STATS_UPDATE,
-    SET_LOCAL_RECORING_STATUS
+    LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED
 } from '../constants/actionTypes';
 
 // The following two actions signal state changes in local recording engagement.
@@ -43,25 +43,18 @@ export function localRecordingUnengaged() {
 }
 
 /**
- * Updates the current known status of the shared YouTube video.
+ * Signals that local recording has memory limit exceeded.
  *
- * @param {string} session - The current session of the local recording.
- * @param {string} status - The current status of the YouTube video being shared.
- * @param {number} time - Time when the recording is engaged.
- * @param {string} ownerId - The participantId of the user sharing the YouTube video.
+ * @param {boolean} isMemoryLimitExceeded - Is memory limit exceeded.
  * @returns {{
-    *     type: SET_SHARED_VIDEO_STATUS,
-    *     ownerId: string,
-    *     status: string,
-    *     time: number,
-    *     videoId: string
+    *     type: LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED,
+    *     isMemoryLimitExceeded: boolean
     * }}
     */
-export function setLocalRecordingStatus(session: string, status: string, time: number, ownerId: string) {
+export function localRecordingMemoryLimitExceeded(isMemoryLimitExceeded: Boolean) {
     return {
-        type: SET_LOCAL_RECORING_STATUS,
-        ownerId,
-        session
+        type: LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED,
+        isMemoryLimitExceeded
     };
 }
 

@@ -22,6 +22,13 @@ export default (state = {}, action) => {
             ...state,
             stats: action.stats
         };
+
+    case actionTypes.LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED: {
+        return {
+            ...state,
+            isMemoryLimitExceeded: action.isMemoryLimitExceeded
+        };
+    }
     default:
         return state;
     }

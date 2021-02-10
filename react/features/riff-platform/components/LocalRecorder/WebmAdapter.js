@@ -1,11 +1,11 @@
 /* eslint-disable require-jsdoc */
-import { Callbacks } from 'jquery';
 
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
+import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import { getCombinedStream, stopLocalVideo, addNewAudioStream } from './helpers';
+import { getCombinedStream, addNewAudioStream } from './helpers';
 
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
@@ -61,9 +61,10 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _conference = null;
 
-    _called = 0;
-
-    _currentMediaRecorder = null;
+    /**
+     * Instance of MediaRecorder.
+     * @private
+     */
     _newMediaRecorder = null;
 
     /**
@@ -96,8 +97,16 @@ export default class WebmAdapter extends RecordingAdapter {
     stop() {
         return new Promise(
             async resolve => {
-                this._mediaRecorder.stop(this.stopLocalVideo());
-                this._mediaRecorder.onstop = () => resolve();
+                if (this._mediaRecorder.state !== 'inactive') {
+                    this._mediaRecorder.stop(this.stopLocalVideo());
+                    this._mediaRecorder.onstop = () => resolve();
+                    this._mediaRecorder = null;
+                } else {
+                    this.stopLocalVideo();
+                    this._mediaRecorder = null;
+                    resolve();
+                }
+                resolve();
             }
         );
     }
@@ -212,18 +221,15 @@ export default class WebmAdapter extends RecordingAdapter {
                 .then(mediaStream => {
                     this._stream = userAudioStream;
                     this._initializeCurrentMediaRecoder(mediaStream);
-
-                    // this._mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
                     this._recorderStream = mediaStream;
 
-                    // this._mediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
                     resolve();
 
-                    // this._recorderStream.getVideoTracks()[0].onended = () => {
-                    // logger.log('Capture stream inactive');
+                    this._recorderStream.getVideoTracks()[0].onended = () => {
+                        logger.log('Capture stream inactive');
 
-                    // return recordingController.stopRecording();
-                    // };
+                        return recordingController.stopRecording();
+                    };
 
                     // this._mediaRecorder.oninactive = () => recordingController.stopRecording();
                 })
@@ -249,14 +255,21 @@ export default class WebmAdapter extends RecordingAdapter {
         this._newMediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
     }
 
-    handleStop() {
+    handleMemoryExceededStop() {
         return new Promise(
             async resolve => {
                 this._mediaRecorder.onstop = () => resolve();
                 this._mediaRecorder.stop();
-                recordingController.downloadRecordedData();
             }
         );
+    }
+
+    _onRecordingRestart() {
+        this._mediaRecorder = this._newMediaRecorder;
+        this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);
+        this._mediaRecorder.requestData();
+        this._newMediaRecorder = null;
+        this._recordedData = [];
     }
 
 
@@ -271,30 +284,17 @@ export default class WebmAdapter extends RecordingAdapter {
         const currentRecordingBlob = new Blob(this._recordedData, { type: 'video/webm' });
         const sizeInMB = currentRecordingBlob.size / (1024 * 1024);
 
-        if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
-
+        if (sizeInMB <= MEDIARECORDER_MAX_SIZE) {
             this._saveMediaData(data);
         } else if (this._mediaRecorder.state === 'recording') {
 
-            this._initializeNewMediaRecoder(this._recorderStream);
-            this.handleStop().then(() => {
-                this._mediaRecorder = this._newMediaRecorder;
-                this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);
-                this._mediaRecorder.requestData();
-                this._newMediaRecorder = null;
-                this._recordedData = [];
+            this.handleMemoryExceededStop().then(() => {
+                if (recordingController._onMemoryExceeded) {
+                    recordingController._onMemoryExceeded(true);
+                }
+                this._initializeNewMediaRecoder(this._recorderStream);
             });
         }
-
-
-        /* else if (this._called === 0) {
-            this.me
-            recordingController.stopRecording();
-            if (recordingController._onWarning) {
-                recordingController._onWarning('Memory limit exceeded. Please start local recording again.');
-            }
-            this._called = this._called + 1;
-        }*/
     }
     stopLocalVideo() {
         this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
@@ -320,6 +320,4 @@ export default class WebmAdapter extends RecordingAdapter {
         return this._replaceMic(micDeviceId);
     }
 }
-
-export const webmController = new WebmAdapter();
 
