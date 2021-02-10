@@ -9,14 +9,12 @@ import { getCombinedStream, addNewAudioStream } from './helpers';
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
  */
-// const MEDIARECORDER_TIMESLICE = 180000;
-
-const MEDIARECORDER_TIMESLICE = 10000;
+const MEDIARECORDER_TIMESLICE = 180000;
 
 /**
  * Defined max size for blob(MB).
  */
-const MEDIARECORDER_MAX_SIZE = 2;
+const MEDIARECORDER_MAX_SIZE = 1000;
 
 /**
  * Recording adapter that uses {@code MediaRecorder}
@@ -296,7 +294,7 @@ export default class WebmAdapter extends RecordingAdapter {
         const currentRecordingBlob = new Blob(this._recordedData, { type: 'video/webm' });
         const sizeInMB = currentRecordingBlob.size / (1024 * 1024);
 
-        if (sizeInMB <= MEDIARECORDER_MAX_SIZE) {
+        if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
             this._saveMediaData(data);
         } else if (this._mediaRecorder && this._mediaRecorder.state === 'recording') {
 
