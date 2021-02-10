@@ -11,12 +11,10 @@ import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
 import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
-import { localRecordingEngaged, localRecordingUnengaged, localRecordingMemoryLimitExceeded } from '../../actions/localRecording';
+import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
 
 import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import WebmAdapter from './WebmAdapter';
-
 
 declare var APP: Object;
 
