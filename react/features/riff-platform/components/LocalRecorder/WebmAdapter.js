@@ -3,7 +3,6 @@
 import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
-import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
 import { getCombinedStream, addNewAudioStream } from './helpers';
 
@@ -97,6 +96,7 @@ export default class WebmAdapter extends RecordingAdapter {
     stop() {
         return new Promise(
             async resolve => {
+                // eslint-disable-next-line no-negated-condition
                 if (this._mediaRecorder.state !== 'inactive') {
                     this._mediaRecorder.stop(this.stopLocalVideo());
                     this._mediaRecorder.onstop = () => resolve();
@@ -106,7 +106,6 @@ export default class WebmAdapter extends RecordingAdapter {
                     this._mediaRecorder = null;
                     resolve();
                 }
-                resolve();
             }
         );
     }
@@ -255,6 +254,13 @@ export default class WebmAdapter extends RecordingAdapter {
         this._newMediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
     }
 
+
+    /**
+     * Stop MediaRecorder in case memory limit exceeded.
+     *
+     * @private
+     * @returns {void}
+     */
     handleMemoryExceededStop() {
         return new Promise(
             async resolve => {
@@ -264,6 +270,12 @@ export default class WebmAdapter extends RecordingAdapter {
         );
     }
 
+    /**
+     * Restarts MediaRecorder with the same stream.
+     *
+     * @private
+     * @returns {void}
+     */
     _onRecordingRestart() {
         this._mediaRecorder = this._newMediaRecorder;
         this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);

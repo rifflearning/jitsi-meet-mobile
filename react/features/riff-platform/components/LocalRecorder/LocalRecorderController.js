@@ -572,7 +572,7 @@ class LocalRecordingController {
     _startRecordingNotificationHandler: () => void;
 
     /**
-     * Signals the all participants to start local recording.
+     * Signals the all participants about local recording engaged .
      *
      * @returns {void}
      */
@@ -653,7 +653,7 @@ class LocalRecordingController {
     _stopRecordingNotificationHandler: () => void;
 
     /**
-     * Signals the all participants to stop local recording.
+     * Signals the all participants about local recording unengaged.
      *
      * @returns {void}
      */
@@ -710,14 +710,25 @@ class LocalRecordingController {
         return isAnyLocalRecordingEnabled;
     }
 
-    // eslint-disable-next-line require-jsdoc
+    /**
+     * Adds new audio stream to AudioContext.
+     *
+     * @private
+     * @param {MediaStream} newStream - The new participant audio stream.
+     * @returns {void}
+     */
     _onNewParticipantAudioStreamAdded(newStream) {
         this._adapter._addNewParticipantAudioStream(newStream);
     }
 
-    // eslint-disable-next-line require-jsdoc
+    /**
+     * Triggers the download of recorded data in case memory limit exceeded.
+     * Restarts MediaRecorder.
+     *
+     * @returns {void}
+     */
     onMemoryExceededDownload() {
-        this.downloadRecordedData('1111');
+        this.downloadRecordedData(this._currentSessionToken);
         this._adapter._onRecordingRestart();
     }
 

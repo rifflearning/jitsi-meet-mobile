@@ -63,14 +63,11 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         };
 
         recordingController.onMemoryExceeded = isExceeded => {
-            console.log('isExceeded midd', isExceeded);
-            dispatch(localRecordingMemoryLimitExceeded(isExceeded));
             if (isExceeded) {
                 dispatch(openDialog(DownloadInfoDialog));
             } else {
                 dispatch(hideDialog(DownloadInfoDialog));
             }
-            console.log('statetew', getState()['features/riff-platform'].localRecording);
         };
 
         typeof APP === 'object' && typeof APP.keyboardshortcut === 'object'

@@ -3,8 +3,7 @@
 import {
     LOCAL_RECORDING_ENGAGED,
     LOCAL_RECORDING_UNENGAGED,
-    LOCAL_RECORDING_STATS_UPDATE,
-    LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED
+    LOCAL_RECORDING_STATS_UPDATE
 } from '../constants/actionTypes';
 
 // The following two actions signal state changes in local recording engagement.
@@ -39,22 +38,6 @@ export function localRecordingEngaged(startTime: Date) {
 export function localRecordingUnengaged() {
     return {
         type: LOCAL_RECORDING_UNENGAGED
-    };
-}
-
-/**
- * Signals that local recording has memory limit exceeded.
- *
- * @param {boolean} isMemoryLimitExceeded - Is memory limit exceeded.
- * @returns {{
-    *     type: LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED,
-    *     isMemoryLimitExceeded: boolean
-    * }}
-    */
-export function localRecordingMemoryLimitExceeded(isMemoryLimitExceeded: Boolean) {
-    return {
-        type: LOCAL_RECORDING_MEMORY_LIMIT_EXCEEDED,
-        isMemoryLimitExceeded
     };
 }
 

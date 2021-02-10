@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable require-jsdoc */
-/* global interfaceConfig */
 
 import { Typography } from '@material-ui/core';
 import DialogContent from '@material-ui/core/DialogContent';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { hideDialog, Dialog } from '../../../base/dialog';
 import { connect } from '../../../base/redux';
@@ -24,20 +23,21 @@ const useStyles = makeStyles(() => {
         paper: {
             width: '80%',
             maxHeight: 435
+        },
+        info: {
+            fontSize: '0.8rem'
+        },
+        autoRecording: {
+            marginTop: '1rem',
+            fontSize: '0.8rem',
+            fontWeight: 'bold'
         }
     };
 });
 
-
-const recordingSteps = [ 'To start recording click on start recording',
-    // eslint-disable-next-line camelcase
-    `Select ${interfaceConfig.APP_NAME} screen type to start recording`,
-    'Click on share button to confirm recording',
-    'To stop recording click on stop recording'
-];
-
-
-function DownloadInfoDialog({ isMemoryLimitExceeded, onClose }) {
+function DownloadInfoDialog({ onClose }) {
+    const [ startAutoDownloading, setStartAutoDownloading ] = useState(false);
+    const [ counter, setCounter ] = useState(15);
 
     const classes = useStyles();
     const onSubmit = () => {
@@ -45,9 +45,21 @@ function DownloadInfoDialog({ isMemoryLimitExceeded, onClose }) {
         onClose();
     };
 
-    if (!isMemoryLimitExceeded) {
-        return null;
-    }
+    useEffect(() => {
+        const timer = counter > 0
+        && setInterval(() => {
+            if (counter === 10) {
+                setStartAutoDownloading(true);
+            }
+            setCounter(counter - 1);
+        }, 1000);
+
+        if (counter === 0) {
+            onSubmit();
+        }
+
+        return () => clearInterval(timer);
+    }, [ counter ]);
 
     return (
         <Dialog
@@ -59,32 +71,29 @@ function DownloadInfoDialog({ isMemoryLimitExceeded, onClose }) {
             open = { true }>
             <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
-                <Typography>
+                <Typography className = { classes.info }>
                     Memory limit exceeded.
-                    The recording has paused.
-                    To continue recording, please download the recording file.
+                    The recording is paused.
+                    To continue recording download the recording file.
                 </Typography>
+                {startAutoDownloading
+                && <Typography className = { classes.autoRecording }>
+                    {`Downloading will start after ${counter} seconds`}
+                </Typography>
+                }
             </DialogContent>
         </Dialog>
     );
 }
 
 DownloadInfoDialog.propTypes = {
-    isMemoryLimitExceeded: PropTypes.bool,
     onClose: PropTypes.func
 };
 
-const mapStateToProps = state => {
-    const {
-        recordingEngagedAt,
-        isMemoryLimitExceeded
-    } = state['features/riff-platform'].localRecording;
-
-    return {
-        recordingEngagedAt,
-        isMemoryLimitExceeded
-    };
+const mapStateToProps = () => {
+    return { };
 };
+
 const mapDispatchToProps = dispatch => {
     return {
         onClose: () => dispatch(hideDialog())
