@@ -11,7 +11,7 @@ import { getCombinedStream, addNewAudioStream } from './helpers';
  */
 // const MEDIARECORDER_TIMESLICE = 180000;
 
-const MEDIARECORDER_TIMESLICE = 1000;
+const MEDIARECORDER_TIMESLICE = 10000;
 
 /**
  * Defined max size for blob(MB).
@@ -298,7 +298,7 @@ export default class WebmAdapter extends RecordingAdapter {
 
         if (sizeInMB <= MEDIARECORDER_MAX_SIZE) {
             this._saveMediaData(data);
-        } else if (this._mediaRecorder.state === 'recording') {
+        } else if (this._mediaRecorder && this._mediaRecorder.state === 'recording') {
 
             this.handleMemoryExceededStop().then(() => {
                 if (recordingController._onMemoryExceeded) {
@@ -309,7 +309,9 @@ export default class WebmAdapter extends RecordingAdapter {
         }
     }
     stopLocalVideo() {
-        this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        if (this._mediaRecorder) {
+            this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
     }
 
     /**

@@ -166,7 +166,14 @@ class LocalRecordingController {
      *
      * @private
      */
-    _meetingName = ''
+    _meetingName = '';
+
+    /**
+     * Recording part of same session.
+     *
+     * @private
+     */
+    _recordingPart = 0;
 
     /**
      * FIXME: callback function for the {@code LocalRecordingController} to notify
@@ -324,9 +331,10 @@ class LocalRecordingController {
             this._adapter.exportRecordedData()
                 .then(args => {
                     const { data, format } = args;
+                    const defineSessionPart = this._recordingPart ? `_${this._recordingPart}` : '';
 
-                    const filename = `session_${sessionToken}`
-                        + `_${formattedMeetingName}.${format}`;
+                    const filename = `session_${sessionToken}${defineSessionPart
+                    }_${formattedMeetingName}.${format}`;
 
                     downloadBlob(data, filename);
                 })
@@ -548,6 +556,8 @@ class LocalRecordingController {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapter;
 
+            this._recordingPart = 0;
+
             delegate.start(this._micDeviceId, this._conference)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
@@ -622,6 +632,9 @@ class LocalRecordingController {
                     this._changeState(ControllerState.IDLE);
                     sessionManager.endSegment(this._currentSessionToken);
                     logger.log('Local recording unengaged.');
+                    if (this._recordingPart) {
+                        this._recordingPart = this._recordingPart + 1;
+                    }
                     this.downloadRecordedData(token);
 
                     const messageKey = 'Recording session {{token}} finished.';
@@ -730,6 +743,7 @@ class LocalRecordingController {
     onMemoryExceededDownload() {
         this.downloadRecordedData(this._currentSessionToken);
         this._adapter._onRecordingRestart();
+        this._recordingPart = this._recordingPart + 1;
     }
 
     // eslint-disable-next-line flowtype/no-types-missing-file-annotation
