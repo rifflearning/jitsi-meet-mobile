@@ -3,8 +3,7 @@
 import {
     LOCAL_RECORDING_ENGAGED,
     LOCAL_RECORDING_UNENGAGED,
-    LOCAL_RECORDING_STATS_UPDATE,
-    SET_LOCAL_RECORING_STATUS
+    LOCAL_RECORDING_STATS_UPDATE
 } from '../constants/actionTypes';
 
 // The following two actions signal state changes in local recording engagement.
@@ -39,29 +38,6 @@ export function localRecordingEngaged(startTime: Date) {
 export function localRecordingUnengaged() {
     return {
         type: LOCAL_RECORDING_UNENGAGED
-    };
-}
-
-/**
- * Updates the current known status of the shared YouTube video.
- *
- * @param {string} session - The current session of the local recording.
- * @param {string} status - The current status of the YouTube video being shared.
- * @param {number} time - Time when the recording is engaged.
- * @param {string} ownerId - The participantId of the user sharing the YouTube video.
- * @returns {{
-    *     type: SET_SHARED_VIDEO_STATUS,
-    *     ownerId: string,
-    *     status: string,
-    *     time: number,
-    *     videoId: string
-    * }}
-    */
-export function setLocalRecordingStatus(session: string, status: string, time: number, ownerId: string) {
-    return {
-        type: SET_LOCAL_RECORING_STATUS,
-        ownerId,
-        session
     };
 }
 

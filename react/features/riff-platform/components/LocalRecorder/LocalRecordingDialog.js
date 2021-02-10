@@ -73,7 +73,7 @@ function LocalRecordingDialog({
         return null;
     }
 
-    const renderModeratorControls = (
+    const renderControls = (
     <>
         <Typography>Follow the below steps to do screen recording:</Typography>
         <List>
@@ -103,7 +103,7 @@ function LocalRecordingDialog({
             open = { open }>
             <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
-                {renderModeratorControls}
+                {renderControls}
             </DialogContent>
         </Dialog>
     );
@@ -111,18 +111,12 @@ function LocalRecordingDialog({
 
 LocalRecordingDialog.propTypes = {
     onClose: PropTypes.func,
-    open: PropTypes.bool,
-    recordingEngagedAt: PropTypes.any
+    open: PropTypes.bool
 };
 
-const mapStateToProps = state => {
-    const {
-        recordingEngagedAt
-    } = state['features/riff-platform'].localRecording;
+const mapStateToProps = () => {
 
-    return {
-        recordingEngagedAt
-    };
+    return { };
 };
 const mapDispatchToProps = dispatch => {
     return {

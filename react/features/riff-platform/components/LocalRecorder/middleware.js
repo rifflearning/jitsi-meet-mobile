@@ -3,7 +3,7 @@
 import { createShortcutEvent, sendAnalytics } from '../../../analytics';
 import { APP_WILL_UNMOUNT } from '../../../base/app/actionTypes';
 import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../../../base/conference/actionTypes';
-import { toggleDialog } from '../../../base/dialog/actions';
+import { toggleDialog, openDialog, hideDialog } from '../../../base/dialog/actions';
 import { i18next } from '../../../base/i18n';
 import { SET_AUDIO_MUTED } from '../../../base/media/actionTypes';
 import { MiddlewareRegistry } from '../../../base/redux';
@@ -13,9 +13,8 @@ import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
 import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
 
+import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import WebmAdapter from './WebmAdapter';
-
 
 declare var APP: Object;
 
@@ -61,19 +60,24 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             }, 10000));
         };
 
+        recordingController.onMemoryExceeded = isExceeded => {
+            if (isExceeded) {
+                dispatch(openDialog(DownloadInfoDialog));
+            } else {
+                dispatch(hideDialog(DownloadInfoDialog));
+            }
+        };
+
         typeof APP === 'object' && typeof APP.keyboardshortcut === 'object'
             && APP.keyboardshortcut.registerShortcut('L', null, () => {
                 sendAnalytics(createShortcutEvent('local.recording'));
                 dispatch(toggleDialog(LocalRecordingInfoDialog));
             }, 'keyboardShortcuts.localRecording');
 
-        if (localRecording.format) {
-            recordingController.switchFormat(localRecording.format);
-        }
-
         const { conference } = getState()['features/base/conference'];
+        const meetingName = getState()['features/riff-platform']?.meeting?.meeting?.name;
 
-        recordingController.registerEvents(conference);
+        recordingController.registerEvents(conference, meetingName);
 
         break;
     }
@@ -104,9 +108,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
 
         if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
-            const webmRecordingController = new WebmAdapter();
-
-            webmRecordingController._addNewParticipantAudioStream(track.jitsiTrack.stream);
+            recordingController._onNewParticipantAudioStreamAdded(track.jitsiTrack.stream);
         }
         break;
     }

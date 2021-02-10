@@ -162,6 +162,20 @@ class LocalRecordingController {
     _registered = false;
 
     /**
+     * Current room name.
+     *
+     * @private
+     */
+    _meetingName = '';
+
+    /**
+     * Recording part of same session.
+     *
+     * @private
+     */
+    _recordingPart = 0;
+
+    /**
      * FIXME: callback function for the {@code LocalRecordingController} to notify
      * UI it wants to display a notice. Keeps {@code LocalRecordingController}
      * decoupled from UI.
@@ -180,6 +194,13 @@ class LocalRecordingController {
      * UI that the local recording state has changed.
      */
     _onStateChanged: ?(boolean) => void;
+
+    /**
+     * FIXME: callback function for the {@code LocalRecordingController} to notify
+     * UI it wants to display a dialog. Keeps {@code LocalRecordingController}
+     * decoupled from UI.
+     */
+    _onMemoryExceeded: ?(boolean) => void;
 
     /**
      * Constructor.
@@ -209,11 +230,13 @@ class LocalRecordingController {
      * Registers listeners for XMPP events.
      *
      * @param {JitsiConference} conference - A {@code JitsiConference} instance.
+     * @param {string} meetingName - Conference room name.
      * @returns {void}
      */
-    registerEvents(conference: Object) {
+    registerEvents(conference: Object, meetingName: string) {
         if (!this._registered) {
             this._conference = conference;
+            this._meetingName = meetingName;
             if (this._conference) {
                 this._conference
                     .addCommandListener(COMMAND_STOP, this._onStopNotification);
@@ -260,6 +283,16 @@ class LocalRecordingController {
     }
 
     /**
+     * Sets the event handler for {@code onMemoryExceeded}.
+     *
+     * @param {Function} delegate - The event handler.
+     * @returns {void}
+     */
+    set onMemoryExceeded(delegate: Function) {
+        this._onMemoryExceeded = delegate;
+    }
+
+    /**
      * Signals the participant to start local recording.
      *
      * @returns {void}
@@ -288,13 +321,20 @@ class LocalRecordingController {
      * @returns {void}
      */
     downloadRecordedData(sessionToken: number) {
+        const formattedMeetingName = this._meetingName.replace(/ /g, '_');
+
+        if (this._onMemoryExceeded) {
+            this._onMemoryExceeded(false);
+        }
+
         if (this._adapter) {
             this._adapter.exportRecordedData()
                 .then(args => {
                     const { data, format } = args;
+                    const defineSessionPart = this._recordingPart ? `_${this._recordingPart}` : '';
 
-                    const filename = `session_${sessionToken}`
-                        + `_${this._conference.myUserId()}.${format}`;
+                    const filename = `session_${sessionToken}${defineSessionPart
+                    }_${formattedMeetingName}.${format}`;
 
                     downloadBlob(data, filename);
                 })
@@ -347,19 +387,6 @@ class LocalRecordingController {
         if (this._state === ControllerState.RECORDING) {
             this._adapter.setMuted(this._isMuted);
         }
-    }
-
-    /**
-     * Switches the recording format.
-     *
-     * @param {string} newFormat - The new format.
-     * @returns {void}
-     */
-    switchFormat(newFormat: string) {
-        this._format = newFormat;
-        logger.log(`Recording format switched to ${newFormat}`);
-
-        // the new format will be used in the next recording session
     }
 
     /**
@@ -456,7 +483,6 @@ class LocalRecordingController {
      * @returns {void}
      */
     _onStartCommand({ sessionToken }) {
-
         if (this._state === ControllerState.IDLE) {
             this._changeState(ControllerState.STARTING);
             this._switchToNewSession(sessionToken);
@@ -530,6 +556,8 @@ class LocalRecordingController {
         if (this._state === ControllerState.STARTING) {
             const delegate = this._adapter;
 
+            this._recordingPart = 0;
+
             delegate.start(this._micDeviceId, this._conference)
             .then(() => {
                 this._changeState(ControllerState.RECORDING);
@@ -554,7 +582,7 @@ class LocalRecordingController {
     _startRecordingNotificationHandler: () => void;
 
     /**
-     * Signals the all participants to start local recording.
+     * Signals the all participants about local recording engaged .
      *
      * @returns {void}
      */
@@ -604,6 +632,9 @@ class LocalRecordingController {
                     this._changeState(ControllerState.IDLE);
                     sessionManager.endSegment(this._currentSessionToken);
                     logger.log('Local recording unengaged.');
+                    if (this._recordingPart) {
+                        this._recordingPart = this._recordingPart + 1;
+                    }
                     this.downloadRecordedData(token);
 
                     const messageKey = 'Recording session {{token}} finished.';
@@ -635,7 +666,7 @@ class LocalRecordingController {
     _stopRecordingNotificationHandler: () => void;
 
     /**
-     * Signals the all participants to stop local recording.
+     * Signals the all participants about local recording unengaged.
      *
      * @returns {void}
      */
@@ -692,12 +723,35 @@ class LocalRecordingController {
         return isAnyLocalRecordingEnabled;
     }
 
+    /**
+     * Adds new audio stream to AudioContext.
+     *
+     * @private
+     * @param {MediaStream} newStream - The new participant audio stream.
+     * @returns {void}
+     */
+    _onNewParticipantAudioStreamAdded(newStream) {
+        this._adapter._addNewParticipantAudioStream(newStream);
+    }
+
+    /**
+     * Triggers the download of recorded data in case memory limit exceeded.
+     * Restarts MediaRecorder.
+     *
+     * @returns {void}
+     */
+    onMemoryExceededDownload() {
+        this.downloadRecordedData(this._currentSessionToken);
+        this._adapter._onRecordingRestart();
+        this._recordingPart = this._recordingPart + 1;
+    }
+
     // eslint-disable-next-line flowtype/no-types-missing-file-annotation
     _switchToNewSession: (string) => void;
 
     /**
      * Switches to a new local recording session.
-     *rEcordingController.registerEvents.
+     * RecordingController.registerEvents.
      *
      * @param {string} sessionToken - The session Token.
      * @returns {void}
