@@ -108,7 +108,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
 
         if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
-            recordingController._onNewParticipantAudioStreamAdded(track.jitsiTrack.stream);
+            recordingController.onNewParticipantAudioStreamAdded(track.jitsiTrack.stream);
         }
         break;
     }

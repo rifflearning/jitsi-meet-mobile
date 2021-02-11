@@ -72,13 +72,11 @@ function DownloadInfoDialog({ onClose }) {
             <Typography style = {{ fontSize: '1.5rem' }}>Local Recording</Typography>
             <DialogContent dividers = { true }>
                 <Typography className = { classes.info }>
-                    Memory limit exceeded.
-                    The recording is paused.
-                    To continue recording download the recording file.
+                    Memory limit exceeded. To download the recording file click on download recording.
                 </Typography>
                 {startAutoDownloading
                 && <Typography className = { classes.autoRecording }>
-                    {`Downloading will start after ${counter} seconds`}
+                    {`Download will start in ${counter} seconds`}
                 </Typography>
                 }
             </DialogContent>

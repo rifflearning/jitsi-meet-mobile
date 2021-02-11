@@ -222,6 +222,8 @@ class LocalRecordingController {
         this._onStartNotification = this._onStartNotification.bind(this);
         this._stopRecordingNotificationHandler = this._stopRecordingNotificationHandler.bind(this);
         this._onStopNotification = this._onStopNotification.bind(this);
+        this.onMemoryExceededDownload = this.onMemoryExceededDownload.bind(this);
+        this.onNewParticipantAudioStreamAdded = this.onNewParticipantAudioStreamAdded.bind(this);
     }
 
     registerEvents: (*) => void;
@@ -726,12 +728,11 @@ class LocalRecordingController {
     /**
      * Adds new audio stream to AudioContext.
      *
-     * @private
      * @param {MediaStream} newStream - The new participant audio stream.
      * @returns {void}
      */
-    _onNewParticipantAudioStreamAdded(newStream) {
-        this._adapter._addNewParticipantAudioStream(newStream);
+    onNewParticipantAudioStreamAdded(newStream) {
+        this._adapter.addNewParticipantAudioStream(newStream);
     }
 
     /**
@@ -741,9 +742,16 @@ class LocalRecordingController {
      * @returns {void}
      */
     onMemoryExceededDownload() {
-        this.downloadRecordedData(this._currentSessionToken);
-        this._adapter._onRecordingRestart();
-        this._recordingPart = this._recordingPart + 1;
+        return this._adapter
+            .handleMemoryExceededStop()
+            .then(() => {
+                this.downloadRecordedData(this._currentSessionToken);
+                this._adapter.onRecordingRestart();
+                this._recordingPart = this._recordingPart + 1;
+            })
+            .catch(err => {
+                logger.error('Failed to stop local recording.', err);
+            });
     }
 
     // eslint-disable-next-line flowtype/no-types-missing-file-annotation
