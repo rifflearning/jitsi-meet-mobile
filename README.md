@@ -154,6 +154,9 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
         enabled: false
     }
     disableDeepLinking: true,
+    localRecording: {
+        enabled: true
+    },
     ```
     Also optional flags:
     ```
@@ -167,9 +170,4 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
 
     // in case we want jibri, but value itself different for every domain
     hiddenDomain: 'recorder.example-domain.com',
-    
-    //in case meetings local recording is needed
-    localRecording: {
-        enabled: true
-    },
     ```
