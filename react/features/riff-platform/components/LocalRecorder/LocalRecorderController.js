@@ -732,7 +732,9 @@ class LocalRecordingController {
      * @returns {void}
      */
     onNewParticipantAudioStreamAdded(newStream) {
-        this._adapter.addNewParticipantAudioStream(newStream);
+        if (this._adapter.addNewParticipantAudioStream) {
+            this._adapter.addNewParticipantAudioStream(newStream);
+        }
     }
 
     /**
