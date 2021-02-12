@@ -14,7 +14,7 @@ const MEDIARECORDER_TIMESLICE = 180000;
 /**
  * Defined max size for blob(MB).
  */
-const MEDIARECORDER_MAX_SIZE = 1000;
+const MEDIARECORDER_MAX_SIZE = 950;
 
 /**
  * Recording adapter that uses {@code MediaRecorder}
@@ -46,12 +46,6 @@ export default class WebmAdapter extends RecordingAdapter {
     _recorderStream = null;
 
     /**
-     * The array of participant streams.
-     * @private
-     */
-   _participatsStream = [];
-
-    /**
      * The {@code JitsiConference} instance.
      *
      * @private
@@ -65,14 +59,17 @@ export default class WebmAdapter extends RecordingAdapter {
     _newMediaRecorder = null;
 
     /**
+     * Prevents initialization new MediadRecorder from happening multiple times.
+     */
+    _isCalled = false;
+
+    /**
      * Implements {@link RecordingAdapter#start()}.
      *
      * @inheritdoc
      */
     start(micDeviceId, conference) {
         this._conference = conference;
-
-        this._participatsStream = this._getAudioParticipantsStream() || [];
 
         if (!this._initPromise) {
             this._initPromise = this._initialize(micDeviceId);
@@ -96,11 +93,11 @@ export default class WebmAdapter extends RecordingAdapter {
             async resolve => {
                 // eslint-disable-next-line no-negated-condition
                 if (this._mediaRecorder.state !== 'inactive') {
-                    this._mediaRecorder.stop(this.stopLocalVideo());
+                    this._mediaRecorder.stop(this._stopStreamTracks());
                     this._mediaRecorder.onstop = () => resolve();
                     this._mediaRecorder = null;
                 } else {
-                    this.stopLocalVideo();
+                    this._stopStreamTracks();
                     this._mediaRecorder = null;
                     resolve();
                 }
@@ -110,27 +107,29 @@ export default class WebmAdapter extends RecordingAdapter {
 
     /**
      * Returns the remote participant audio stream.
+      *@Private.
      *
      * @param {Object} participant - The participant object.
-     * @returns {*}
+     * @returns {(Track|undefined)}
      */
     _getAudioParticipantStream(participant) {
         if (participant._tracks?.length) {
-
-            return participant._tracks.find(t => t.mediaType === 'audio')?.stream;
+            return participant._tracks.find(t => t.type === 'audio')?.stream;
         }
     }
 
     /**
      * Returns array of remote participants audio stream.
+     *@Private.
      *
-     * @returns {*}
+     * @returns {(Track[])} - List of all participant audio streams.
      */
     _getAudioParticipantsStream() {
         const participantsAudioStreamArray = this._conference.getParticipants()
-          .filter(participant => this._getAudioParticipantStream(participant));
+          .map(participant => this._getAudioParticipantStream(participant))
+          .filter(stream => stream);
 
-        return participantsAudioStreamArray.length || [];
+        return participantsAudioStreamArray;
     }
 
     /**
@@ -184,12 +183,11 @@ export default class WebmAdapter extends RecordingAdapter {
     /**
      * Add new audio stream to AudioContext.
      *
-     * @private
      * @param {MediaStream} newAudioStream - The new participant audio stream.
      * @returns {void}
      */
 
-    _addNewParticipantAudioStream(newAudioStream) {
+    addNewParticipantAudioStream(newAudioStream) {
         if (newAudioStream.getAudioTracks().length) {
             addNewAudioStream(newAudioStream);
         }
@@ -211,8 +209,8 @@ export default class WebmAdapter extends RecordingAdapter {
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
             .then(async userAudioStream => {
-
-                const allParticipatsAudioStreams = this._participatsStream.concat(userAudioStream);
+                const participatsStream = this._getAudioParticipantsStream() || [];
+                const allParticipatsAudioStreams = participatsStream.concat(userAudioStream);
 
                 getCombinedStream(allParticipatsAudioStreams)
                 .then(mediaStream => {
@@ -227,8 +225,6 @@ export default class WebmAdapter extends RecordingAdapter {
 
                         return recordingController.stopRecording();
                     };
-
-                    // this._mediaRecorder.oninactive = () => recordingController.stopRecording();
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);
@@ -242,11 +238,25 @@ export default class WebmAdapter extends RecordingAdapter {
         });
     }
 
+    /**
+     * Initialize the current MediaRecorder.
+     *
+     * @private
+     * @param {MediaStream} stream - The current stream.
+     * @returns {void}
+     */
     _initializeCurrentMediaRecoder(stream) {
         this._mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
         this._mediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
     }
 
+    /**
+     * Initialize the new MediaRecorder. To continue recording with current stream.
+     *
+     * @private
+     * @param {MediaStream} stream - The current stream.
+     * @returns {void}
+     */
     _initializeNewMediaRecoder(stream) {
         this._newMediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
         this._newMediaRecorder.ondataavailable = e => this._onMediaDataAvailable(e.data);
@@ -256,7 +266,6 @@ export default class WebmAdapter extends RecordingAdapter {
     /**
      * Stop MediaRecorder in case memory limit exceeded.
      *
-     * @private
      * @returns {void}
      */
     handleMemoryExceededStop() {
@@ -271,15 +280,15 @@ export default class WebmAdapter extends RecordingAdapter {
     /**
      * Restarts MediaRecorder with the same stream.
      *
-     * @private
      * @returns {void}
      */
-    _onRecordingRestart() {
+    onRecordingRestart() {
         this._mediaRecorder = this._newMediaRecorder;
         this._mediaRecorder.start(MEDIARECORDER_TIMESLICE);
         this._mediaRecorder.requestData();
         this._newMediaRecorder = null;
         this._recordedData = [];
+        this._isCalled = false;
     }
 
 
@@ -294,19 +303,21 @@ export default class WebmAdapter extends RecordingAdapter {
         const currentRecordingBlob = new Blob(this._recordedData, { type: 'video/webm' });
         const sizeInMB = currentRecordingBlob.size / (1024 * 1024);
 
-        if (sizeInMB < MEDIARECORDER_MAX_SIZE) {
-            this._saveMediaData(data);
-        } else if (this._mediaRecorder && this._mediaRecorder.state === 'recording') {
+        this._saveMediaData(data);
+        if (sizeInMB >= MEDIARECORDER_MAX_SIZE
+            && this._mediaRecorder
+            && this._mediaRecorder.state === 'recording'
+            && !this._isCalled) {
 
-            this.handleMemoryExceededStop().then(() => {
-                if (recordingController._onMemoryExceeded) {
-                    recordingController._onMemoryExceeded(true);
-                }
-                this._initializeNewMediaRecoder(this._recorderStream);
-            });
+            if (recordingController._onMemoryExceeded) {
+                recordingController._onMemoryExceeded(true);
+            }
+            this._initializeNewMediaRecoder(this._recorderStream);
+            this._isCalled = true;
         }
     }
-    stopLocalVideo() {
+
+    _stopStreamTracks() {
         if (this._mediaRecorder) {
             this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
         }
