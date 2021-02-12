@@ -9,6 +9,7 @@ import {
     sendAnalytics
 } from '../../../analytics';
 import { openDialog, toggleDialog } from '../../../base/dialog';
+import { isMobileBrowser } from '../../../base/environment/utils';
 import { translate } from '../../../base/i18n';
 import {
     IconChat,
@@ -1204,7 +1205,7 @@ class Toolbox extends Component<Props, State> {
         if (this._shouldShowButton('tileview')) {
             buttonsRight.push('tileview');
         }
-        if (this._shouldShowButton('localrecording')) {
+        if (this._shouldShowButton('localrecording') && !isMobileBrowser()) {
             buttonsRight.push('localrecording');
         }
 
