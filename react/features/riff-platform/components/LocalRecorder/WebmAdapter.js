@@ -46,12 +46,6 @@ export default class WebmAdapter extends RecordingAdapter {
     _recorderStream = null;
 
     /**
-     * The array of participant streams.
-     * @private
-     */
-   _participatsStream = [];
-
-    /**
      * The {@code JitsiConference} instance.
      *
      * @private
@@ -77,8 +71,6 @@ export default class WebmAdapter extends RecordingAdapter {
     start(micDeviceId, conference) {
         this._conference = conference;
 
-        this._participatsStream = this._getAudioParticipantsStream() || [];
-
         if (!this._initPromise) {
             this._initPromise = this._initialize(micDeviceId);
         }
@@ -101,11 +93,11 @@ export default class WebmAdapter extends RecordingAdapter {
             async resolve => {
                 // eslint-disable-next-line no-negated-condition
                 if (this._mediaRecorder.state !== 'inactive') {
-                    this._mediaRecorder.stop(this.stopLocalVideo());
+                    this._mediaRecorder.stop(this._stopStreamTracks());
                     this._mediaRecorder.onstop = () => resolve();
                     this._mediaRecorder = null;
                 } else {
-                    this.stopLocalVideo();
+                    this._stopStreamTracks();
                     this._mediaRecorder = null;
                     resolve();
                 }
@@ -115,27 +107,29 @@ export default class WebmAdapter extends RecordingAdapter {
 
     /**
      * Returns the remote participant audio stream.
+      *@Private.
      *
      * @param {Object} participant - The participant object.
-     * @returns {*}
+     * @returns {(Track|undefined)}
      */
     _getAudioParticipantStream(participant) {
         if (participant._tracks?.length) {
-
-            return participant._tracks.find(t => t.mediaType === 'audio')?.stream;
+            return participant._tracks.find(t => t.type === 'audio')?.stream;
         }
     }
 
     /**
      * Returns array of remote participants audio stream.
+     *@Private.
      *
-     * @returns {*}
+     * @returns {(Track[])} - List of all participant audio streams.
      */
     _getAudioParticipantsStream() {
         const participantsAudioStreamArray = this._conference.getParticipants()
-          .filter(participant => this._getAudioParticipantStream(participant));
+          .map(participant => this._getAudioParticipantStream(participant))
+          .filter(stream => stream);
 
-        return participantsAudioStreamArray.length || [];
+        return participantsAudioStreamArray;
     }
 
     /**
@@ -215,8 +209,8 @@ export default class WebmAdapter extends RecordingAdapter {
         return new Promise((resolve, error) => {
             this._getAudioStream(micDeviceId)
             .then(async userAudioStream => {
-
-                const allParticipatsAudioStreams = this._participatsStream.concat(userAudioStream);
+                const participatsStream = this._getAudioParticipantsStream() || [];
+                const allParticipatsAudioStreams = participatsStream.concat(userAudioStream);
 
                 getCombinedStream(allParticipatsAudioStreams)
                 .then(mediaStream => {
@@ -231,8 +225,6 @@ export default class WebmAdapter extends RecordingAdapter {
 
                         return recordingController.stopRecording();
                     };
-
-                    // this._mediaRecorder.oninactive = () => recordingController.stopRecording();
                 })
                 .catch(err => {
                     logger.error(`Error calling getUserMedia(): ${err}`);
@@ -325,7 +317,7 @@ export default class WebmAdapter extends RecordingAdapter {
         }
     }
 
-    stopLocalVideo() {
+    _stopStreamTracks() {
         if (this._mediaRecorder) {
             this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
         }
