@@ -260,7 +260,7 @@ class DashboardView extends React.Component {
                                     ]}
                                 />
                             </div>
-                            <div className='metric-row' style={timelineRowStyle}>
+                            { process.env.DISABLE_EMOTIONS_CHART !== 'true' && <div className='metric-row' style={timelineRowStyle}>
                                 <EmotionsChart
                                     graphType={GraphTypes.TIMELINE}
                                     eventTypes={[
@@ -272,7 +272,7 @@ class DashboardView extends React.Component {
                                         GraphTypes.THEIR_INFLUENCE,
                                     ]}
                                 />
-                            </div>
+                            </div>}
                         </div>
                     </div>
                 </div>
