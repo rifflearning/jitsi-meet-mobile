@@ -20,7 +20,8 @@ export function attachSibilant(tracks) {
             const { accessToken } = await loginToServerForSibilant();
 
             const userData = getState()['features/riff-platform'].signIn.user;
-            const { roomId: room, name: title } = getState()['features/riff-platform'].meeting.meeting;
+            const room = window.location.pathname.split('/')[1];
+            const title = getState()['features/riff-platform'].meeting?.meeting?.name;
 
             await riffAddUserToMeeting(userData, room, accessToken, title);
 
