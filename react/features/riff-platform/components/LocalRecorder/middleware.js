@@ -6,6 +6,7 @@ import { CONFERENCE_JOINED, CONFERENCE_WILL_LEAVE } from '../../../base/conferen
 import { toggleDialog, openDialog, hideDialog } from '../../../base/dialog/actions';
 import { i18next } from '../../../base/i18n';
 import { SET_AUDIO_MUTED } from '../../../base/media/actionTypes';
+import { PARTICIPANT_JOINED, PARTICIPANT_LEFT } from '../../../base/participants/actionTypes';
 import { MiddlewareRegistry } from '../../../base/redux';
 import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
@@ -15,6 +16,7 @@ import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/lo
 
 import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
+import { createUserAudioTrack, stopLocalVideo } from './helpers';
 
 declare var APP: Object;
 
@@ -119,6 +121,38 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             return;
         }
         recordingController.stopRecording();
+        break;
+    }
+    case PARTICIPANT_JOINED: {
+        const isYoutubeJoined = action.participant.name === 'YouTube';
+
+
+        // TODO save Youtube id
+        if (!isYoutubeJoined) {
+            return;
+        }
+
+
+        createUserAudioTrack().then(audioStream => {
+            recordingController.onNewParticipantAudioStreamAdded(audioStream);
+            dispatch(showNotification({
+                title: i18next.t('localRecording.localRecording'),
+                description: 'Local recording use your microphone'
+            }, 10000));
+        })
+        .catch(error => Promise.reject(error));
+
+        break;
+    }
+    case PARTICIPANT_LEFT: {
+        const isYoutubeLeft = action.participant.id;
+
+        if (!isYoutubeLeft) {
+            // return;
+        }
+
+        //recordingController.updateAudioStreams();
+
         break;
     }
     }

@@ -774,6 +774,11 @@ class LocalRecordingController {
         sessionManager.createSession(sessionToken, this._format);
     }
 
+    // eslint-disable-next-line require-jsdoc
+    updateAudioStreams() {
+        this._adapter.replaceAudioStreams();
+    }
+
 }
 
 /**

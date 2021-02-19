@@ -4,7 +4,7 @@ import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
 import { recordingController } from './LocalRecorderController';
-import { getCombinedStream, addNewAudioStream } from './helpers';
+import { getCombinedStream, addNewAudioStream, updateAudioStreams } from './helpers';
 
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
@@ -62,6 +62,8 @@ export default class WebmAdapter extends RecordingAdapter {
      * Prevents initialization new MediadRecorder from happening multiple times.
      */
     _isCalled = false;
+
+    _participantAudioStreams = [];
 
     /**
      * Implements {@link RecordingAdapter#start()}.
@@ -212,6 +214,8 @@ export default class WebmAdapter extends RecordingAdapter {
                 const participatsStream = this._getAudioParticipantsStream() || [];
                 const allParticipatsAudioStreams = participatsStream.concat(userAudioStream);
 
+                this._participantAudioStreams = allParticipatsAudioStreams;
+
                 getCombinedStream(allParticipatsAudioStreams)
                 .then(mediaStream => {
                     this._stream = userAudioStream;
@@ -341,6 +345,10 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     setMicDevice(micDeviceId) {
         return this._replaceMic(micDeviceId);
+    }
+
+    replaceAudioStreams() {
+        updateAudioStreams(this._participantAudioStreams);
     }
 }
 
