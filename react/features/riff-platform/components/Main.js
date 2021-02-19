@@ -53,8 +53,6 @@ const useStyles = makeStyles(theme => {
     };
 });
 
-const negotiationsGroupId = process.env.NEGOTIATIONS_GROUP_ADMIN_USER_ID;
-
 // eslint-disable-next-line require-jsdoc
 function Meetings() {
     return (
@@ -94,11 +92,11 @@ const Main = ({ user }) => {
             <Route
                 path = { ROUTES.MEETINGS }
                 component = { Meetings } />
-            {negotiationsGroupId
+            {process.env.DISABLE_GROUPS !== 'true'
                 && <Route
                     path = { ROUTES.MEETINGS_HARVARD }
                     // eslint-disable-next-line react/jsx-no-bind
-                    component = { () => <AllMeetings groupName = { negotiationsGroupId } /> } />
+                    component = { () => <AllMeetings isGroup = { true } /> } />
             }
             <Route path = { ROUTES.SCHEDULE } >
                 <Scheduler />
