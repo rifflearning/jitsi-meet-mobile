@@ -25,27 +25,43 @@ Create `.env` file in root dir (*ask colleagues for the `.env`*):
 
 ```
 ### Uncomment variables for specific instance deployment:
+## Local development:
+RIFF_SERVER_URL=https://dev-jitsi.riffplatform.com 
+API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
+# for local api-gateway:
+# RIFF_SERVER_URL=https://localhost:4445/api
+
+## Common variables
+PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+RIFF_SERVER_URL=/
+API_GATEWAY=/api-gateway
+
+## Deployment to dev-jitsi instance:
+# AWS_NAME=ubuntu@dev-jitsi.riffplatform.com
+# DISABLE_GROUPS=true
 
 ## Deployment to rif-poc instance:
-API_GATEWAY=/api-gateway
-RIFF_SERVER_URL=/
-NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb8999575d80a6fe1b2961
-PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
-AWS_NAME=ubuntu@riff-poc.riffplatform.com
+# AWS_NAME=ubuntu@riff-poc.riffplatform.com
 
 ## Deployment to hls-negotiations instance:
-# API_GATEWAY=/api-gateway
-# RIFF_SERVER_URL=/
-# NEGOTIATIONS_GROUP_ADMIN_USER_ID=5feb890b2802c112989e367e
-# PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
 # AWS_NAME=ubuntu@hls-negotiations.riffremote.com
+# DISABLE_EMOTIONS_CHART=true
 
-## Deployment to mattermost instance:
-# API_GATEWAY=
-# RIFF_SERVER_URL=/
-# NEGOTIATIONS_GROUP_ADMIN_USER_ID=
-# PEM_PATH=~/.ssh/riffdev_1_useast2_key.pem
+## Deployment to nd-negotiations instance:
+# AWS_NAME=ubuntu@nd-negotiations.riffremote.com
+# DISABLE_EMOTIONS_CHART=true
+
+## Deployment to pega.riffremote.com instance:
+# AWS_NAME=ubuntu@pega.riffremote.com
+# DISABLE_EMOTIONS_CHART=true
+
+## Deployment to staging.riffedu instance (DEV):
 # AWS_NAME=ubuntu@meet.staging.riffedu.com
+# MATTERMOST_EMBEDDED_ONLY=true
+
+## Deployment to said-oxford.riffedu instance:
+# AWS_NAME=ubuntu@meet.said-oxford.riffedu.com
+# PEM_PATH=~/.ssh/riffdev_1_euwest2_key.pem
 # MATTERMOST_EMBEDDED_ONLY=true
 ```
 
