@@ -16,7 +16,7 @@ import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/lo
 
 import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import { createUserAudioTrack, stopLocalVideo } from './helpers';
+import { createUserAudioTrack } from './helpers';
 
 declare var APP: Object;
 
@@ -110,7 +110,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         }
 
         if (track.jitsiTrack && track.jitsiTrack.getType() === 'audio') {
-            recordingController.onNewParticipantAudioStreamAdded(track.jitsiTrack.stream);
+            recordingController.onNewParticipantAudioStreamAdded(track.jitsiTrack.stream, track.participantId);
         }
         break;
     }
@@ -125,16 +125,14 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     }
     case PARTICIPANT_JOINED: {
         const isYoutubeJoined = action.participant.name === 'YouTube';
+        const { isEngaged } = getState()['features/riff-platform'].localRecording;
 
-
-        // TODO save Youtube id
-        if (!isYoutubeJoined) {
+        if (!isYoutubeJoined || !isEngaged) {
             return;
         }
 
-
         createUserAudioTrack().then(audioStream => {
-            recordingController.onNewParticipantAudioStreamAdded(audioStream);
+            recordingController.onNewParticipantAudioStreamAdded(audioStream, action.participant.id);
             dispatch(showNotification({
                 title: i18next.t('localRecording.localRecording'),
                 description: 'Local recording use your microphone'
@@ -145,14 +143,13 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case PARTICIPANT_LEFT: {
-        const isYoutubeLeft = action.participant.id;
+        const { isEngaged } = getState()['features/riff-platform'].localRecording;
 
-        if (!isYoutubeLeft) {
-            // return;
+        if (!isEngaged) {
+            return;
         }
 
-        //recordingController.updateAudioStreams();
-
+        recordingController.removeParticipantAudioStream(action.participant.id);
         break;
     }
     }

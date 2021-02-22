@@ -729,11 +729,12 @@ class LocalRecordingController {
      * Adds new audio stream to AudioContext.
      *
      * @param {MediaStream} newStream - The new participant audio stream.
+     * @param {string} id - The new participant id.
      * @returns {void}
      */
-    onNewParticipantAudioStreamAdded(newStream) {
+    onNewParticipantAudioStreamAdded(newStream, id) {
         if (this._adapter.addNewParticipantAudioStream) {
-            this._adapter.addNewParticipantAudioStream(newStream);
+            this._adapter.addNewParticipantAudioStream(newStream, id);
         }
     }
 
@@ -775,8 +776,10 @@ class LocalRecordingController {
     }
 
     // eslint-disable-next-line require-jsdoc
-    updateAudioStreams() {
-        this._adapter.replaceAudioStreams();
+    removeParticipantAudioStream(id) {
+        if (this._adapter.removeAudioStreamsById) {
+            this._adapter.removeAudioStreamsById(id);
+        }
     }
 
 }

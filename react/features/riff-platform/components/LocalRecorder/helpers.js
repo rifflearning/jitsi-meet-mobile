@@ -4,46 +4,76 @@ import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/l
 import { COMMAND_START, COMMAND_STOP } from './LocalRecorderController';
 
 class AudioStreamsMixer {
+    initialize = false;
 
     initializeAudioContext(streamsArr) {
-        this.ctx = new AudioContext();
-        this.dest = this.ctx.createMediaStreamDestination();
+        if (!this.initialize) {
+            this.initialize = true;
+            this.audioContext = new AudioContext();
+            this.dest = this.audioContext.createMediaStreamDestination();
+            this.sources = [];
+        }
+
         streamsArr.length && streamsArr.forEach(stream => {
-            if (stream.getAudioTracks().length) {
-                this.ctx.createMediaStreamSource(stream).connect(this.dest);
+            if (stream.stream.getAudioTracks().length) {
+                this.addStream(stream);
             }
         });
+    }
 
+    addStream({ stream, id }) {
+        const sources = stream.getAudioTracks().map(track =>
+            this.audioContext.createMediaStreamSource(new MediaStream([ track ])));
+
+        sources.forEach(source => {
+
+            // Add it to the current sources being mixed
+            this.sources.push({ id,
+                source });
+            source.connect(this.dest);
+
+        });
+    }
+
+    getAudioTracks() {
         return this.dest.stream.getAudioTracks();
     }
 
-    addNewStream(newUserStream) {
-        if (this.ctx && newUserStream.getAudioTracks().length) {
-            this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
-        }
+    flushAll() {
+        this.sources.forEach(source => {
+            source.source.disconnect(this.dest);
+        });
+
+        this.sources = [];
     }
 
-   /* updateAudioContext(streamsArr) {
-        if (this.ctx) {
-            this.ctx.stop().then(() =>
-                streamsArr.length && streamsArr.forEach(stream => {
-                    if (stream.getAudioTracks().length) {
-                        this.ctx.createMediaStreamSource(stream).connect(this.dest);
-                    }
-                })
-            );
-        }
+    cleanup() {
+        this.audioContext.close();
+    }
 
-    }*/
+    removeAudioSouce(id) {
+        const sources = [];
+
+        this.sources.forEach(source => {
+            if (source.id === id) {
+                source.source.disconnect(this.dest);
+            } else {
+                sources.push(source);
+            }
+        });
+
+        this.sources = sources;
+    }
 }
 
 const audioStreamsMixer = new AudioStreamsMixer();
 
-export const addNewAudioStream = newParticipantStream => {
-    audioStreamsMixer.addNewStream(newParticipantStream);
+export const addNewAudioStream = (newParticipantStream, id) => {
+    audioStreamsMixer.addStream({ stream: newParticipantStream,
+        id });
 };
 
-export const updateAudioStreams = streams => audioStreamsMixer.updateAudioContext(streams);
+export const removeAudioStream = id => audioStreamsMixer.removeAudioSouce(id);
 
 const createDesktopTrack = () => {
 
@@ -61,7 +91,8 @@ export const getCombinedStream = async participantStreams => {
     }
 
     return createDesktopTrack().then(desktopStream => {
-        const audioTrack = audioStreamsMixer.initializeAudioContext(participantStreams);
+        audioStreamsMixer.initializeAudioContext(participantStreams);
+        const audioTrack = audioStreamsMixer.getAudioTracks();
         const mediaStream = new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
 
         return mediaStream;

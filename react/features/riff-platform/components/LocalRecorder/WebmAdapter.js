@@ -4,7 +4,7 @@ import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
 import { recordingController } from './LocalRecorderController';
-import { getCombinedStream, addNewAudioStream, updateAudioStreams } from './helpers';
+import { getCombinedStream, addNewAudioStream, removeAudioStream } from './helpers';
 
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
@@ -116,7 +116,10 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _getAudioParticipantStream(participant) {
         if (participant._tracks?.length) {
-            return participant._tracks.find(t => t.type === 'audio')?.stream;
+            return {
+                id: participant._id,
+                stream: participant._tracks.find(t => t.type === 'audio')?.stream
+            };
         }
     }
 
@@ -189,9 +192,9 @@ export default class WebmAdapter extends RecordingAdapter {
      * @returns {void}
      */
 
-    addNewParticipantAudioStream(newAudioStream) {
+    addNewParticipantAudioStream(newAudioStream, id) {
         if (newAudioStream.getAudioTracks().length) {
-            addNewAudioStream(newAudioStream);
+            addNewAudioStream(newAudioStream, id);
         }
     }
 
@@ -212,7 +215,8 @@ export default class WebmAdapter extends RecordingAdapter {
             this._getAudioStream(micDeviceId)
             .then(async userAudioStream => {
                 const participatsStream = this._getAudioParticipantsStream() || [];
-                const allParticipatsAudioStreams = participatsStream.concat(userAudioStream);
+                const allParticipatsAudioStreams = participatsStream.concat({ id: 'local',
+                    stream: userAudioStream });
 
                 this._participantAudioStreams = allParticipatsAudioStreams;
 
@@ -347,8 +351,7 @@ export default class WebmAdapter extends RecordingAdapter {
         return this._replaceMic(micDeviceId);
     }
 
-    replaceAudioStreams() {
-        updateAudioStreams(this._participantAudioStreams);
+    removeAudioStreamsById(id) {
+        removeAudioStream(id);
     }
 }
-
