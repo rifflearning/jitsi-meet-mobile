@@ -196,6 +196,11 @@ class LocalRecordingController {
     _onStateChanged: ?(boolean) => void;
 
     /**
+     * saves in the redux store user local recording state.
+     */
+    _onStatusUpdated: ?(boolean) => void;
+
+    /**
      * FIXME: callback function for the {@code LocalRecordingController} to notify
      * UI it wants to display a dialog. Keeps {@code LocalRecordingController}
      * decoupled from UI.
@@ -262,6 +267,16 @@ class LocalRecordingController {
      */
     set onStateChanged(delegate: Function) {
         this._onStateChanged = delegate;
+    }
+
+    /**
+     * Sets the event handler for {@code onStatusUpdated}.
+     *
+     * @param {Function} delegate - The event handler.
+     * @returns {void}
+     */
+    set onStatusUpdated(delegate: Function) {
+        this._onStatusUpdated = delegate;
     }
 
     /**
@@ -399,9 +414,7 @@ class LocalRecordingController {
     getLocalStats(): LocalRecordingStats {
         return {
             currentSessionToken: this._currentSessionToken,
-            isRecording: this._state === ControllerState.RECORDING,
-            recordedBytes: 0,
-            recordedLength: 0
+            isRecording: this._state === ControllerState.RECORDING
         };
     }
 
@@ -418,7 +431,6 @@ class LocalRecordingController {
             .map(member => {
                 return {
                     id: member.getId(),
-                    displayName: member.getDisplayName(),
                     recordingStats:
                         JSON.parse(member.getProperty(PROPERTY_STATS) || '{}'),
                     isSelf: false
@@ -435,7 +447,6 @@ class LocalRecordingController {
 
         result[localId] = {
             id: localId,
-            displayName: i18next.t('localRecording.me'),
             recordingStats: this.getLocalStats(),
             isSelf: true
         };
@@ -572,6 +583,7 @@ class LocalRecordingController {
                 this._startRecordingNotificationHandler();
 
                 delegate.setMuted(this._isMuted);
+                this._onStatusUpdated(this.getLocalStats());
                 this._updateStats();
             })
             .catch(err => {
@@ -649,7 +661,7 @@ class LocalRecordingController {
                     }
 
                     this._stopRecordingNotificationHandler();
-
+                    this._onStatusUpdated(this.getLocalStats());
                     this._updateStats();
                 })
                 .catch(err => {

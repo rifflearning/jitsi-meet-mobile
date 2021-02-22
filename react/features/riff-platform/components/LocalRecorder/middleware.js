@@ -12,16 +12,17 @@ import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
 import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
-import { localRecordingEngaged, localRecordingUnengaged } from '../../actions/localRecording';
+import { localRecordingEngaged, localRecordingStats } from '../../actions/localRecording';
 
 import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import { createUserAudioTrack } from './helpers';
+import { createUserAudioTrack, isLocalRecordingEngagedByLocalUser } from './helpers';
 
 declare var APP: Object;
 
 MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     const result = next(action);
+
 
     switch (action.type) {
     case CONFERENCE_JOINED: {
@@ -38,15 +39,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
 
         // realize the delegates on recordingController, allowing the UI to
         // react to state changes in recordingController.
-        recordingController.onStateChanged = isEngaged => {
-            if (isEngaged) {
-                const nowTime = new Date();
+        recordingController.onStateChanged = isEngaged => dispatch(localRecordingEngaged(isEngaged));
 
-                dispatch(localRecordingEngaged(nowTime));
-            } else {
-                dispatch(localRecordingUnengaged());
-            }
-        };
+        recordingController.onStatusUpdated = stats => dispatch(localRecordingStats(stats));
 
         recordingController.onWarning = (messageKey, messageParams) => {
             dispatch(showNotification({
@@ -100,12 +95,11 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case TRACK_ADDED: {
-        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
         const { conference } = getState()['features/base/conference'];
-
         const { track } = action;
 
-        if (!track || track.local || !isEngaged || !conference) {
+        if (!track || track.local || !isRecording || !conference) {
             return;
         }
 
@@ -115,9 +109,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case CONFERENCE_WILL_LEAVE: {
-        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
 
-        if (!isEngaged) {
+        if (!isRecording) {
             return;
         }
         recordingController.stopRecording();
@@ -125,9 +119,9 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     }
     case PARTICIPANT_JOINED: {
         const isYoutubeJoined = action.participant.name === 'YouTube';
-        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
 
-        if (!isYoutubeJoined || !isEngaged) {
+        if (!isYoutubeJoined || !isRecording) {
             return;
         }
 
@@ -143,14 +137,15 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case PARTICIPANT_LEFT: {
-        const { isEngaged } = getState()['features/riff-platform'].localRecording;
+        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
 
-        if (!isEngaged) {
+        if (!isRecording) {
             return;
         }
 
         recordingController.removeParticipantAudioStream(action.participant.id);
         break;
+
     }
     }
 

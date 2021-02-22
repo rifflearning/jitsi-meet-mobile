@@ -6,18 +6,11 @@ export default (state = {}, action) => {
     case actionTypes.LOCAL_RECORDING_ENGAGED: {
         return {
             ...state,
-            isEngaged: true,
-            recordingEngagedAt: action.recordingEngagedAt,
+            isEngaged: action.isEngaged,
             encodingFormat: recordingController._format
         };
     }
-    case actionTypes.LOCAL_RECORDING_UNENGAGED:
-        return {
-            ...state,
-            isEngaged: false,
-            recordingEngagedAt: null
-        };
-    case actionTypes.LOCAL_RECORDING_STATS_UPDATE:
+    case actionTypes.LOCAL_RECORDING_STATS:
         return {
             ...state,
             stats: action.stats

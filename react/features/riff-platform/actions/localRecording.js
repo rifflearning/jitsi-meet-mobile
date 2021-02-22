@@ -2,11 +2,10 @@
 
 import {
     LOCAL_RECORDING_ENGAGED,
-    LOCAL_RECORDING_UNENGAGED,
-    LOCAL_RECORDING_STATS_UPDATE
+    LOCAL_RECORDING_STATS
 } from '../constants/actionTypes';
 
-// The following two actions signal state changes in local recording engagement.
+// The following action signals state changes in local recording engagement.
 // In other words, the events of the local WebWorker / MediaRecorder starting to
 // record and finishing recording.
 // Note that this is not the event fired when the users tries to start the
@@ -15,35 +14,21 @@ import {
 /**
  * Signals that local recording has been engaged.
  *
- * @param {Date} startTime - Time when the recording is engaged.
+ * @param {Date} isEngaged - Local recording is engaged.
  * @returns {{
  *     type: LOCAL_RECORDING_ENGAGED,
- *     recordingEngagedAt: Date
+ *     isEngaged: boolean
  * }}
  */
-export function localRecordingEngaged(startTime: Date) {
+export function localRecordingEngaged(isEngaged: Boolean) {
     return {
         type: LOCAL_RECORDING_ENGAGED,
-        recordingEngagedAt: startTime
+        isEngaged
     };
 }
 
 /**
- * Signals that local recording has finished.
- *
- * @returns {{
- *     type: LOCAL_RECORDING_UNENGAGED
- * }}
- */
-export function localRecordingUnengaged() {
-    return {
-        type: LOCAL_RECORDING_UNENGAGED
-    };
-}
-
-/**
- * Updates the the local recording stats from each client,
- * to be displayed on {@code LocalRecordingInfoDialog}.
+ * Local recording stats.
  *
  * @param {*} stats - The stats object.
  * @returns {{
@@ -51,9 +36,9 @@ export function localRecordingUnengaged() {
  *     stats: Object
  * }}
  */
-export function statsUpdate(stats: Object) {
+export function localRecordingStats(stats: Object) {
     return {
-        type: LOCAL_RECORDING_STATS_UPDATE,
+        type: LOCAL_RECORDING_STATS,
         stats
     };
 }
