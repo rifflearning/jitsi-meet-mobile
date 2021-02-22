@@ -10,19 +10,19 @@ import { PARTICIPANT_JOINED, PARTICIPANT_LEFT } from '../../../base/participants
 import { MiddlewareRegistry } from '../../../base/redux';
 import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
+import { statsUpdate } from '../../../local-recording/actions';
 import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
-import { localRecordingEngaged, localRecordingStats } from '../../actions/localRecording';
+import { localRecordingEngaged, localRecordingStats, setSharedVideoId } from '../../actions/localRecording';
 
 import DownloadInfoDialog from './DownloadInfoDialog';
 import { recordingController } from './LocalRecorderController';
-import { createUserAudioTrack, isLocalRecordingEngagedByLocalUser } from './helpers';
+import { createUserAudioTrack } from './helpers';
 
 declare var APP: Object;
 
 MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     const result = next(action);
-
 
     switch (action.type) {
     case CONFERENCE_JOINED: {
@@ -37,11 +37,31 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             break;
         }
 
+
         // realize the delegates on recordingController, allowing the UI to
         // react to state changes in recordingController.
         recordingController.onStateChanged = isEngaged => dispatch(localRecordingEngaged(isEngaged));
 
-        recordingController.onStatusUpdated = stats => dispatch(localRecordingStats(stats));
+        recordingController.onStatusUpdated = stats => {
+            dispatch(localRecordingStats(stats));
+
+            if (stats?.isRecording) {
+                const isVideoShared = [ 'playing', 'pause', 'start' ]
+                    .includes(getState()['features/shared-video'].status);
+                const { sharedVideoId } = getState()['features/riff-platform'].localRecording;
+
+                if (isVideoShared) {
+                    createUserAudioTrack().then(audioStream => {
+                        recordingController.onNewParticipantAudioStreamAdded(audioStream, sharedVideoId);
+                        dispatch(showNotification({
+                            title: i18next.t('localRecording.localRecording'),
+                            description: 'Local recording use your microphone for recording YouTube audio'
+                        }, 10000));
+                    })
+                .catch(error => Promise.reject(error));
+                }
+            }
+        };
 
         recordingController.onWarning = (messageKey, messageParams) => {
             dispatch(showNotification({
@@ -121,6 +141,8 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const isYoutubeJoined = action.participant.name === 'YouTube';
         const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
 
+        dispatch(setSharedVideoId(action.participant.id));
+
         if (!isYoutubeJoined || !isRecording) {
             return;
         }
@@ -129,7 +151,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             recordingController.onNewParticipantAudioStreamAdded(audioStream, action.participant.id);
             dispatch(showNotification({
                 title: i18next.t('localRecording.localRecording'),
-                description: 'Local recording use your microphone'
+                description: 'Local recording use your microphone for recording YouTube audio'
             }, 10000));
         })
         .catch(error => Promise.reject(error));

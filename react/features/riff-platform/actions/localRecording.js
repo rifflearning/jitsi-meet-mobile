@@ -2,7 +2,8 @@
 
 import {
     LOCAL_RECORDING_ENGAGED,
-    LOCAL_RECORDING_STATS
+    LOCAL_RECORDING_STATS,
+    LOCAL_RECORDING_SET_SHARED_VIDEO_ID
 } from '../constants/actionTypes';
 
 // The following action signals state changes in local recording engagement.
@@ -40,5 +41,21 @@ export function localRecordingStats(stats: Object) {
     return {
         type: LOCAL_RECORDING_STATS,
         stats
+    };
+}
+
+/**
+ * YouTube video id for add/remove user microphone with local recording.
+ *
+ * @param {*} id - The YouTube video id.
+ * @returns {{
+    *     type: LOCAL_RECORDING_STATS_UPDATE,
+    *     stats: Object
+    * }}
+    */
+export function setSharedVideoId(id: string) {
+    return {
+        type: LOCAL_RECORDING_SET_SHARED_VIDEO_ID,
+        id
     };
 }

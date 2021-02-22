@@ -15,6 +15,11 @@ export default (state = {}, action) => {
             ...state,
             stats: action.stats
         };
+    case actionTypes.LOCAL_RECORDING_SET_SHARED_VIDEO_ID:
+        return {
+            ...state,
+            sharedVideoId: action.id
+        };
     default:
         return state;
     }
