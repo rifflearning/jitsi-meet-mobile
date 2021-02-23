@@ -47,10 +47,10 @@ export function localRecordingStats(stats: Object) {
 /**
  * YouTube video id for add/remove user microphone with local recording.
  *
- * @param {*} id - The YouTube video id.
+ * @param {string} id - The shared YouTube video id.
  * @returns {{
-    *     type: LOCAL_RECORDING_STATS_UPDATE,
-    *     stats: Object
+    *     type: LOCAL_RECORDING_SET_SHARED_VIDEO_ID,
+    *     id: string
     * }}
     */
 export function setSharedVideoId(id: string) {

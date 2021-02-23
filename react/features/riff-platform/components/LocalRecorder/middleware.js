@@ -151,7 +151,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         const { sharedVideoId } = getState()['features/riff-platform'].localRecording;
 
         if (sharedVideoId === action.participant.id) {
-            dispatch(setSharedVideoId(null));
+            dispatch(setSharedVideoId(''));
         }
         break;
 
