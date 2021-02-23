@@ -787,7 +787,12 @@ class LocalRecordingController {
         sessionManager.createSession(sessionToken, this._format);
     }
 
-    // eslint-disable-next-line require-jsdoc
+    /**
+     * Function for removing audio source from AudioContext.
+     *
+     * @param {string} id - Participant id.
+     * @returns {void}
+     */
     removeParticipantAudioStream(id) {
         if (this._adapter.removeAudioStreamsById) {
             this._adapter.removeAudioStreamsById(id);

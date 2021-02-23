@@ -23,6 +23,27 @@ declare var APP: Object;
 MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     const result = next(action);
 
+
+    const getRecordingStatus = () => getState()['features/riff-platform'].localRecording?.stats?.isRecording;
+
+    const getLocalRecordingMessage = (messageKey, messageParams) => {
+        return {
+            title: i18next.t('localRecording.localRecording'),
+            description: i18next.t(messageKey, messageParams)
+        };
+    };
+
+    const onSharingVideoAdded = participantId => createUserAudioTrack()
+                .then(audioStream => {
+                    recordingController.onNewParticipantAudioStreamAdded(audioStream, participantId);
+
+                    dispatch(showNotification(
+                        // eslint-disable-next-line max-len
+                        getLocalRecordingMessage('Local recording will use your microphone during YouTube video sharing to record sound from YouTube video')
+                    ), 10000);
+                })
+                .catch(error => console.log(error));
+
     switch (action.type) {
     case CONFERENCE_JOINED: {
         const { localRecording } = getState()['features/base/config'];
@@ -44,43 +65,24 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
             dispatch(localRecordingStats(stats));
 
             if (stats?.isRecording) {
-                const isVideoShared = [ 'playing', 'pause', 'start' ]
-                    .includes(getState()['features/shared-video'].status);
                 const { sharedVideoId } = getState()['features/riff-platform'].localRecording;
 
-                if (isVideoShared) {
-                    createUserAudioTrack().then(audioStream => {
-                        recordingController.onNewParticipantAudioStreamAdded(audioStream, sharedVideoId);
-                        dispatch(showNotification({
-                            title: i18next.t('localRecording.localRecording'),
-                            description: 'Local recording use your microphone for recording YouTube audio'
-                        }, 10000));
-                    })
-                .catch(error => Promise.reject(error));
+                if (sharedVideoId) {
+                    onSharingVideoAdded(sharedVideoId);
                 }
             }
         };
 
         recordingController.onWarning = (messageKey, messageParams) => {
-            dispatch(showNotification({
-                title: i18next.t('localRecording.localRecording'),
-                description: i18next.t(messageKey, messageParams)
-            }, 10000));
+            dispatch(showNotification(getLocalRecordingMessage(messageKey, messageParams), 10000));
         };
 
         recordingController.onNotify = (messageKey, messageParams) => {
-            dispatch(showNotification({
-                title: i18next.t('localRecording.localRecording'),
-                description: i18next.t(messageKey, messageParams)
-            }, 10000));
+            dispatch(showNotification(getLocalRecordingMessage(messageKey, messageParams), 10000));
         };
 
         recordingController.onMemoryExceeded = isExceeded => {
-            if (isExceeded) {
-                dispatch(openDialog(DownloadInfoDialog));
-            } else {
-                dispatch(hideDialog(DownloadInfoDialog));
-            }
+            dispatch((isExceeded ? openDialog : hideDialog)(DownloadInfoDialog));
         };
 
         typeof APP === 'object' && typeof APP.keyboardshortcut === 'object'
@@ -113,7 +115,7 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case TRACK_ADDED: {
-        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
+        const isRecording = getRecordingStatus();
         const { conference } = getState()['features/base/conference'];
         const { track } = action;
 
@@ -127,43 +129,30 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         break;
     }
     case CONFERENCE_WILL_LEAVE: {
-        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
-
-        if (!isRecording) {
-            return;
+        if (getRecordingStatus()) {
+            recordingController.stopRecording();
         }
-        recordingController.stopRecording();
         break;
     }
     case PARTICIPANT_JOINED: {
-        const isYoutubeJoined = action.participant.name === 'YouTube';
-        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
-
-        dispatch(setSharedVideoId(action.participant.id));
-
-        if (!isYoutubeJoined || !isRecording) {
-            return;
+        if (action.participant.name === 'YouTube') {
+            dispatch(setSharedVideoId(action.participant.id));
+            if (getRecordingStatus()) {
+                onSharingVideoAdded(action.participant.id);
+            }
         }
-
-        createUserAudioTrack().then(audioStream => {
-            recordingController.onNewParticipantAudioStreamAdded(audioStream, action.participant.id);
-            dispatch(showNotification({
-                title: i18next.t('localRecording.localRecording'),
-                description: 'Local recording use your microphone for recording YouTube audio'
-            }, 10000));
-        })
-        .catch(error => Promise.reject(error));
 
         break;
     }
     case PARTICIPANT_LEFT: {
-        const isRecording = getState()['features/riff-platform'].localRecording?.stats?.isRecording;
-
-        if (!isRecording) {
-            return;
+        if (getRecordingStatus()) {
+            recordingController.removeParticipantAudioStream(action.participant.id);
         }
+        const { sharedVideoId } = getState()['features/riff-platform'].localRecording;
 
-        recordingController.removeParticipantAudioStream(action.participant.id);
+        if (sharedVideoId === action.participant.id) {
+            dispatch(setSharedVideoId(null));
+        }
         break;
 
     }

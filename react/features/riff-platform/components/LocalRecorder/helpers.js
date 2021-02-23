@@ -4,15 +4,11 @@ import { isScreenShareSourceAvailable } from '../../../riff-dashboard-page/src/l
 import { COMMAND_START, COMMAND_STOP } from './LocalRecorderController';
 
 class AudioStreamsMixer {
-    initialize = false;
 
     initializeAudioContext(streamsArr) {
-        if (!this.initialize) {
-            this.initialize = true;
-            this.audioContext = new AudioContext();
-            this.dest = this.audioContext.createMediaStreamDestination();
-            this.sources = [];
-        }
+        this.audioContext = new AudioContext();
+        this.dest = this.audioContext.createMediaStreamDestination();
+        this.sources = [];
 
         streamsArr.length && streamsArr.forEach(stream => {
             if (stream.stream.getAudioTracks().length) {
@@ -27,7 +23,7 @@ class AudioStreamsMixer {
 
         sources.forEach(source => {
 
-            // Add it to the current sources being mixed
+            // Add new source to the current sources being mixed
             this.sources.push({ id,
                 source });
             source.connect(this.dest);
@@ -39,7 +35,7 @@ class AudioStreamsMixer {
         return this.dest.stream.getAudioTracks();
     }
 
-    flushAll() {
+    flushAllSources() {
         this.sources.forEach(source => {
             source.source.disconnect(this.dest);
         });
@@ -76,7 +72,7 @@ export const addNewAudioStream = (newParticipantStream, id) => {
 export const removeAudioStream = id => audioStreamsMixer.removeAudioSouce(id);
 
 export const cleanupAudioContext = () => {
-    audioStreamsMixer.flushAll();
+    audioStreamsMixer.flushAllSources();
     audioStreamsMixer.cleanup();
 };
 
@@ -97,10 +93,9 @@ export const getCombinedStream = async participantStreams => {
 
     return createDesktopTrack().then(desktopStream => {
         audioStreamsMixer.initializeAudioContext(participantStreams);
-        const audioTrack = audioStreamsMixer.getAudioTracks();
-        const mediaStream = new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
+        const audioTrack = audioStreamsMixer.getAudioTracks() || [];
 
-        return mediaStream;
+        return new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
     })
     .catch(error => Promise.reject(error));
 };
