@@ -10,7 +10,6 @@ import { PARTICIPANT_JOINED, PARTICIPANT_LEFT } from '../../../base/participants
 import { MiddlewareRegistry } from '../../../base/redux';
 import { SETTINGS_UPDATED } from '../../../base/settings/actionTypes';
 import { TRACK_ADDED } from '../../../base/tracks/actionTypes';
-import { statsUpdate } from '../../../local-recording/actions';
 import { LocalRecordingInfoDialog } from '../../../local-recording/components';
 import { showNotification } from '../../../notifications/actions';
 import { localRecordingEngaged, localRecordingStats, setSharedVideoId } from '../../actions/localRecording';
@@ -36,7 +35,6 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
         if (!isLocalRecordingEnabled) {
             break;
         }
-
 
         // realize the delegates on recordingController, allowing the UI to
         // react to state changes in recordingController.

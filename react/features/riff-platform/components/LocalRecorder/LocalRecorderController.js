@@ -793,7 +793,6 @@ class LocalRecordingController {
             this._adapter.removeAudioStreamsById(id);
         }
     }
-
 }
 
 /**

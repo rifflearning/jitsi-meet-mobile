@@ -75,6 +75,11 @@ export const addNewAudioStream = (newParticipantStream, id) => {
 
 export const removeAudioStream = id => audioStreamsMixer.removeAudioSouce(id);
 
+export const cleanupAudioContext = () => {
+    audioStreamsMixer.flushAll();
+    audioStreamsMixer.cleanup();
+};
+
 const createDesktopTrack = () => {
 
     const getDesktopStreamPromise = navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' },
