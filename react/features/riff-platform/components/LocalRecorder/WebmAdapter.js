@@ -333,7 +333,7 @@ export default class WebmAdapter extends RecordingAdapter {
     }
 
     /**
-     * Callback for storing the data.
+     * Function for storing the data.
      *
      * @private
      * @param {Blob} data - Encoded data.

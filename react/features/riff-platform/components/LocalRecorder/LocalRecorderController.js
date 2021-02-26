@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable flowtype/no-types-missing-file-annotation */
 
-import { i18next } from '../../../base/i18n';
 import logger from '../../../local-recording/logger';
 import { downloadBlob } from '../../../local-recording/recording';
 import { sessionManager } from '../../../local-recording/session';
@@ -84,22 +83,11 @@ type LocalRecordingStats = {
     /**
      * Whether local recording is engaged on the participant's device.
      */
-    isRecording: boolean,
-
-    /**
-     * Total recorded bytes. (Reserved for future use.)
-     */
-    recordedBytes: number,
-
-    /**
-     * Total recording duration. (Reserved for future use.)
-     */
-    recordedLength: number
+    isRecording: boolean
 }
 
 /**
- * The component responsible for the coordination of local recording, across
- * multiple participants.
+ *  The component responsible for the local recording.
  */
 class LocalRecordingController {
     /**
