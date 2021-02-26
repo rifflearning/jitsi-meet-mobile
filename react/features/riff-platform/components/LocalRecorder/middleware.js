@@ -36,11 +36,6 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     const onSharingVideoAdded = participantId => createUserAudioTrack()
                 .then(audioStream => {
                     recordingController.onNewParticipantAudioStreamAdded(audioStream, participantId);
-
-                    dispatch(showNotification(
-                        // eslint-disable-next-line max-len
-                        getLocalRecordingMessage('Local recording will use your microphone during YouTube video sharing to record sound from YouTube video')
-                    ), 10000);
                 })
                 .catch(error => console.log(error));
 
