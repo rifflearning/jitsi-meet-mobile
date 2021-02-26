@@ -34,10 +34,10 @@ MiddlewareRegistry.register(({ getState, dispatch }) => next => action => {
     };
 
     const onSharingVideoAdded = participantId => createUserAudioTrack()
-                .then(audioStream => {
-                    recordingController.onNewParticipantAudioStreamAdded(audioStream, participantId);
-                })
-                .catch(error => console.log(error));
+        .then(audioStream => {
+            recordingController.onNewParticipantAudioStreamAdded(audioStream, participantId);
+        })
+        .catch(error => console.log(error));
 
     switch (action.type) {
     case CONFERENCE_JOINED: {
