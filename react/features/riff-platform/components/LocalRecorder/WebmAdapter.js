@@ -4,7 +4,7 @@ import logger from '../../../local-recording/logger';
 import { RecordingAdapter } from '../../../local-recording/recording';
 
 import { recordingController } from './LocalRecorderController';
-import { getCombinedStream, addNewAudioStream } from './helpers';
+import { getCombinedStream, addNewAudioStream, removeAudioStream, cleanupAudioContext } from './helpers';
 
 /**
  * The argument slices the recording into chunks, calling dataavailable every defined seconds.
@@ -63,6 +63,8 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _isCalled = false;
 
+    _participantAudioStreams = [];
+
     /**
      * Implements {@link RecordingAdapter#start()}.
      *
@@ -114,7 +116,10 @@ export default class WebmAdapter extends RecordingAdapter {
      */
     _getAudioParticipantStream(participant) {
         if (participant._tracks?.length) {
-            return participant._tracks.find(t => t.type === 'audio')?.stream;
+            return {
+                id: participant._id,
+                stream: participant._tracks.find(t => t.type === 'audio')?.stream
+            };
         }
     }
 
@@ -187,9 +192,9 @@ export default class WebmAdapter extends RecordingAdapter {
      * @returns {void}
      */
 
-    addNewParticipantAudioStream(newAudioStream) {
+    addNewParticipantAudioStream(newAudioStream, id) {
         if (newAudioStream.getAudioTracks().length) {
-            addNewAudioStream(newAudioStream);
+            addNewAudioStream(newAudioStream, id);
         }
     }
 
@@ -210,7 +215,10 @@ export default class WebmAdapter extends RecordingAdapter {
             this._getAudioStream(micDeviceId)
             .then(async userAudioStream => {
                 const participatsStream = this._getAudioParticipantsStream() || [];
-                const allParticipatsAudioStreams = participatsStream.concat(userAudioStream);
+                const allParticipatsAudioStreams = participatsStream.concat({ id: 'local',
+                    stream: userAudioStream });
+
+                this._participantAudioStreams = allParticipatsAudioStreams;
 
                 getCombinedStream(allParticipatsAudioStreams)
                 .then(mediaStream => {
@@ -321,10 +329,11 @@ export default class WebmAdapter extends RecordingAdapter {
         if (this._mediaRecorder) {
             this._mediaRecorder.stream.getTracks().forEach(track => track.stop());
         }
+        cleanupAudioContext();
     }
 
     /**
-     * Callback for storing the data.
+     * Function for storing the data.
      *
      * @private
      * @param {Blob} data - Encoded data.
@@ -342,5 +351,8 @@ export default class WebmAdapter extends RecordingAdapter {
     setMicDevice(micDeviceId) {
         return this._replaceMic(micDeviceId);
     }
-}
 
+    removeAudioStreamsById(id) {
+        removeAudioStream(id);
+    }
+}

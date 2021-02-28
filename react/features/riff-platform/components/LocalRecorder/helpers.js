@@ -6,29 +6,74 @@ import { COMMAND_START, COMMAND_STOP } from './LocalRecorderController';
 class AudioStreamsMixer {
 
     initializeAudioContext(streamsArr) {
-        this.ctx = new AudioContext();
-        this.dest = this.ctx.createMediaStreamDestination();
+        this.audioContext = new AudioContext();
+        this.dest = this.audioContext.createMediaStreamDestination();
+        this.sources = [];
+
         streamsArr.length && streamsArr.forEach(stream => {
-            if (stream.getAudioTracks().length) {
-                this.ctx.createMediaStreamSource(stream).connect(this.dest);
+            if (stream.stream.getAudioTracks().length) {
+                this.addStream(stream);
             }
         });
+    }
 
+    addStream({ stream, id }) {
+        const sources = stream.getAudioTracks().map(track =>
+            this.audioContext.createMediaStreamSource(new MediaStream([ track ])));
+
+        sources.forEach(source => {
+
+            // Add new source to the current sources being mixed
+            this.sources.push({ id,
+                source });
+            source.connect(this.dest);
+
+        });
+    }
+
+    getAudioTracks() {
         return this.dest.stream.getAudioTracks();
     }
 
-    addNewStream(newUserStream) {
-        if (this.ctx && newUserStream.getAudioTracks().length) {
-            this.ctx.createMediaStreamSource(newUserStream).connect(this.dest);
-        }
+    flushAllSources() {
+        this.sources.forEach(source => {
+            source.source.disconnect(this.dest);
+        });
 
+        this.sources = [];
+    }
+
+    cleanup() {
+        this.audioContext.close();
+    }
+
+    removeAudioSouce(id) {
+        const sources = [];
+
+        this.sources.forEach(source => {
+            if (source.id === id) {
+                source.source.disconnect(this.dest);
+            } else {
+                sources.push(source);
+            }
+        });
+
+        this.sources = sources;
     }
 }
 
 const audioStreamsMixer = new AudioStreamsMixer();
 
-export const addNewAudioStream = newParticipantStream => {
-    audioStreamsMixer.addNewStream(newParticipantStream);
+export const addNewAudioStream = (newParticipantStream, id) => {
+    audioStreamsMixer.addStream({ stream: newParticipantStream,
+        id });
+};
+
+export const removeAudioStream = id => audioStreamsMixer.removeAudioSouce(id);
+
+export const cleanupAudioContext = () => {
+    audioStreamsMixer.flushAllSources();
+    audioStreamsMixer.cleanup();
 };
 
 const createDesktopTrack = () => {
@@ -47,19 +92,15 @@ export const getCombinedStream = async participantStreams => {
     }
 
     return createDesktopTrack().then(desktopStream => {
-        const audioTrack = audioStreamsMixer.initializeAudioContext(participantStreams);
-        const mediaStream = new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
+        audioStreamsMixer.initializeAudioContext(participantStreams);
+        const audioTrack = audioStreamsMixer.getAudioTracks() || [];
 
-        return mediaStream;
+        return new MediaStream(desktopStream.getVideoTracks().concat(audioTrack));
     })
     .catch(error => Promise.reject(error));
 };
 
-export const stopLocalVideo = async recorderStream => {
-    recorderStream.getTracks().forEach(async track => {
-        track.stop();
-    });
-};
+export const stopLocalVideo = recorderStream => recorderStream.getAudioTracks().forEach(track => track.stop());
 
 export const stopLocalRecordingHandling = user => {
     const checkUserLocalRecordingStatus = JSON.parse(user._properties?.localRecStats || null);
@@ -72,4 +113,14 @@ export const stopLocalRecordingHandling = user => {
             }
         });
     }
+};
+
+export const createUserAudioTrack = () => {
+
+    const getUserAudioStreamPromise = navigator.mediaDevices.getUserMedia({ video: false,
+        audio: true });
+
+    return getUserAudioStreamPromise.then(audioStream => audioStream, error => {
+        throw new Error(error);
+    });
 };

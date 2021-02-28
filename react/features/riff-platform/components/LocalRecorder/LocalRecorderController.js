@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable flowtype/no-types-missing-file-annotation */
 
-import { i18next } from '../../../base/i18n';
 import logger from '../../../local-recording/logger';
 import { downloadBlob } from '../../../local-recording/recording';
 import { sessionManager } from '../../../local-recording/session';
@@ -84,22 +83,11 @@ type LocalRecordingStats = {
     /**
      * Whether local recording is engaged on the participant's device.
      */
-    isRecording: boolean,
-
-    /**
-     * Total recorded bytes. (Reserved for future use.)
-     */
-    recordedBytes: number,
-
-    /**
-     * Total recording duration. (Reserved for future use.)
-     */
-    recordedLength: number
+    isRecording: boolean
 }
 
 /**
- * The component responsible for the coordination of local recording, across
- * multiple participants.
+ *  The component responsible for the local recording.
  */
 class LocalRecordingController {
     /**
@@ -196,6 +184,11 @@ class LocalRecordingController {
     _onStateChanged: ?(boolean) => void;
 
     /**
+     * saves in the redux store user local recording state.
+     */
+    _onStatusUpdated: ?(boolean) => void;
+
+    /**
      * FIXME: callback function for the {@code LocalRecordingController} to notify
      * UI it wants to display a dialog. Keeps {@code LocalRecordingController}
      * decoupled from UI.
@@ -262,6 +255,16 @@ class LocalRecordingController {
      */
     set onStateChanged(delegate: Function) {
         this._onStateChanged = delegate;
+    }
+
+    /**
+     * Sets the event handler for {@code onStatusUpdated}.
+     *
+     * @param {Function} delegate - The event handler.
+     * @returns {void}
+     */
+    set onStatusUpdated(delegate: Function) {
+        this._onStatusUpdated = delegate;
     }
 
     /**
@@ -399,9 +402,7 @@ class LocalRecordingController {
     getLocalStats(): LocalRecordingStats {
         return {
             currentSessionToken: this._currentSessionToken,
-            isRecording: this._state === ControllerState.RECORDING,
-            recordedBytes: 0,
-            recordedLength: 0
+            isRecording: this._state === ControllerState.RECORDING
         };
     }
 
@@ -418,7 +419,6 @@ class LocalRecordingController {
             .map(member => {
                 return {
                     id: member.getId(),
-                    displayName: member.getDisplayName(),
                     recordingStats:
                         JSON.parse(member.getProperty(PROPERTY_STATS) || '{}'),
                     isSelf: false
@@ -435,7 +435,6 @@ class LocalRecordingController {
 
         result[localId] = {
             id: localId,
-            displayName: i18next.t('localRecording.me'),
             recordingStats: this.getLocalStats(),
             isSelf: true
         };
@@ -572,6 +571,7 @@ class LocalRecordingController {
                 this._startRecordingNotificationHandler();
 
                 delegate.setMuted(this._isMuted);
+                this._onStatusUpdated(this.getLocalStats());
                 this._updateStats();
             })
             .catch(err => {
@@ -649,7 +649,7 @@ class LocalRecordingController {
                     }
 
                     this._stopRecordingNotificationHandler();
-
+                    this._onStatusUpdated(this.getLocalStats());
                     this._updateStats();
                 })
                 .catch(err => {
@@ -729,11 +729,12 @@ class LocalRecordingController {
      * Adds new audio stream to AudioContext.
      *
      * @param {MediaStream} newStream - The new participant audio stream.
+     * @param {string} id - The new participant id.
      * @returns {void}
      */
-    onNewParticipantAudioStreamAdded(newStream) {
+    onNewParticipantAudioStreamAdded(newStream, id) {
         if (this._adapter.addNewParticipantAudioStream) {
-            this._adapter.addNewParticipantAudioStream(newStream);
+            this._adapter.addNewParticipantAudioStream(newStream, id);
         }
     }
 
@@ -774,6 +775,17 @@ class LocalRecordingController {
         sessionManager.createSession(sessionToken, this._format);
     }
 
+    /**
+     * Function for removing audio source from AudioContext.
+     *
+     * @param {string} id - Participant id.
+     * @returns {void}
+     */
+    removeParticipantAudioStream(id) {
+        if (this._adapter.removeAudioStreamsById) {
+            this._adapter.removeAudioStreamsById(id);
+        }
+    }
 }
 
 /**
