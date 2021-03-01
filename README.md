@@ -171,5 +171,4 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     // in case we want jibri, but value itself different for every domain
     hiddenDomain: 'recorder.example-domain.com',
     ```
-
-[Riff local recording guidelines for this project](react/features/riff-platform/docs/RIFFDEVNOTES.md)
+### [Local recording dev notes](react/features/riff-platform/docs/LOCALRECDEVNOTES.md)
