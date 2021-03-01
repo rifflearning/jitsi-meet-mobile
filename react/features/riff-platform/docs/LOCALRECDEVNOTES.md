@@ -18,7 +18,7 @@ Once **getDisplayMedia** has grabbed a media stream successfully:
 
 With [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder ) we can access encoded blob chunks, which means that once the recording is finished we can construct a real file out of them, and then upload or download it.
 
-For **YouTube audio recording** (getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia ) is used for microphone capturing and add this stream to **AudioStreamsMixer** instance.
+For **YouTube audio recording** [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia ) is used for microphone capturing and add this stream to **AudioStreamsMixer** instance.
 
 In the memory exceeded case (approximately is 1GB) the current MediaRecorder instance is stopped,
 the recording file is downloaded and the new MediaRecorder instance with the same media stream is initialized.
