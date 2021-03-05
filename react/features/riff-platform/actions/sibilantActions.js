@@ -125,6 +125,7 @@ function sendUtteranceToServer(data, { uid: participant }, room, token) {
                 room,
                 startTime: data.start.toISOString(),
                 endTime: data.end.toISOString(),
+                volumes: data.volumes,
                 token
             });
 
