@@ -1,7 +1,9 @@
+/* global process */
+
 import * as actionTypes from '../constants/actionTypes';
 
 const initialState = {
-    isOpen: false
+    isOpen: process.env.HIDE_MEETING_MEDIATOR_BY_DEFAULT !== 'true'
 };
 
 export default (state = initialState, action) => {
