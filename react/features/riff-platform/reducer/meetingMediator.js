@@ -8,7 +8,7 @@ export default (state = initialState, action) => {
     switch (action.type) {
     case actionTypes.TOGGLE_MEETING_MEDIATOR:
         return { ...state,
-            isOpen: !state.isOpen };
+            isOpen: action.isOpen === undefined ? !state.isOpen : action.isOpen };
     default:
         return state;
     }
