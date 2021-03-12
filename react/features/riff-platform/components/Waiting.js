@@ -147,10 +147,10 @@ const Waiting = ({ meeting, checkIsMeetingAllowedProp }) => {
                 }
 
                 {/* host will be able to edit meeting, can go to meeting directly, can send invitation?' */}
-                <Typography color = 'error'>
+                <Typography color = 'textPrimary'>
                     {Boolean(waitingTime)
                     && `You can join the meeting 5 min before the start. You'll be able to join in ${time}`}
-                    {Boolean(noHostError) && 'No host, waiting for a host...'}
+                    {Boolean(noHostError) && 'Waiting for the host...'}
                     {Boolean(expiredMeetingError) && 'Meeting is expired. Please, join another meeting.'}
                 </Typography>
             </div>
