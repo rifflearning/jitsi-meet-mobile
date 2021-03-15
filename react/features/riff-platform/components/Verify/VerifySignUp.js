@@ -17,20 +17,27 @@ const VerifySignUp = ({ doSignIn }) => {
     const token = urlParams.get('token');
 
     useEffect(() => {
+        let t = null;
+
         if (token) {
             api.signUpVerify(token).then(res => {
                 setstate('Email submitted, logging in...');
 
-                doSignIn(res.token).then(prevPath => {
+                t = setTimeout(() => doSignIn(res.token).then(prevPath => {
                     if (prevPath) {
                         history.push(`${ROUTES.WAITING}${prevPath}`);
                     }
-                });
+                }), 1000);
             })
-          .catch(() => {
-              setstate('Link is broken or expired');
-          });
+            .catch(err => {
+                console.error(err);
+                setstate('Link has expired');
+            });
         }
+
+        return () => {
+            clearInterval(t);
+        };
     }, []);
 
     if (token) {

@@ -17,13 +17,11 @@ export default () => {
         if (token) {
             api.resetPasswordVerify({ token })
                 .then(() => {
-                    setstate('Password changed. Login with the new password.');
                     setIsTokenValid(true);
-
-                    // setTimeout(() => history.push('/login'), 5000);
                 })
-                .catch(() => {
-                    setstate('Link is broken or expired');
+                .catch(err => {
+                    console.error(err);
+                    setstate('Link has expired');
                 });
         }
     }, []);

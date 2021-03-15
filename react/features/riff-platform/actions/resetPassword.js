@@ -53,7 +53,7 @@ export function resetPassword({ email }) {
 
         } catch (e) {
             if (e.status === 404) {
-                dispatch(resetPasswordFailure('User is not exist. Please register before using this service.'));
+                dispatch(resetPasswordFailure('User does not exist. Please sign up first.'));
             } else {
                 dispatch(resetPasswordFailure('Error in reset password'));
             }
