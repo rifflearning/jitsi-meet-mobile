@@ -11,8 +11,11 @@ import {
     getLocalParticipant
 } from '../../base/participants';
 import { connect } from '../../base/redux';
+import { recordingController } from '../../riff-platform/components/LocalRecorder/LocalRecorderController';
+import LocalRecordingDialog from '../../riff-platform/components/LocalRecorder/LocalRecordingDialog';
 import { statsUpdate } from '../actions';
-import { recordingController } from '../controller';
+
+// import { recordingController } from '../controller';
 
 
 /**
@@ -55,7 +58,12 @@ type Props = {
     /**
      * Invoked to obtain translated strings.
      */
-    t: Function
+    t: Function,
+
+    /**
+     * Current format.
+     */
+    format: string
 }
 
 /**
@@ -145,26 +153,31 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
      * @returns {ReactElement}
      */
     render() {
-        const { isModerator, t } = this.props;
+        const { isModerator, t, format } = this.props;
 
         return (
-            <Dialog
-                cancelKey = { 'dialog.close' }
-                submitDisabled = { true }
-                titleKey = 'localRecording.dialogTitle'>
-                <div className = 'localrec-control'>
-                    <span className = 'localrec-control-info-label'>
-                        {`${t('localRecording.moderator')}:`}
-                    </span>
-                    <span className = 'info-value'>
-                        { isModerator
-                            ? t('localRecording.yes')
-                            : t('localRecording.no') }
-                    </span>
-                </div>
-                { this._renderModeratorControls() }
-                { this._renderDurationAndFormat() }
-            </Dialog>
+            <>
+                {format === 'webm'
+                    ? <LocalRecordingDialog open = { true } />
+                    : <Dialog
+                        cancelKey = { 'dialog.close' }
+                        submitDisabled = { true }
+                        titleKey = 'localRecording.dialogTitle'>
+                        <div className = 'localrec-control'>
+                            <span className = 'localrec-control-info-label'>
+                                {`${t('localRecording.moderator')}:`}
+                            </span>
+                            <span className = 'info-value'>
+                                { isModerator
+                                    ? t('localRecording.yes')
+                                    : t('localRecording.no') }
+                            </span>
+                        </div>
+                        { this._renderModeratorControls() }
+                        { this._renderDurationAndFormat() }
+                    </Dialog>
+                }
+            </>
         );
     }
 
@@ -378,7 +391,8 @@ class LocalRecordingInfoDialog extends Component<Props, State> {
  *     isModerator: boolean,
  *     isEngaged: boolean,
  *     recordingEngagedAt: Date,
- *     stats: Object
+ *     stats: Object,
+ *     format: string
  * }}
  */
 function _mapStateToProps(state) {
@@ -388,15 +402,19 @@ function _mapStateToProps(state) {
         recordingEngagedAt,
         stats
     } = state['features/local-recording'];
+
     const isModerator
         = getLocalParticipant(state).role === PARTICIPANT_ROLE.MODERATOR;
+
+    const { format } = state['features/base/config']?.localRecording;
 
     return {
         encodingFormat,
         isModerator,
         isEngaged,
         recordingEngagedAt,
-        stats
+        stats,
+        format
     };
 }
 

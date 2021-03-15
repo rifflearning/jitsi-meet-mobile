@@ -25,6 +25,7 @@ import { TimelineChart } from './TimelineChart';
 import { StackedBarGraph } from './StackedBarGraph';
 import { SpeakingTime } from './SpeakingTime';
 import { MeetingInfo } from './MeetingInfo';
+import { EmotionsChart } from './EmotionsChart';
 
 
 const graphsMapDispatch = dispatch => ({
@@ -84,6 +85,8 @@ const ConnectedStackedBarGraph =    connect(stackedBarGraphMapProps.mapStateToPr
                                             graphsMapDispatch)(StackedBarGraph);
 const ConnectedSpeakingTime =       connect(pieChartMapProps.mapStateToProps,
                                             graphsMapDispatch)(SpeakingTime);
+const ConnectedEmotionsChart =      connect(timelineChartMapProps.mapStateToProps,
+                                            graphsMapDispatch)(EmotionsChart);
 /* eslint-enable no-multi-spaces */
 
 /* **************************************************************************** *
@@ -95,4 +98,5 @@ export {
     ConnectedTimelineChart as TimelineChart,
     ConnectedStackedBarGraph as StackedBarGraph,
     ConnectedSpeakingTime as SpeakingTime,
+    ConnectedEmotionsChart as EmotionsChart,
 };

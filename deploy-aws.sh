@@ -45,11 +45,17 @@ cp -a static/* temp-deploy-aws/static
 # copy css
 mkdir temp-deploy-aws/css
 cp css/all.css temp-deploy-aws/css/
-cp css/dashboard.css temp-deploy-aws/css/
+
 
 # copy all libs
 mkdir temp-deploy-aws/libs
 cp libs/* temp-deploy-aws/libs/
+
+# add versioning to all.css and app.bundle.min.js imports in index.html 
+SHA_SUM_ALL_CSS=$(shasum temp-deploy-aws/css/all.css | awk '{print substr($1,0,8)}')
+SHA_SUM_APP_BUNDLE=$(shasum temp-deploy-aws/libs/app.bundle.min.js | awk '{print substr($1,0,8)}')
+awk "{gsub(/css\/all.css/,\"css\/all.css?v=${SHA_SUM_ALL_CSS}\")}1" temp-deploy-aws/index.html > temp-deploy-aws/temp.html && mv temp-deploy-aws/temp.html temp-deploy-aws/index.html
+awk "{gsub(/app.bundle.min.js\?v=139/,\"app.bundle.min.js?v=${SHA_SUM_APP_BUNDLE}\")}1" temp-deploy-aws/index.html > temp-deploy-aws/temp.html && mv temp-deploy-aws/temp.html temp-deploy-aws/index.html
 
 # copy all images
 mkdir temp-deploy-aws/images
@@ -72,7 +78,6 @@ rm -rf /home/ubuntu/temp-deploy-aws; \
 unzip /home/ubuntu/temp-deploy-aws.zip; \
 rm /home/ubuntu/temp-deploy-aws.zip; \
 sudo mv /home/ubuntu/temp-deploy-aws/css/all.css /usr/share/jitsi-meet/css/;  \
-sudo mv /home/ubuntu/temp-deploy-aws/css/dashboard.css /usr/share/jitsi-meet/css/;  \
 rm -fr /home/ubuntu/temp-deploy-aws/css; \
 sudo rm -fr /usr/share/jitsi-meet/images; \
 sudo rm -fr /usr/share/jitsi-meet/libs; \

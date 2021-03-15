@@ -73,7 +73,7 @@ class MeetingInfo extends React.PureComponent {
             return loadingDisplay;
         }
 
-        const roomName = this.props.meeting.room;
+        const roomName = this.props.meeting.title;
 
         const meetingInfo = (
             <div className='meeting-info-component'>

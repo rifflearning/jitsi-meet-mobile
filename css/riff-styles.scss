@@ -1,0 +1,58 @@
+html body {
+  background-color: $defaultBackground;
+
+    #react #riff-dashboard-page-full {
+        background-color: $defaultBackground;
+        font-family: sans-serif;
+
+        @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+
+        h2 {
+            color: #ffffff;
+        }
+    }
+}
+
+#meeting-mediator-wrapper {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    cursor: move;
+    pointer-events: all;
+
+    &.closed {
+       display: none;
+    }
+
+     .chart-card-title {
+        justify-content: start !important;
+
+         .chart-card-toggle {
+             margin-left: 10px;
+        }
+    }
+
+     .meeting-mediator-close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #4a4a4a;
+        cursor: pointer;
+        height: 24px;
+        width: 24px;
+        padding: 5px;
+        z-index: 1;
+
+        svg {
+            fill: #4a4a4a;
+        }
+    }
+
+    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+}
+
+/* tooltip for meeting-mediator */
+body > .tooltip {
+    z-index: 1000;
+}

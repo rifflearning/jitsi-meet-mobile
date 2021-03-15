@@ -11,3 +11,13 @@ export const MEDIA_TYPE = {
 export const FRAME = {
     WIDTH: 720
 };
+
+/**
+ * The set of features in global store
+ */
+export const FEATURES = {
+    TRACKS: 'features/base/tracks',
+    PARTICIPANTS: 'features/base/participants',
+    CONFERENCE: 'features/base/conference',
+    RIFF_PLATFORM: 'features/riff-platform'
+}

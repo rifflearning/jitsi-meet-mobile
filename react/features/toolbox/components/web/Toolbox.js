@@ -9,6 +9,7 @@ import {
     sendAnalytics
 } from '../../../analytics';
 import { openDialog, toggleDialog } from '../../../base/dialog';
+import { isMobileBrowser } from '../../../base/environment/utils';
 import { translate } from '../../../base/i18n';
 import {
     IconChat,
@@ -45,6 +46,7 @@ import {
     LiveStreamButton,
     RecordButton
 } from '../../../recording';
+import MeetingMediatorButton from '../../../riff-platform/components/DraggableMeetingMediator/MeetingMediatorButton';
 import { SecurityDialogButton } from '../../../security';
 import {
     SETTINGS_TABS,
@@ -1187,6 +1189,9 @@ class Toolbox extends Component<Props, State> {
         if (this._shouldShowButton('closedcaptions')) {
             buttonsLeft.push('closedcaptions');
         }
+        if (this._shouldShowButton('meetingmediator')) {
+            buttonsLeft.push('meetingmediator');
+        }
         if (overflowHasItems) {
             buttonsRight.push('overflowmenu');
         }
@@ -1200,7 +1205,7 @@ class Toolbox extends Component<Props, State> {
         if (this._shouldShowButton('tileview')) {
             buttonsRight.push('tileview');
         }
-        if (this._shouldShowButton('localrecording')) {
+        if (this._shouldShowButton('localrecording') && !isMobileBrowser()) {
             buttonsRight.push('localrecording');
         }
 
@@ -1258,6 +1263,8 @@ class Toolbox extends Component<Props, State> {
                                 tooltip = { t('toolbar.chat') } />
                             <ChatCounter />
                         </div> }
+                    { buttonsLeft.indexOf('meetingmediator') !== -1
+                        && <MeetingMediatorButton />}
                     {
                         buttonsLeft.indexOf('closedcaptions') !== -1
                             && <ClosedCaptionButton />

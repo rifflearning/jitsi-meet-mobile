@@ -1,53 +1,104 @@
+import io from 'socket.io-client';
 import { FRAME } from './constants';
 
 
 class Capturer {
-    constructor(stream) {
-        this._video = document.createElement('video');
+    constructor(room, roomId, userId, stream) {
+        this._socket = null;
+        this._isLive = false;
+        this._room = room;
+        this._roomId = roomId;
+        this._userId = userId;
+        this._capturer = new ImageCapture(stream.getVideoTracks()[0]);
+
+        // used for bitmap processing
         this._canvas = document.createElement('canvas');
-
-        // Indicates whether or not streaming is on and 
-        // we can capture frames from it
-        this._streaming = false;
-
-        // Width of frame, will be set to the default value
-        this._frameWidth = null;
-
-        // Height of frame, will be calculated based on the aspect ratio
-        // of the input stream
-        this._frameHeight = null;
-
-        this._video.srcObject = stream;
-        this._video.addEventListener('canplay', (e) => {
-            this._streaming = true;
-            this._frameWidth = FRAME.WIDTH;
-            this._frameHeight = this._video.videoHeight / (this._video.videoWidth / FRAME.WIDTH);
-        }, false);
-        
-        this._video.play();
     }
 
     /**
-     * Captures a frame of the video stream by drawing it into an offscreen canvas
+     * Creates socket connection and initialises capturing process
      * 
-     * @returns {Promise}
+     * @param {String} dispatcherUrl - The url that socket will use to connect
+     * @returns {void}
      */
-    captureFrame = () => {
-        return new Promise((resolve, reject) => {
-            if (this._streaming) {
-                const context = this._canvas.getContext('2d');
-                this._canvas.width = this._frameWidth;
-                this._canvas.height = this._frameHeight;
-            
-                context.drawImage(this._video, 0, 0, this._frameWidth, this._frameHeight);
-
-                this._canvas.toBlob(resolve, 'image/png', 1);
-            } else {
-                reject('video stream is not ready for capturing yet');
-            }
+    connect = async (dispatcherUrl) => {
+        this._socket = io(dispatcherUrl);
+        this._socket.on('connect', () => {
+            this._socket.emit('server-ping', this._userId);
+        });
+        this._socket.on('server-pong', () => {
+            this._isLive = true;
+            this._socket.emit('add', { 
+                room: this._room, 
+                roomId: this._roomId, 
+                userId: this._userId 
+            });
+            this._pushNextFrame();
         });
     }
 
+    /**
+     * Infinite loop of capturing next available frame in stream
+     * 
+     * @returns {void}
+     */
+    _pushNextFrame = async () => {
+        if (this._isLive) {
+            try {
+                const bitmap = await this._capturer.grabFrame();
+                const blob = await this._processFrame(bitmap);
+                
+                this._socket.emit('next-frame', { 
+                    room: this._room, 
+                    roomId: this._roomId, 
+                    userId: this._userId, 
+                    image: blob 
+                });
+                this._pushNextFrame(); // schedule next one
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    /**
+     * Converts {ImageBitmap} to JPEG by drawing it into canvas
+     * 
+     * @returns {Promise}
+     */
+    _processFrame = (bitmap) => {
+        return new Promise(resolve => {
+            const context = this._canvas.getContext('2d');
+            const { width, height } = this._rescaleToWidth(bitmap, FRAME.WIDTH);
+ 
+            this._canvas.width = width;
+            this._canvas.height = height;           
+            context.drawImage(bitmap, 0, 0, width, height);
+            this._canvas.toBlob(resolve, 'image/jpeg', 1);
+        });
+    }
+
+    _rescaleToWidth = (bitmap, width) => {
+        return {
+            width: width,
+            height: bitmap.height / (bitmap.width / width)
+        };
+    }
+
+    /**
+     * Stops frames pushing and closes all resources
+     * 
+     * @returns {void}
+     */
+    disconnect = () => {
+        this._isLive = false;
+        this._socket.emit('remove', { 
+            room: this._room, 
+            roomId: this._roomId, 
+            userId: this._userId 
+        });
+        this._socket.close();
+    }
 }
 
 export default Capturer;

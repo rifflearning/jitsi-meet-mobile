@@ -41,55 +41,34 @@ import { firebaseApp } from './libs/utils/firebase_utils';
 
 logger.info(`Running riff-rtc server version ${getRtcServerVer()}\n\n`);
 
-// We don't have access to jitsi's store here, so paste data manually
-const setRiffFirebaseCredentials = (userData) => {
-    const riffMetrics = JSON.parse(localStorage.getItem('features/riff-metrics')) || {};
-    riffMetrics.userData = userData;
-    localStorage.setItem('features/riff-metrics',JSON.stringify(riffMetrics));
-}
-
 const DashboardPage = () => {
-    const [isAuth, setIsAuth] = useState(false);
-
     useEffect(() => {
-        const unsubscribe = firebaseApp.auth().onAuthStateChanged(user => {
-            if (user === null) {
-                localStorage.setItem('prevPathname', window.location.pathname);
-                window.location.href = '/static/login.html';
-            } else {
-                const { displayName, email, uid } = user;
-                setRiffFirebaseCredentials({ displayName, email, uid })
-                setIsAuth(true);
+        const $style = document.createElement("style");
+        document.head.appendChild($style);
+        $style.innerHTML = `
+            body, html {
+                height: auto;
             }
-        });
-
+            `;
         return () => {
-            unsubscribe();
-        };
-    }, []);
+            $style.parentNode.removeChild($style);
+        }
+    }, [])
 
-    if (!isAuth) return <div />;
-
-    return <div>
-        <Helmet defaultTitle='Riff' titleTemplate='%s - Riff' />
-        <div>
-            <NavBar
-                activeRoute={'/riffs'}
-            />
-            <div id='main-content-container'>
-                <Dashboard />
-            </div>
+    return <div id="riff-dashboard-page-full">
+        <div id='main-content-container'>
+            <Dashboard />
         </div>
     </div>
 }
 
-ReactDOM.render(
+export default () => (
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <ConnectedRouter history={browserHistory}>
+            {/* <ConnectedRouter history={browserHistory}> */}
               <DashboardPage />
-            </ConnectedRouter>
+            {/* </ConnectedRouter> */}
         </PersistGate>
-    </Provider>,
-    document.getElementById('root')
-);
+    </Provider>
+)
+

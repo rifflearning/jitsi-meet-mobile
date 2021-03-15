@@ -133,7 +133,6 @@ export default class RemoteVideo extends SmallVideo {
         this.updateStatusBar();
         this.addAudioLevelIndicator();
         this.addPresenceLabel();
-        this.addEmotionsChart();
 
         return this.container;
     }

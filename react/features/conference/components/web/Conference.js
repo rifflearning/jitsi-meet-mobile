@@ -2,10 +2,8 @@
 
 import _ from 'lodash';
 import React from 'react';
-import Draggable from 'react-draggable';
 
 import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
-import { getConferenceNameForTitle } from '../../../base/conference';
 import { connect, disconnect } from '../../../base/connection';
 import { translate } from '../../../base/i18n';
 import { connect as reactReduxConnect } from '../../../base/redux';
@@ -16,7 +14,7 @@ import { LargeVideo } from '../../../large-video';
 import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
 import { Prejoin, isPrejoinPageVisible } from '../../../prejoin';
 // eslint-disable-next-line max-len
-import { MeetingMediator } from '../../../riff-dashboard-page/src/components/Chat/Meeting/MeetingSidebar/MeetingMediator';
+import DraggableMeetingMediator from '../../../riff-platform/components/DraggableMeetingMediator';
 import {
     Toolbox,
     fullScreenChanged,
@@ -96,16 +94,6 @@ type Props = AbstractProps & {
      * If prejoin page is visible or not.
      */
     _showPrejoin: boolean,
-
-    /**
-     * displayName for MeetingMediator.
-     */
-    displayName: boolean,
-
-    /**
-     * webRtcPeers for MeetingMediator.
-     */
-    webRtcPeers: boolean,
 
     dispatch: Function,
     t: Function
@@ -204,9 +192,7 @@ class Conference extends AbstractConference<Props, *> {
             _iAmRecorder,
             _isLobbyScreenVisible,
             _layoutClassName,
-            _showPrejoin,
-            displayName,
-            webRtcPeers
+            _showPrejoin
         } = this.props;
         const hideLabels = filmstripOnly || _iAmRecorder;
 
@@ -216,19 +202,7 @@ class Conference extends AbstractConference<Props, *> {
                 id = 'videoconference_page'
                 onMouseMove = { this._onShowToolbar }>
 
-                {!_showPrejoin
-                    && <div className = 'drag-container'>
-                        <Draggable bounds = 'parent'>
-                            <div
-                                id = 'meeting-mediator-wrapper'>
-                                <MeetingMediator
-                                    displayName = { displayName }
-                                    isEnabled = { true }
-                                    webRtcPeers = { webRtcPeers } />
-                            </div>
-                        </Draggable>
-                    </div>
-                }
+                {!_showPrejoin && <DraggableMeetingMediator />}
 
                 <Notice />
                 <Subject />
@@ -314,18 +288,8 @@ function _mapStateToProps(state) {
         _iAmRecorder: state['features/base/config'].iAmRecorder,
         _isLobbyScreenVisible: state['features/base/dialog']?.component === LobbyScreen,
         _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state)],
-        _roomName: getConferenceNameForTitle(state),
-        _showPrejoin: isPrejoinPageVisible(state),
-        displayName: state['features/riff-metrics'].userData.displayName || '',
-        webRtcPeers: state['features/base/participants'].map((p, i) => {
-            if (i === 0) {
-                const { uid, displayName } = state['features/riff-metrics'].userData;
-
-                return { nick: `${uid}|${displayName}` };
-            }
-
-            return { nick: p.name };
-        })
+        _roomName: state['features/riff-platform']?.meeting?.meeting?.name,
+        _showPrejoin: isPrejoinPageVisible(state)
     };
 }
 

@@ -3,7 +3,6 @@
 deploy-local.sh
 /libs/
 all.css
-dashboard.css
 *css.map
 .remote-sync.json
 .sync-config.cson
@@ -85,5 +84,7 @@ android/app/google-services.json
 ios/app/dropbox.key
 ios/app/GoogleService-Info.plist
 
-# .env variables for firebase
+# .env variables for firebase, riff, client aws deployment
 .env
+temp-deploy-aws
+temp-deploy-aws.zip

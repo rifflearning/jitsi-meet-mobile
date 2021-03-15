@@ -12,5 +12,6 @@ import '../power-monitor/middleware';
 import '../prejoin/middleware';
 import '../shared-video/middleware';
 import '../talk-while-muted/middleware';
+import '../riff-platform/components/LocalRecorder/middleware';
 
 import './middlewares.any';

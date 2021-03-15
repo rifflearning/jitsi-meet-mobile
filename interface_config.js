@@ -15,7 +15,7 @@ var interfaceConfig = {
      * Note: this mode is experimental and subject to breakage.
      */
     AUTO_PIN_LATEST_SCREEN_SHARE: 'remote-only',
-    BRAND_WATERMARK_LINK: 'https://www.riffanalytics.ai',
+    BRAND_WATERMARK_LINK: '',
 
     CLOSE_PAGE_GUEST_HINT: false, // A html text to be shown to guests on the close page, false disables it
     /**
@@ -107,7 +107,7 @@ var interfaceConfig = {
     HIDE_INVITE_MORE_HEADER: false,
 
     INITIAL_TOOLBAR_TIMEOUT: 20000,
-    JITSI_WATERMARK_LINK: 'https://www.riffanalytics.ai',
+    JITSI_WATERMARK_LINK: '',
 
     LANG_DETECTION: true, // Allow i18n to detect the system language
     LIVE_STREAMING_HELP_LINK: 'https://support.google.com/youtube/answer/2474026', // Documentation reference for the live streaming feature.
@@ -169,7 +169,7 @@ var interfaceConfig = {
      * If indicated some of the error dialogs may point to the support URL for
      * help.
      */
-    SUPPORT_URL: 'https://www.riffanalytics.ai/contact-us/',
+    SUPPORT_URL: 'https://riffanalytics.ai/contact/',
 
     TOOLBAR_ALWAYS_VISIBLE: false,
 
@@ -189,7 +189,8 @@ var interfaceConfig = {
         'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
         'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
         'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-        /* 'tileview',*/ 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+        /* 'tileview',*/ 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security',
+        'meetingmediator', 'localrecording'
     ],
 
     TOOLBAR_TIMEOUT: 4000,
