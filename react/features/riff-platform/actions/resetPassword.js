@@ -24,16 +24,32 @@ function resetPasswordFailure(error) {
     };
 }
 
-export function resetPassword({ email, password }) {
+export function resetPasswordVerify({ token, password }) {
     return async dispatch => {
         dispatch(resetPasswordRequest());
 
         try {
-            await api.resetPassword({ email,
+            await api.resetPasswordVerify({ token,
                 password });
 
             // eslint-disable-next-line max-len
             return dispatch(resetPasswordSuccess('The password has successfully been changed. You can now login with the new password. You will land to login page in 5 seconds'));
+
+        } catch (e) {
+            dispatch(resetPasswordFailure('Error in reset password, try again'));
+        }
+    };
+}
+
+export function resetPassword({ email }) {
+    return async dispatch => {
+        dispatch(resetPasswordRequest());
+
+        try {
+            await api.resetPassword({ email });
+
+            // eslint-disable-next-line max-len
+            return dispatch(resetPasswordSuccess('Please, verify email to change the password.'));
 
         } catch (e) {
             if (e.status === 404) {
