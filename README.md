@@ -13,11 +13,11 @@ make dev
 ---
 ## Development with Riff features:
 
-Clone repository, checkout to `develop` or `integration-riff-platform` branch and install dependencies:
+Clone repository, checkout to `develop` branch and install dependencies:
 
 ```
 git clone https://github.com/rifflearning/jitsi-meet.git
-git checkout integration-riff-platform
+git checkout develop
 npm install
 ```
 
@@ -40,7 +40,6 @@ API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
 # HIDE_MEETING_MEDIATOR_BY_DEFAULT_FOR_ANON_USER=true
 
 ### Deployment specific variables:
-
 ## dev-jitsi (DEV):
 # AWS_NAME=ubuntu@dev-jitsi.riffplatform.com
 # DISABLE_GROUPS=true
@@ -92,10 +91,10 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
 
 1. Install Jitsi-Meet to aws with [official guide](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart).
 
-2. Deploy *develop* or *integration-riff-platform* branch to the instance:
+2. Deploy `develop` branch to the instance:
     ```
     git clone https://github.com/rifflearning/jitsi-meet.git
-    git checkout integration-riff-platform
+    git checkout develop
     npm install
     ```
     Add appropriate variables `.env` for deployment and put `.pem` file to `~/.ssh/riffdev_1_useast2_key.pem` (*ask colleagues for the `.env` and `.pem` files*):
