@@ -30,7 +30,8 @@ WEBPACK_DEV_SERVER_PROXY_TARGET=https://dev-jitsi.riffplatform.com
 RIFF_SERVER_URL=https://dev-jitsi.riffplatform.com 
 API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
 # for local api-gateway:
-# RIFF_SERVER_URL=https://localhost:4445/api
+# API_GATEWAY=https://localhost:4445/api
+
 
 
 ### Deployment common variables:
@@ -59,6 +60,7 @@ API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
 ## pega:
 # AWS_NAME=ubuntu@pega.riffremote.com
 # DISABLE_EMOTIONS_CHART=true
+# DISABLE_GROUPS=true
 
 ## staging.riffedu (DEV):
 # AWS_NAME=ubuntu@meet.staging.riffedu.com
