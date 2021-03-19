@@ -39,10 +39,7 @@ export async function shouldRedirectToRiff() {
         return false;
     }
 
-    if (await shouldRedirectToLoginPage()) {
-        return true;
-    }
-    if (await shouldRedirectToWaitingRoom()) {
+    if (await shouldRedirectToLoginPage() || await shouldRedirectToWaitingRoom()) {
         return true;
     }
 
@@ -220,10 +217,10 @@ export function redirectToRiffMetrics() {
         if (isAnon) {
             dispatch(logout());
 
-            return navigateWithoutReload(RiffPlatform, '/app/meetingEnded');
+            return navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.MEETING_ENDED}`);
         }
 
-        navigateWithoutReload(RiffPlatform, '/app/dashboard');
+        navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.DASHBOARD}`);
     };
 }
 
