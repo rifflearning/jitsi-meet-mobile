@@ -21,6 +21,7 @@ import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
 import Meeting from './Meeting';
+import MeetingEndedPage from './MeetingEndedPage';
 import AllMeetings from './Meetings';
 import Profile from './Profile';
 import ResetPassword from './ResetPassword';
@@ -121,6 +122,9 @@ const Main = ({ user }) => {
             </Route>
             <Route path = { ROUTES.RESETPASSWORD } >
                 <ResetPassword />
+            </Route>
+            <Route path = { ROUTES.MEETING_ENDED } >
+                <MeetingEndedPage />
             </Route>
             <Redirect to = { ROUTES.SIGNIN } />
         </Switch>

@@ -215,11 +215,14 @@ export function redirectToRiffMetrics() {
             await participantLeaveRoom(roomId, uid);
         }
 
+        window.parent.postMessage('JITSI_CONFERENCE_END', '*');
+
         if (isAnon) {
             dispatch(logout());
+
+            return navigateWithoutReload(RiffPlatform, '/app/meetingEnded');
         }
 
-        window.parent.postMessage('JITSI_CONFERENCE_END', '*');
         navigateWithoutReload(RiffPlatform, '/app/dashboard');
     };
 }
