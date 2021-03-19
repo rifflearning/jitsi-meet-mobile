@@ -1,7 +1,7 @@
 /* global config, APP, process */
 /* eslint-disable require-jsdoc */
 
-import Sibilant from 'sibilant-webaudio';
+import Sibilant from '@rifflearning/sibilant';
 
 import UIEvents from '../../../../service/UI/UIEvents';
 import { app, socket } from '../../riff-dashboard-page/src/libs/riffdata-client';
