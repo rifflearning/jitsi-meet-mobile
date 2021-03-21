@@ -10,7 +10,7 @@ export default () => (
             align = 'center'
             component = 'h4'
             variant = 'h4'>
-            The Meeting is Ended.
+            The meeting has ended.
         </Typography>
     </Container>
 );
