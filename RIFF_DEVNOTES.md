@@ -1,0 +1,2 @@
+## Sibilant 
+- we use [@rifflearning/sibilant](https://github.com/rifflearning/sibilant) package for detecting speaking events and send them to the riff-data server for meeting mediator and metrics page
