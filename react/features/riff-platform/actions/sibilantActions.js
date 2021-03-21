@@ -120,7 +120,7 @@ async function loginToRiffDataServer() {
 function sendUtteranceToRiffDataServer(data, { uid: participant }, room, token) {
     return async dispatch => {
         try {
-            const volumesObj = process.env.ADD_VOLUMES_FIELD_TO_UTTERANCE_OBJ === 'true'
+            const volumesObj = process.env.SEND_SIBILANT_VOLUMES_TO_RIFF_DATA_SERVER === 'true'
                 ? { volumes: data.volumes }
                 : {};
             const res = await app.service('utterances').create({
