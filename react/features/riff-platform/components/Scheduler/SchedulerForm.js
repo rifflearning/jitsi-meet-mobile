@@ -16,6 +16,7 @@ import {
     Switch
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Autocomplete } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import {
     MuiPickersUtilsProvider,
@@ -47,7 +48,6 @@ import {
     getRecurringMonthlyEventsByEndDate,
     daysOfWeekMap
 } from './helpers';
-import { convertToLocalTime } from '../../functions';
 
 moment.locale('en');
 
@@ -225,10 +225,10 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     const mStart = moment.utc(startDate).minutes();
 
     return dates.map(date => {
-        const newDateStart = convertToLocalTime(moment(date).set('hour', hStart)
-.set('minute', mStart));
-        const newDateEnd = convertToLocalTime(newDateStart.clone().add('hours', duration.hours)
-.add('minutes', duration.minutes));
+        const newDateStart = moment(date).set('hour', hStart)
+.set('minute', mStart);
+        const newDateEnd = newDateStart.clone().add('hours', duration.hours)
+.add('minutes', duration.minutes);
 
         return {
             startDate: newDateStart.toISOString(),
@@ -302,6 +302,7 @@ const SchedulerForm = ({
     const [ recurrenceDate, setRecurrenceDate ] = useState([]);
     const [ waitForHost, setWaitForHost ] = useState(false);
     const [ forbidNewParticipantsAfterDateEnd, setForbidNewParticipantsAfterDateEnd ] = useState(false);
+    const [ timezone, setTimezone ] = useState(momentTZ.tz.guess());
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
@@ -460,9 +461,10 @@ const SchedulerForm = ({
             waitForHost,
             forbidNewParticipantsAfterDateEnd,
             multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null,
-            timezone: momentTZ.tz.guess()
+            timezone
         };
-console.log('defaultOptions', defaultOptions)
+
+        console.log('defaultOptions', defaultOptions);
         const meetingData = {
             createdBy: userId,
             name,
@@ -651,6 +653,8 @@ console.log('defaultOptions', defaultOptions)
             : moment();
     };
 
+    const availableTimezones = momentTZ.tz.names();
+
     return (
         <form
             className = { classes.form }
@@ -799,6 +803,40 @@ console.log('defaultOptions', defaultOptions)
                                 key = { el }
                                 value = { el }>{el}</MenuItem>))}
                         </TextField>
+                    </Grid>
+                </Grid>
+                <Grid
+                    item
+                    xs = { 12 }
+                    sm = { 3 }
+                    md = { 2 }>
+                    <Typography>
+            Time Zone
+                    </Typography>
+                </Grid>
+                <Grid
+                    container
+                    item
+                    xs = { 12 }
+                    sm = { 8 }
+                    md = { 10 }
+                    spacing = { 3 } >
+                    <Grid
+                        item
+                        sm = { 12 }
+                        md = { 4 } >
+                        <Autocomplete
+                            id = 'time-zone'
+                            getOptionLabel = { option => option }
+                            disableClearable = { true }
+                            value = { timezone }
+                            style = { { width: '270px'}}
+                            options = { availableTimezones }
+                            onChange = { (e, value) => setTimezone(value) }
+                            renderInput = { params => (<TextField
+                                { ...params }
+                                variant = 'outlined'
+                                margin = 'normal' />) } />
                     </Grid>
                 </Grid>
             </Grid>
