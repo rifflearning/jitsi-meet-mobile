@@ -23,6 +23,7 @@ import {
     KeyboardDatePicker
 } from '@material-ui/pickers';
 import moment from 'moment';
+import momentTZ from 'moment-timezone';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import 'moment-recur';
@@ -46,6 +47,7 @@ import {
     getRecurringMonthlyEventsByEndDate,
     daysOfWeekMap
 } from './helpers';
+import { convertToLocalTime } from '../../functions';
 
 moment.locale('en');
 
@@ -223,10 +225,10 @@ const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
     const mStart = moment.utc(startDate).minutes();
 
     return dates.map(date => {
-        const newDateStart = moment(date).set('hour', hStart)
-.set('minute', mStart);
-        const newDateEnd = newDateStart.clone().add('hours', duration.hours)
-.add('minutes', duration.minutes);
+        const newDateStart = convertToLocalTime(moment(date).set('hour', hStart)
+.set('minute', mStart));
+        const newDateEnd = convertToLocalTime(newDateStart.clone().add('hours', duration.hours)
+.add('minutes', duration.minutes));
 
         return {
             startDate: newDateStart.toISOString(),
@@ -421,6 +423,8 @@ const SchedulerForm = ({
                     minutes } })
             : null;
 
+        console.log('recurrenceValues', recurrenceValues);
+
         const getRecurrenceOptions = () => {
             const recurrenceOptions = {
                 recurrenceType
@@ -455,9 +459,10 @@ const SchedulerForm = ({
             allowAnonymous,
             waitForHost,
             forbidNewParticipantsAfterDateEnd,
-            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null,
+            timezone: momentTZ.tz.guess()
         };
-
+console.log('defaultOptions', defaultOptions)
         const meetingData = {
             createdBy: userId,
             name,

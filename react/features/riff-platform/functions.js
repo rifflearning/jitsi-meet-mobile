@@ -195,3 +195,34 @@ export function checkMeetingSingleOccurrenceDate({ meetingId, meeting, meetingsR
 export function getNumberRangeArray(start, end, step = 1) {
     return [ ...Array(Math.floor((end - start) / step) + 1) ].map((_, i) => start + (i * step));
 }
+
+// eslint-disable-next-line require-jsdoc
+export function convertToLocalTime(date, timezone = 'Europe/Kiev') {
+    const isDST = moment(new Date(date), timezone).isDST();
+
+    if (!isDST) {
+        return moment(date);
+    }
+    const timezoneOffset = getOffsetDelta(timezone);
+    const localTime = moment(date)
+        .clone()
+        .subtract(timezoneOffset, 'minutes')
+
+    return localTime;
+
+}
+
+/**
+ * Get time zone offset for timezone.
+ *
+ * @param {string} tz - Timezone.
+ * @returns {number} - Returns delta in minutes.
+ */
+function getOffsetDelta(tz) {
+    const janOffset = moment.tz({ month: 0,
+        day: 1 }, tz).utcOffset();
+    const junOffset = moment.tz({ month: 5,
+        day: 1 }, tz).utcOffset();
+
+    return Math.abs(junOffset - janOffset);
+}
