@@ -197,8 +197,8 @@ export function getNumberRangeArray(start, end, step = 1) {
 }
 
 // eslint-disable-next-line require-jsdoc
-export function convertToLocalTime(date, timezone = 'Europe/Kiev') {
-    const isDST = moment(new Date(date), timezone).isDST();
+export function convertToLocalTime(date, timezone) {
+    const isDST = moment(moment(date), timezone).isDST();
 
     if (!isDST) {
         return moment(date);
@@ -206,7 +206,7 @@ export function convertToLocalTime(date, timezone = 'Europe/Kiev') {
     const timezoneOffset = getOffsetDelta(timezone);
     const localTime = moment(date)
         .clone()
-        .subtract(timezoneOffset, 'minutes')
+        .subtract(timezoneOffset, 'minutes');
 
     return localTime;
 

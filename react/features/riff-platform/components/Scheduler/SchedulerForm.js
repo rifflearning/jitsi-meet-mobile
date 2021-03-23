@@ -72,6 +72,9 @@ const useStyles = makeStyles(theme => {
         },
         formAlert: {
             border: 'none'
+        },
+        timezoneList: {
+            maxWidth: '260px'
         }
     };
 });
@@ -424,8 +427,6 @@ const SchedulerForm = ({
                     minutes } })
             : null;
 
-        console.log('recurrenceValues', recurrenceValues);
-
         const getRecurrenceOptions = () => {
             const recurrenceOptions = {
                 recurrenceType
@@ -460,11 +461,9 @@ const SchedulerForm = ({
             allowAnonymous,
             waitForHost,
             forbidNewParticipantsAfterDateEnd,
-            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null,
-            timezone
+            multipleRoomsQuantity: isMultipleRooms ? multipleRooms : null
         };
 
-        console.log('defaultOptions', defaultOptions);
         const meetingData = {
             createdBy: userId,
             name,
@@ -474,6 +473,7 @@ const SchedulerForm = ({
             allowAnonymous,
             waitForHost,
             recurrenceValues,
+            timezone,
             recurrenceOptions: recurringMeeting ? {
                 defaultOptions,
                 options: getRecurrenceOptions()
@@ -653,7 +653,7 @@ const SchedulerForm = ({
             : moment();
     };
 
-    const availableTimezones = momentTZ.tz.names();
+    const timeZonesList = momentTZ.tz.names();
 
     return (
         <form
@@ -823,15 +823,16 @@ const SchedulerForm = ({
                     spacing = { 3 } >
                     <Grid
                         item
-                        sm = { 12 }
+                        xs = { 12 }
                         md = { 4 } >
                         <Autocomplete
                             id = 'time-zone'
                             getOptionLabel = { option => option }
                             disableClearable = { true }
+                            disabled = { isEditOneOccurrence }
                             value = { timezone }
-                            style = { { width: '270px'}}
-                            options = { availableTimezones }
+                            className = { classes.timezoneList }
+                            options = { timeZonesList }
                             onChange = { (e, value) => setTimezone(value) }
                             renderInput = { params => (<TextField
                                 { ...params }
