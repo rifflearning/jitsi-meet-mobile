@@ -39,10 +39,7 @@ export async function shouldRedirectToRiff() {
         return false;
     }
 
-    if (await shouldRedirectToLoginPage()) {
-        return true;
-    }
-    if (await shouldRedirectToWaitingRoom()) {
+    if (await shouldRedirectToLoginPage() || await shouldRedirectToWaitingRoom()) {
         return true;
     }
 
@@ -202,11 +199,11 @@ export function setTileViewByDefault() {
 }
 
 /**
- * Redirect to riff-metric-page after the meeting.
+ * Redirects to riff (dashboard, meeting_ended page, ...) after the meeting.
  *
  * @returns {void}
 */
-export function redirectToRiffMetrics() {
+export function redirectToRiffAfterMeeting() {
     return async (dispatch, getState) => {
         const roomId = getState()['features/riff-platform'].riff.roomId;
         const { uid, isAnon } = getState()['features/riff-platform'].signIn.user;
@@ -215,12 +212,16 @@ export function redirectToRiffMetrics() {
             await participantLeaveRoom(roomId, uid);
         }
 
+        // if in iframe, send message to parent window (for embedding in mattermost)
+        window.parent.postMessage('JITSI_CONFERENCE_END', '*');
+
         if (isAnon) {
             dispatch(logout());
+
+            return navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.MEETING_ENDED}`);
         }
 
-        window.parent.postMessage('JITSI_CONFERENCE_END', '*');
-        navigateWithoutReload(RiffPlatform, '/app/dashboard');
+        navigateWithoutReload(RiffPlatform, `${ROUTES.BASENAME}${ROUTES.DASHBOARD}`);
     };
 }
 

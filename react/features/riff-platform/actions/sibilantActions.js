@@ -42,17 +42,18 @@ export function attachSibilant(tracks) {
 
             // attach initialStream
             if (stream) {
-                reconnectSibilant(stream);
+                bindSibilantToStream(stream);
             }
 
+            // add more notes
             // try attach sibilant on devicelist change
-            document.addEventListener('RIFF_UPDATE_DEVICE_LIST', () => reconnectSibilant());
+            document.addEventListener('RIFF_UPDATE_DEVICE_LIST', () => bindSibilantToStream());
 
             // try attach sibilant on change audio device // setTimeout as a temprorary solution
-            APP.UI.addListener(UIEvents.AUDIO_DEVICE_CHANGED, () => setTimeout(() => reconnectSibilant(), 1000));
+            APP.UI.addListener(UIEvents.AUDIO_DEVICE_CHANGED, () => setTimeout(() => bindSibilantToStream(), 1000));
 
             // eslint-disable-next-line no-inner-declarations
-            function reconnectSibilant(initialStream) {
+            function bindSibilantToStream(initialStream) {
                 // eslint-disable-next-line max-len
                 const newStream = initialStream || APP.store.getState()['features/base/conference'].conference?.getLocalAudioTrack().stream;
 
@@ -120,7 +121,7 @@ async function loginToRiffDataServer() {
 function sendUtteranceToRiffDataServer(data, { uid: participant }, room, token) {
     return async dispatch => {
         try {
-            const volumesObj = process.env.ADD_VOLUMES_FIELD_TO_UTTERANCE_OBJ === 'true'
+            const volumesObj = process.env.SEND_SIBILANT_VOLUMES_TO_RIFF_DATA_SERVER === 'true'
                 ? { volumes: data.volumes }
                 : {};
             const res = await app.service('utterances').create({
