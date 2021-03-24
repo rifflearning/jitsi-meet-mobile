@@ -90,7 +90,7 @@ const MeetingsRow = ({
         setisOpenDeleteDialog(false);
     };
 
-    const durationTime = localUserTimezone === meeting?.timezone
+    const durationTime = meeting?.timezone && localUserTimezone === meeting?.timezone
         ? formatDurationTime(convertToLocalTime(meeting.dateStart, meeting.timezone),
             convertToLocalTime(meeting.dateEnd, meeting.timezone))
         : formatDurationTime(meeting.dateStart, meeting.dateEnd);
@@ -119,7 +119,7 @@ const MeetingsRow = ({
                     variant = 'h6' >
                     {durationTime}
                 </Typography>
-                {localUserTimezone !== meeting?.timezone && <Typography
+                {meeting?.timezone && localUserTimezone !== meeting?.timezone && <Typography
                     className = { classes.meetingTimezone }
                     variant = 'caption' >
                     {timezoneTimeInfo}
