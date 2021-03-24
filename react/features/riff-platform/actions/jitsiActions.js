@@ -199,11 +199,11 @@ export function setTileViewByDefault() {
 }
 
 /**
- * Redirect to riff-metric-page after the meeting.
+ * Redirects to riff (dashboard, meeting_ended page, ...) after the meeting.
  *
  * @returns {void}
 */
-export function redirectToRiffMetrics() {
+export function redirectToRiffAfterMeeting() {
     return async (dispatch, getState) => {
         const roomId = getState()['features/riff-platform'].riff.roomId;
         const { uid, isAnon } = getState()['features/riff-platform'].signIn.user;
