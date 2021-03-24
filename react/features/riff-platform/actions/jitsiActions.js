@@ -212,6 +212,7 @@ export function redirectToRiffAfterMeeting() {
             await participantLeaveRoom(roomId, uid);
         }
 
+        // if in iframe, send message to parent window (for embedding in mattermost)
         window.parent.postMessage('JITSI_CONFERENCE_END', '*');
 
         if (isAnon) {
