@@ -29,3 +29,5 @@ When we start meeting from *meetingslist* from *riff-platform*, we get redirecte
 
 ## Sibilant 
 - we use [@rifflearning/sibilant](https://github.com/rifflearning/sibilant) package for detecting speaking events and send them to the riff-data server for meeting mediator and metrics page
+
+## [Local recording dev notes](react/features/riff-platform/docs/LOCALRECDEVNOTES.md)
