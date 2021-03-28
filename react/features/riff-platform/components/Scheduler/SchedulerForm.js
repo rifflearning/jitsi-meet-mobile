@@ -274,6 +274,7 @@ const SchedulerForm = ({
     doLogout
 }) => {
     const classes = useStyles();
+    const localUserTimezone = momentTZ.tz.guess();
 
     const [ name, setname ] = useState('');
     const [ description, setdescription ] = useState('');
@@ -305,7 +306,7 @@ const SchedulerForm = ({
     const [ recurrenceDate, setRecurrenceDate ] = useState([]);
     const [ waitForHost, setWaitForHost ] = useState(false);
     const [ forbidNewParticipantsAfterDateEnd, setForbidNewParticipantsAfterDateEnd ] = useState(false);
-    const [ timezone, setTimezone ] = useState(momentTZ.tz.guess());
+    const [ timezone, setTimezone ] = useState(localUserTimezone);
 
     const [ nameError, setnameError ] = useState('');
     const [ durationError, setDurationError ] = useState('');
@@ -325,6 +326,15 @@ const SchedulerForm = ({
 
     const isEditAllMeetingsRecurring = defineEditMode() === 'all';
     const isEditOneOccurrence = defineEditMode() === 'one';
+
+    const getUTCTimeByLocalTimeAndTimezone = (time, timeZone) => {
+        const t = moment(time)
+            .format()
+            .slice(0, 19);
+        const timeZoneTime = momentTZ.tz(t, timeZone);
+
+        return moment.utc(timeZoneTime);
+    };
 
     useEffect(() => {
         if (meeting && isEditing) {
@@ -348,7 +358,16 @@ const SchedulerForm = ({
 
             setHours(durationH);
             setMinutes(durationM);
-            setdate(meetingData.dateStart);
+
+
+            if (meetingData.timezone) {
+                setTimezone(meeting.timezone);
+                setdate(momentTZ.tz(meetingData.dateStart, meetingData.timezone));
+            } else {
+                setdate(meetingData.dateStart);
+                setTimezone(localUserTimezone);
+            }
+
 
             const meetingRecurrenceOptions = meeting.recurrenceOptions?.options;
 
@@ -455,7 +474,7 @@ const SchedulerForm = ({
         };
 
         const defaultOptions = {
-            dateStart: date,
+            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
             dateEnd,
             description,
             allowAnonymous,
@@ -468,8 +487,8 @@ const SchedulerForm = ({
             createdBy: userId,
             name,
             description,
-            dateStart: new Date(date).getTime(),
-            dateEnd: dateEnd.getTime(),
+            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
+            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
             allowAnonymous,
             waitForHost,
             recurrenceValues,
@@ -493,8 +512,8 @@ const SchedulerForm = ({
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
                     description,
-                    dateStart: new Date(date).getTime(),
-                    dateEnd: dateEnd.getTime(),
+                    dateStart: moment.utc(date),
+                    dateEnd: moment.utc(date),
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,
@@ -734,7 +753,8 @@ const SchedulerForm = ({
                                     format = 'MM/DD/YYYY'
                                     margin = 'normal'
                                     id = 'date-picker-inline'
-                                    minDate = { defineStartDateMinValue() }
+
+                                    //  minDate = { defineStartDateMinValue() }
                                     label = 'Date'
                                     value = { date }
                                     onChange = { d => {
