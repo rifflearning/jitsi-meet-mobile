@@ -333,7 +333,7 @@ const SchedulerForm = ({
             .slice(0, 19);
         const timeZoneTime = momentTZ.tz(t, timeZone);
 
-        return moment.utc(timeZoneTime);
+        return moment.utc(timeZoneTime).toISOString();
     };
 
     useEffect(() => {
@@ -434,10 +434,10 @@ const SchedulerForm = ({
             return;
         }
 
-        const dateEnd = new Date(date);
-
-        dateEnd.setHours(dateEnd.getHours() + hours);
-        dateEnd.setMinutes(dateEnd.getMinutes() + minutes);
+        const dateEnd = moment(date)
+            .clone()
+            .add('hours', hours)
+            .add('minutes', minutes);
 
         const recurrenceValues = recurringMeeting
             ? getRecurringDatesWithTime({ dates: recurrenceDate,
@@ -475,7 +475,7 @@ const SchedulerForm = ({
 
         const defaultOptions = {
             dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
-            dateEnd,
+            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
             description,
             allowAnonymous,
             waitForHost,
