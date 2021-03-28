@@ -3,6 +3,7 @@
 import { Button, makeStyles, MenuItem, TextField, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
+import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -90,9 +91,11 @@ const MeetingsRow = ({
         setisOpenDeleteDialog(false);
     };
 
-    const durationTime = meeting?.timezone && localUserTimezone === meeting?.timezone
+    // const isDstInTimezone = moment(moment(meeting?.dateStart), meeting?.timezone).isDST();
+
+    const durationTime = meeting?.timezone
         ? formatDurationTime(convertToLocalTime(meeting.dateStart, meeting.timezone),
-            convertToLocalTime(meeting.dateEnd, meeting.timezone))
+        convertToLocalTime(meeting.dateEnd, meeting.timezone))
         : formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
 
@@ -107,7 +110,7 @@ const MeetingsRow = ({
 
     const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
-    const timezoneTimeInfo = `${momentTZ.tz(meeting.dateStart, meeting.timezone).format('HH:mm')} ${meeting?.timezone}`;
+    const timezoneTimeInfo = `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('HH:mm')} ${meeting?.timezone}`;
 
     return (
         <TableRow

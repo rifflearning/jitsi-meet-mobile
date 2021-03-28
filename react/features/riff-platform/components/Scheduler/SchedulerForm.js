@@ -224,14 +224,16 @@ const getDaysOfWeekObj = ({ daysOfWeekArr, selectedDaysOfWeekArr }) => daysOfWee
 }, {});
 
 const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
+
     const hStart = moment.utc(startDate).hours();
     const mStart = moment.utc(startDate).minutes();
 
     return dates.map(date => {
-        const newDateStart = moment(date).set('hour', hStart)
-.set('minute', mStart);
+        const newDateStart = moment.utc(date).set('hour', hStart)
+        .set('minute', mStart);
+
         const newDateEnd = newDateStart.clone().add('hours', duration.hours)
-.add('minutes', duration.minutes);
+        .add('minutes', duration.minutes);
 
         return {
             startDate: newDateStart.toISOString(),
@@ -359,10 +361,9 @@ const SchedulerForm = ({
             setHours(durationH);
             setMinutes(durationM);
 
-
-            if (meetingData.timezone) {
+            if (meeting.timezone) {
                 setTimezone(meeting.timezone);
-                setdate(momentTZ.tz(meetingData.dateStart, meetingData.timezone));
+                setdate(momentTZ.tz(meetingData.dateStart, meeting.timezone));
             } else {
                 setdate(meetingData.dateStart);
                 setTimezone(localUserTimezone);
@@ -436,12 +437,12 @@ const SchedulerForm = ({
 
         const dateEnd = moment(date)
             .clone()
-            .add('hours', hours)
-            .add('minutes', minutes);
+            .add(hours, 'hours')
+            .add(minutes, 'minutes');
 
         const recurrenceValues = recurringMeeting
             ? getRecurringDatesWithTime({ dates: recurrenceDate,
-                startDate: date,
+                startDate: getUTCTimeByLocalTimeAndTimezone(date, timezone),
                 duration: { hours,
                     minutes } })
             : null;
@@ -512,8 +513,8 @@ const SchedulerForm = ({
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
                     description,
-                    dateStart: moment.utc(date),
-                    dateEnd: moment.utc(date),
+                    dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
+                    dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,
@@ -540,8 +541,8 @@ const SchedulerForm = ({
     useEffect(() => {
         if (endDateBy === 'endDateTime') {
             const recurrence = calculateRecurringByEndDate({
-                startDate: moment.utc(date),
-                endDate: moment.utc(endDate),
+                startDate: getUTCTimeByLocalTimeAndTimezone(date, timezone),
+                endDate: getUTCTimeByLocalTimeAndTimezone(endDate, timezone),
                 daysInterval: recurrenceInterval,
                 occurrences: defaultOccurrences,
                 recurrenceType,
@@ -572,7 +573,7 @@ const SchedulerForm = ({
 
         if (endDateBy === 'endDateTime' && isUpdateEndDate) {
             const recurrence = calculateRecurringByEndDate({
-                startDate: moment.utc(date),
+                startDate: getUTCTimeByLocalTimeAndTimezone(date, timezone),
                 endDate: null,
                 daysInterval: recurrenceInterval,
                 occurrences: defaultOccurrences,
@@ -598,7 +599,7 @@ const SchedulerForm = ({
     useEffect(() => {
         if (endDateBy !== 'endDateTime') {
             const recurrence = calculateRecurringByOccurrence({
-                startDate: moment.utc(date),
+                startDate: getUTCTimeByLocalTimeAndTimezone(date, timezone),
                 daysInterval: recurrenceInterval,
                 occurrences: endTimes,
                 recurrenceType,

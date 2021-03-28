@@ -1,4 +1,5 @@
 import moment from 'moment';
+import momentTZ from 'moment-timezone';
 
 import * as ROUTES from './constants/routes';
 
@@ -198,13 +199,16 @@ export function getNumberRangeArray(start, end, step = 1) {
 
 // eslint-disable-next-line require-jsdoc
 export function convertToLocalTime(date, timezone) {
-    const isDST = moment(moment(date), timezone).isDST();
+    const isDST = momentTZ.tz(date, timezone).isDST();
+
+    //return momentTZ.tz(date, timezone);
 
     if (!isDST) {
-        return moment(date);
+        return momentTZ.tz(date, timezone);
     }
     const timezoneOffset = getOffsetDelta(timezone);
-    const localTime = moment(date)
+
+    const localTime = momentTZ.tz(date, timezone)
         .clone()
         .subtract(timezoneOffset, 'minutes');
 

@@ -25,7 +25,7 @@ import { getMeetingById, meetingReset } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { getNumberRangeArray, formatDurationTime, convertToLocalTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime, convertToLocaTimezonelTime } from '../../functions';
 import Loader from '../Loader';
 import { ConfirmationDialogRaw } from '../Meetings/Dialog';
 import StyledPaper from '../StyledPaper';
