@@ -15,13 +15,12 @@ export const getRecurringDailyEventsByOccurance = ({
     startDate,
     daysOccurances,
     daysInterval
-}) =>
-    [ startDate ].concat(
-        moment(startDate)
+}) => [ startDate ].concat(
+        moment.utc(startDate)
             .recur()
             .every(daysInterval, 'days')
             .next(daysOccurances - 1)
-    );
+);
 
 // eslint-disable-next-line no-confusing-arrow
 export const getRecurringDailyEventsByEndDate = ({
@@ -31,7 +30,7 @@ export const getRecurringDailyEventsByEndDate = ({
     daysOccurances
 }) =>
     endDate
-        ? moment(startDate)
+        ? moment.utc(startDate)
             .recur(endDate)
             .every(daysInterval, 'days')
             .all()
@@ -52,13 +51,13 @@ export const getRecurringWeeklyEventsByOccurance = ({
 
     return isStartDateBelongsToDaysArr
         ? [ startDate ].concat(
-              moment(startDate)
+            moment.utc(startDate)
                   .recur()
                   .every(daysOfWeek)
                   .daysOfWeek()
                   .next(weeksOccurances - 1)
         )
-        : moment(startDate)
+        : moment.utc(startDate)
               .recur()
               .every(daysOfWeek)
               .daysOfWeek()
@@ -73,7 +72,7 @@ export const getRecurringWeeklyEventsByEndDate = ({
     daysOfWeek
 }) =>
     endDate
-        ? moment(startDate)
+        ? moment.utc(startDate)
             .recur(endDate)
             .every(daysOfWeek)
             .daysOfWeek()
@@ -94,30 +93,30 @@ export const getRecurringMonthlyEventsByOccurance = ({
 }) => {
     if (monthlyBy === 'monthlyByDay') {
         const isStartDayEqualToDayOfMonth
-            = parseInt(moment(startDate).format('D'), 10) === dayOfMonth;
+            = parseInt(moment.utc(startDate).format('D'), 10) === dayOfMonth;
 
         return isStartDayEqualToDayOfMonth
             ? [ startDate ].concat(
-                  moment(startDate)
+                moment.utc(startDate)
                       .recur()
                       .every(dayOfMonth)
                       .daysOfMonth()
                       .next(monthOccurances - 1)
             )
-            : moment(startDate)
+            : moment.utc(startDate)
                   .recur()
                   .every(dayOfMonth)
                   .daysOfMonth()
                   .next(monthOccurances);
     }
-    const recurrence = moment(startDate)
+    const recurrence = moment.utc(startDate)
             .recur()
             .every(monthlyByWeekDay)
             .daysOfWeek()
             .every(monthlyByPosition)
             .weeksOfMonthByDay()
             .next(monthOccurances);
-    const startDateFromRecurrence = moment(startDate)
+    const startDateFromRecurrence = moment.utc(startDate)
             .recur(recurrence[0])
             .every(monthlyByWeekDay)
             .daysOfWeek()
@@ -125,13 +124,13 @@ export const getRecurringMonthlyEventsByOccurance = ({
             .weeksOfMonthByDay()
             .all()[0];
 
-    const isStartDayEqualToStartDateFromRecurrence = moment(
+    const isStartDayEqualToStartDateFromRecurrence = moment.utc(
             startDate
     ).isSame(startDateFromRecurrence, 'day');
 
     return isStartDayEqualToStartDateFromRecurrence
         ? [ startDate ].concat(
-                  moment(startDate)
+            moment.utc(startDate)
                       .recur()
                       .every(monthlyByWeekDay)
                       .daysOfWeek()
@@ -154,7 +153,7 @@ export const getRecurringMonthlyEventsByEndDate = ({
 }) => {
     if (monthlyBy === 'monthlyByDay') {
         return endDate
-            ? moment(startDate)
+            ? moment.utc(startDate)
                   .recur(endDate)
                   .every(dayOfMonth)
                   .daysOfMonth()
@@ -170,7 +169,7 @@ export const getRecurringMonthlyEventsByEndDate = ({
     }
 
     return endDate
-        ? moment(startDate)
+        ? moment.utc(startDate)
                   .recur(endDate)
                   .every(monthlyByWeekDay)
                   .daysOfWeek()

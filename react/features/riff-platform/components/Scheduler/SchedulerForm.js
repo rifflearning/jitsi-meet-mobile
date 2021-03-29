@@ -331,11 +331,12 @@ const SchedulerForm = ({
 
     const getUTCTimeByLocalTimeAndTimezone = (time, timeZone) => {
         const t = moment(time)
+            .clone()
             .format()
             .slice(0, 19);
         const timeZoneTime = momentTZ.tz(t, timeZone);
 
-        return moment.utc(timeZoneTime).toISOString();
+        return timeZoneTime.utc();
     };
 
     useEffect(() => {
