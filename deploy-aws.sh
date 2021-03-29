@@ -1,7 +1,7 @@
 #!/bin/bash
 # In order to build and deploy to aws instance with jitsi-meet client
 # you need to provide enviroment variables to /.env file
-# and run "make deploy-aws" or only deploy with "sh deploy-aws.sh".
+# and run "make deploy-aws" or only deploy with "bash deploy-aws.sh".
 
 # Set all vars from .env file, we need for PEM_PATH, AWS_NAME
 set -o allexport; source .env; set +o allexport
