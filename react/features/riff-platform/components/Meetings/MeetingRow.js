@@ -110,7 +110,12 @@ const MeetingsRow = ({
 
     const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
-    const timezoneTimeInfo = `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('HH:mm')} ${meeting?.timezone}`;
+    const isSameDay = convertToLocalTime(meeting.dateStart, localUserTimezone).format('DD')
+    === convertToLocalTime(meeting.dateStart, meeting.timezone).format('DD');
+
+    const timezoneTimeInfo = `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('HH:mm')} 
+    ${isSameDay ? '' : `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('MMM DD')},`}
+    ${meeting?.timezone}`;
 
     return (
         <TableRow
