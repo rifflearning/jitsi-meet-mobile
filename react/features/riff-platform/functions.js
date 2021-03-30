@@ -198,21 +198,35 @@ export function getNumberRangeArray(start, end, step = 1) {
 }
 
 // eslint-disable-next-line require-jsdoc
-export function convertToLocalTime(date, timezone) {
+export function convertToDSTTimezoneTime(date, timezone) {
     const isDST = momentTZ.tz(date, timezone).isDST();
-
-    //return momentTZ.tz(date, timezone);
 
     if (!isDST) {
         return momentTZ.tz(date, timezone);
     }
     const timezoneOffset = getOffsetDelta(timezone);
 
-    const localTime = momentTZ.tz(date, timezone)
+    const DSTTimezoneTime = momentTZ.tz(date, timezone)
         .clone()
         .subtract(timezoneOffset, 'minutes');
 
-    return localTime;
+    return DSTTimezoneTime;
+}
+
+// eslint-disable-next-line require-jsdoc
+export function convertToTimezoneTime(date, timezone) {
+    const isDST = momentTZ.tz(date, timezone).isDST();
+
+    if (isDST) {
+        return momentTZ.tz(date, timezone);
+    }
+    const timezoneOffset = getOffsetDelta(timezone);
+
+    const timezoneTime = momentTZ.tz(date, timezone)
+        .clone()
+        .add(timezoneOffset, 'minutes');
+
+    return timezoneTime;
 
 }
 

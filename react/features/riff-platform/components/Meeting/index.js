@@ -25,7 +25,7 @@ import { getMeetingById, meetingReset } from '../../actions/meeting';
 import { deleteMeeting,
     deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { getNumberRangeArray, formatDurationTime, convertToLocalTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
 import Loader from '../Loader';
 import { ConfirmationDialogRaw } from '../Meetings/Dialog';
 import StyledPaper from '../StyledPaper';
@@ -70,7 +70,7 @@ const MenuProps = {
 
 const getFormattedDate = (dateStart, dateEnd, timezone) => {
     const duration = timezone
-        ? formatDurationTime(convertToLocalTime(dateStart, timezone), convertToLocalTime(dateEnd, timezone))
+        ? formatDurationTime(momentTZ.tz(dateStart, timezone), momentTZ.tz(dateEnd, timezone))
         : formatDurationTime(dateStart, dateEnd);
     const date = moment(dateStart).format('MMM DD, YYYY');
 
@@ -222,12 +222,12 @@ function Meeting({
     const isMeetingcreatedByCurrentUser = meeting?.createdBy === userId;
     const localUserTimezone = momentTZ.tz.guess();
 
-    const isSameDay = convertToLocalTime(meeting.dateStart, localUserTimezone).format('DD')
-        === convertToLocalTime(meeting.dateStart, meeting.timezone).format('DD');
+    const isSameDay = momentTZ.tz(meeting.dateStart, localUserTimezone).format('DD')
+        === momentTZ.tz(meeting.dateStart, meeting.timezone).format('DD');
 
-    const timezoneTimeInfo = `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('HH:mm')} -
-    ${convertToLocalTime(meeting.dateEnd, meeting.timezone).format('HH:mm')}, 
-    ${isSameDay ? '' : `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('MMM DD')},`}
+    const timezoneTimeInfo = `${momentTZ.tz(meeting.dateStart, meeting.timezone).format('HH:mm')} -
+    ${momentTZ.tz(meeting.dateEnd, meeting.timezone).format('HH:mm')}, 
+    ${isSameDay ? '' : `${momentTZ.tz(meeting.dateStart, meeting.timezone).format('MMM DD')},`}
      ${meeting.timezone}`;
 
     if (loading) {

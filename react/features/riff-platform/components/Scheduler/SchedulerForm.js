@@ -37,7 +37,7 @@ import { schedule,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
-import { getNumberRangeArray, convertToLocalTime } from '../../functions';
+import { getNumberRangeArray, convertToTimezoneTime, convertToDSTTimezoneTime } from '../../functions';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -224,17 +224,28 @@ const getDaysOfWeekObj = ({ daysOfWeekArr, selectedDaysOfWeekArr }) => daysOfWee
     return acc;
 }, {});
 
-const getRecurringDatesWithTime = ({ dates, startDate, duration }) => {
+const getRecurringDatesWithTime = ({ dates, startDate, duration, timezone }) => {
 
     const hStart = moment.utc(startDate).hours();
     const mStart = moment.utc(startDate).minutes();
 
-    return dates.map(date => {
-        const newDateStart = moment.utc(date).set('hour', hStart)
-        .set('minute', mStart);
+    const isStartDST = momentTZ.tz(startDate, timezone).isDST();
 
-        const newDateEnd = newDateStart.clone().add('hours', duration.hours)
+    return dates.map(date => {
+        let newDateStart = moment.utc(date).set('hour', hStart)
+        .set('minute', mStart);
+        let newDateEnd = newDateStart.clone().add('hours', duration.hours)
         .add('minutes', duration.minutes);
+
+        const isDateDTS = momentTZ.tz(newDateStart, timezone).isDST();
+
+        if (!isStartDST && isDateDTS) {
+            newDateStart = convertToDSTTimezoneTime(newDateStart, timezone);
+            newDateEnd = convertToDSTTimezoneTime(newDateEnd, timezone);
+        } else if (isStartDST && !isDateDTS) {
+            newDateStart = convertToTimezoneTime(newDateStart, timezone);
+            newDateEnd = convertToTimezoneTime(newDateEnd, timezone);
+        }
 
         return {
             startDate: newDateStart.toISOString(),
@@ -365,7 +376,7 @@ const SchedulerForm = ({
 
             if (meeting.timezone) {
                 setTimezone(meeting.timezone);
-                setdate(convertToLocalTime(momentTZ.tz(meetingData.dateStart, meeting.timezone), meeting.timezone));
+                setdate(momentTZ.tz(meetingData.dateStart, meeting.timezone));
             } else {
                 setdate(meetingData.dateStart);
                 setTimezone(localUserTimezone);
@@ -446,7 +457,8 @@ const SchedulerForm = ({
             ? getRecurringDatesWithTime({ dates: recurrenceDate,
                 startDate: getUTCTimeByLocalTimeAndTimezone(date, timezone),
                 duration: { hours,
-                    minutes } })
+                    minutes },
+                timezone })
             : null;
 
         const getRecurrenceOptions = () => {
@@ -477,8 +489,8 @@ const SchedulerForm = ({
         };
 
         const defaultOptions = {
-            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
-            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
+            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone).toISOString(),
+            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone).toISOString(),
             description,
             allowAnonymous,
             waitForHost,
@@ -490,8 +502,8 @@ const SchedulerForm = ({
             createdBy: userId,
             name,
             description,
-            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
-            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
+            dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone).toISOString(),
+            dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone).toISOString(),
             allowAnonymous,
             waitForHost,
             recurrenceValues,
@@ -515,8 +527,8 @@ const SchedulerForm = ({
                 return updateScheduleMeetingRecurringSingleOccurrence(meeting._id, meeting.roomId, {
                     name,
                     description,
-                    dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone),
-                    dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone),
+                    dateStart: getUTCTimeByLocalTimeAndTimezone(date, timezone).toISOString(),
+                    dateEnd: getUTCTimeByLocalTimeAndTimezone(dateEnd, timezone).toISOString(),
                     allowAnonymous,
                     waitForHost,
                     forbidNewParticipantsAfterDateEnd,

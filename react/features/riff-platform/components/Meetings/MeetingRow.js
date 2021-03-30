@@ -3,7 +3,6 @@
 import { Button, makeStyles, MenuItem, TextField, Typography } from '@material-ui/core';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -12,7 +11,7 @@ import { useHistory } from 'react-router-dom';
 import { connect } from '../../../base/redux';
 import { deleteMeeting, deleteMeetingsRecurring } from '../../actions/meetings';
 import * as ROUTES from '../../constants/routes';
-import { getNumberRangeArray, formatDurationTime, convertToLocalTime } from '../../functions';
+import { getNumberRangeArray, formatDurationTime } from '../../functions';
 
 import { ConfirmationDialogRaw } from './Dialog';
 
@@ -94,8 +93,8 @@ const MeetingsRow = ({
     // const isDstInTimezone = moment(moment(meeting?.dateStart), meeting?.timezone).isDST();
 
     const durationTime = meeting?.timezone
-        ? formatDurationTime(convertToLocalTime(meeting.dateStart, meeting.timezone),
-        convertToLocalTime(meeting.dateEnd, meeting.timezone))
+        ? formatDurationTime(momentTZ.tz(meeting.dateStart, meeting.timezone),
+        momentTZ.tz(meeting.dateEnd, meeting.timezone))
         : formatDurationTime(meeting.dateStart, meeting.dateEnd);
 
 
@@ -110,11 +109,11 @@ const MeetingsRow = ({
 
     const roomsNumbersArr = meeting.multipleRoomsQuantity ? getNumberRangeArray(1, meeting.multipleRoomsQuantity) : [];
 
-    const isSameDay = convertToLocalTime(meeting.dateStart, localUserTimezone).format('DD')
-    === convertToLocalTime(meeting.dateStart, meeting.timezone).format('DD');
+    const isSameDay = momentTZ.tz(meeting.dateStart, localUserTimezone).format('DD')
+    === momentTZ.tz(meeting.dateStart, meeting.timezone).format('DD');
 
-    const timezoneTimeInfo = `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('HH:mm')} 
-    ${isSameDay ? '' : `${convertToLocalTime(meeting.dateStart, meeting.timezone).format('MMM DD')},`}
+    const timezoneTimeInfo = `${momentTZ.tz(meeting.dateStart, meeting.timezone).format('HH:mm')} 
+    ${isSameDay ? '' : `${momentTZ.tz(meeting.dateStart, meeting.timezone).format('MMM DD')},`}
     ${meeting?.timezone}`;
 
     return (
