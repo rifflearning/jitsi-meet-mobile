@@ -37,7 +37,7 @@ import { schedule,
     updateScheduleRecurringSingleOccurrence
 } from '../../actions/scheduler';
 import { logout } from '../../actions/signIn';
-import { getNumberRangeArray } from '../../functions';
+import { getNumberRangeArray, convertToLocalTime } from '../../functions';
 
 import {
     getRecurringDailyEventsByOccurance,
@@ -48,6 +48,7 @@ import {
     getRecurringMonthlyEventsByEndDate,
     daysOfWeekMap
 } from './helpers';
+
 
 moment.locale('en');
 
@@ -364,7 +365,7 @@ const SchedulerForm = ({
 
             if (meeting.timezone) {
                 setTimezone(meeting.timezone);
-                setdate(momentTZ.tz(meetingData.dateStart, meeting.timezone));
+                setdate(convertToLocalTime(momentTZ.tz(meetingData.dateStart, meeting.timezone), meeting.timezone));
             } else {
                 setdate(meetingData.dateStart);
                 setTimezone(localUserTimezone);
