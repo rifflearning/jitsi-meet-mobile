@@ -44,7 +44,7 @@ API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
 ## dev-jitsi (DEV):
 # AWS_NAME=ubuntu@dev-jitsi.riffplatform.com
 # DISABLE_GROUPS=true
-# ADD_VOLUMES_FIELD_TO_UTTERANCE_OBJ=true
+# SEND_SIBILANT_VOLUMES_TO_RIFF_DATA_SERVER=true
 
 ## rif-poc:
 # AWS_NAME=ubuntu@riff-poc.riffplatform.com
@@ -77,7 +77,7 @@ API_GATEWAY=https://dev-jitsi.riffplatform.com/api-gateway
 # DISABLE_GROUPS=true
 # DISABLE_EMOTIONS_CHART=true
 # MATTERMOST_EMBEDDED_ONLY=true # disables auth, enables "Meeting ended" page instead of admin panel
-# ADD_VOLUMES_FIELD_TO_UTTERANCE_OBJ=true # sends utterance obj with additional field 'volumes', for data analysis purposes only
+# SEND_SIBILANT_VOLUMES_TO_RIFF_DATA_SERVER=true # sends utterance obj with additional field 'volumes', for data analysis purposes only
 # HIDE_MEETING_MEDIATOR_BY_DEFAULT=true
 # HIDE_MEETING_MEDIATOR_BY_DEFAULT_FOR_ANON_USER=true
 ```
@@ -112,7 +112,7 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     ## dev-jitsi (DEV):
     AWS_NAME=ubuntu@dev-jitsi.riffplatform.com
     DISABLE_GROUPS=true
-    ADD_VOLUMES_FIELD_TO_UTTERANCE_OBJ=true
+    SEND_SIBILANT_VOLUMES_TO_RIFF_DATA_SERVER=true
     ```
     Build and deploy with:
     ```
@@ -193,4 +193,4 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     // in case we want jibri, but value itself different for every domain
     hiddenDomain: 'recorder.example-domain.com',
     ```
-### [Local recording dev notes](react/features/riff-platform/docs/LOCALRECDEVNOTES.md)
+    
