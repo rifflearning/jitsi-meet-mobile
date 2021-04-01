@@ -29,7 +29,6 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import 'moment-recur';
 import { useHistory } from 'react-router';
-import { format } from 'util';
 
 import { connect } from '../../../base/redux';
 import { schedule,
@@ -131,7 +130,6 @@ const recurrenceTypeMap = {
 };
 
 const defaultOccurrences = 7;
-
 
 const calculateRecurringByEndDate = ({
     startDate,
@@ -274,11 +272,11 @@ const getMeetingDuration = ({ dateStart, dateEnd }) => {
         durationM };
 };
 
-const formattedDate = date => date.utc().toISOString();
+const formattedDate = date => moment.utc(date).toISOString();
 
 const setCorrectTimeToDate = (correctD, d, timezone) => {
-    const h = correctD.utc().hours();
-    const m = correctD.utc().minutes();
+    const h = moment.utc(correctD).hours();
+    const m = moment.utc(correctD).minutes();
 
     const isCorrectDateDTS = momentTZ.tz(correctD, timezone).isDST();
     const isDateDTS = momentTZ.tz(d, timezone).isDST();
