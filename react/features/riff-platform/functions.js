@@ -1,5 +1,4 @@
 import moment from 'moment';
-import momentTZ from 'moment-timezone';
 
 import * as ROUTES from './constants/routes';
 
@@ -195,52 +194,4 @@ export function checkMeetingSingleOccurrenceDate({ meetingId, meeting, meetingsR
  */
 export function getNumberRangeArray(start, end, step = 1) {
     return [ ...Array(Math.floor((end - start) / step) + 1) ].map((_, i) => start + (i * step));
-}
-
-// eslint-disable-next-line require-jsdoc
-export function convertToDSTTimezoneTime(date, timezone) {
-    const isDST = momentTZ.tz(date, timezone).isDST();
-
-    if (!isDST) {
-        return momentTZ.tz(date, timezone);
-    }
-    const timezoneOffset = getOffsetDelta(timezone);
-
-    const DSTTimezoneTime = momentTZ.tz(date, timezone)
-        .clone()
-        .subtract(timezoneOffset, 'minutes');
-
-    return DSTTimezoneTime;
-}
-
-// eslint-disable-next-line require-jsdoc
-export function convertToTimezoneTime(date, timezone) {
-    const isDST = momentTZ.tz(date, timezone).isDST();
-
-    if (isDST) {
-        return momentTZ.tz(date, timezone);
-    }
-    const timezoneOffset = getOffsetDelta(timezone);
-
-    const timezoneTime = momentTZ.tz(date, timezone)
-        .clone()
-        .add(timezoneOffset, 'minutes');
-
-    return timezoneTime;
-
-}
-
-/**
- * Get time zone offset for timezone.
- *
- * @param {string} tz - Timezone.
- * @returns {number} - Returns delta in minutes.
- */
-function getOffsetDelta(tz) {
-    const janOffset = moment.tz({ month: 0,
-        day: 1 }, tz).utcOffset();
-    const junOffset = moment.tz({ month: 5,
-        day: 1 }, tz).utcOffset();
-
-    return Math.abs(junOffset - janOffset);
 }

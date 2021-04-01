@@ -1,5 +1,6 @@
 import moment from 'moment';
 import 'moment-recur';
+import momentTZ from 'moment-timezone';
 
 export const daysOfWeekMap = {
     'Mon': 1,
@@ -16,7 +17,7 @@ export const getRecurringDailyEventsByOccurance = ({
     daysOccurances,
     daysInterval
 }) => [ startDate ].concat(
-        moment.utc(startDate)
+        startDate
             .recur()
             .every(daysInterval, 'days')
             .next(daysOccurances - 1)
@@ -30,7 +31,7 @@ export const getRecurringDailyEventsByEndDate = ({
     daysOccurances
 }) =>
     endDate
-        ? moment.utc(startDate)
+        ? startDate
             .recur(endDate)
             .every(daysInterval, 'days')
             .all()
@@ -46,18 +47,18 @@ export const getRecurringWeeklyEventsByOccurance = ({
     daysOfWeek
 }) => {
     const isStartDateBelongsToDaysArr = daysOfWeek.find(
-        day => day === daysOfWeekMap[moment(startDate).format('ddd')]
+        day => day === daysOfWeekMap[startDate.format('ddd')]
     );
 
     return isStartDateBelongsToDaysArr
         ? [ startDate ].concat(
-            moment.utc(startDate)
+                startDate
                   .recur()
                   .every(daysOfWeek)
                   .daysOfWeek()
                   .next(weeksOccurances - 1)
         )
-        : moment.utc(startDate)
+        : startDate
               .recur()
               .every(daysOfWeek)
               .daysOfWeek()
@@ -70,19 +71,17 @@ export const getRecurringWeeklyEventsByEndDate = ({
     endDate,
     weeksOccurances,
     daysOfWeek
-}) =>
-    endDate
-        ? moment.utc(startDate)
+}) => endDate
+    ? startDate
             .recur(endDate)
             .every(daysOfWeek)
             .daysOfWeek()
             .all()
-        : getRecurringWeeklyEventsByOccurance({
-            startDate,
-            weeksOccurances,
-            daysOfWeek
-        });
-
+    : getRecurringWeeklyEventsByOccurance({
+        startDate,
+        weeksOccurances,
+        daysOfWeek
+    });
 export const getRecurringMonthlyEventsByOccurance = ({
     startDate,
     monthOccurances,
@@ -93,30 +92,30 @@ export const getRecurringMonthlyEventsByOccurance = ({
 }) => {
     if (monthlyBy === 'monthlyByDay') {
         const isStartDayEqualToDayOfMonth
-            = parseInt(moment.utc(startDate).format('D'), 10) === dayOfMonth;
+            = parseInt(startDate.format('D'), 10) === dayOfMonth;
 
         return isStartDayEqualToDayOfMonth
             ? [ startDate ].concat(
-                moment.utc(startDate)
+                startDate
                       .recur()
                       .every(dayOfMonth)
                       .daysOfMonth()
                       .next(monthOccurances - 1)
             )
-            : moment.utc(startDate)
+            : startDate
                   .recur()
                   .every(dayOfMonth)
                   .daysOfMonth()
                   .next(monthOccurances);
     }
-    const recurrence = moment.utc(startDate)
+    const recurrence = startDate
             .recur()
             .every(monthlyByWeekDay)
             .daysOfWeek()
             .every(monthlyByPosition)
             .weeksOfMonthByDay()
             .next(monthOccurances);
-    const startDateFromRecurrence = moment.utc(startDate)
+    const startDateFromRecurrence = startDate
             .recur(recurrence[0])
             .every(monthlyByWeekDay)
             .daysOfWeek()
@@ -124,13 +123,12 @@ export const getRecurringMonthlyEventsByOccurance = ({
             .weeksOfMonthByDay()
             .all()[0];
 
-    const isStartDayEqualToStartDateFromRecurrence = moment.utc(
-            startDate
-    ).isSame(startDateFromRecurrence, 'day');
+    const isStartDayEqualToStartDateFromRecurrence
+            = startDate.isSame(startDateFromRecurrence, 'day');
 
     return isStartDayEqualToStartDateFromRecurrence
         ? [ startDate ].concat(
-            moment.utc(startDate)
+                startDate
                       .recur()
                       .every(monthlyByWeekDay)
                       .daysOfWeek()
@@ -153,7 +151,7 @@ export const getRecurringMonthlyEventsByEndDate = ({
 }) => {
     if (monthlyBy === 'monthlyByDay') {
         return endDate
-            ? moment.utc(startDate)
+            ? startDate
                   .recur(endDate)
                   .every(dayOfMonth)
                   .daysOfMonth()
@@ -169,7 +167,7 @@ export const getRecurringMonthlyEventsByEndDate = ({
     }
 
     return endDate
-        ? moment.utc(startDate)
+        ? startDate
                   .recur(endDate)
                   .every(monthlyByWeekDay)
                   .daysOfWeek()
@@ -185,4 +183,59 @@ export const getRecurringMonthlyEventsByEndDate = ({
             monthlyByPosition
         });
 
+};
+
+// Removes timezone DST offset from date for recurring meetings.
+export const removeDstOffsetTimezoneTime = (date, timezone) => {
+    const isDST = momentTZ.tz(date, timezone).isDST();
+
+    if (!isDST) {
+        return momentTZ.tz(date, timezone);
+    }
+    const timezoneOffset = getOffsetDelta(timezone);
+
+    return momentTZ.tz(date, timezone)
+        .clone()
+        .subtract(timezoneOffset, 'minutes');
+};
+
+// Adds timezone DST offset from date for recurring meetings.
+export const addDstOffsetTimezoneTime = (date, timezone) => {
+    const isDST = momentTZ.tz(date, timezone).isDST();
+
+    if (isDST) {
+        return momentTZ.tz(date, timezone).utc();
+    }
+    const timezoneOffset = getOffsetDelta(timezone);
+
+    return momentTZ.tz(date, timezone)
+        .clone()
+        .add(timezoneOffset, 'minutes');
+};
+
+/**
+ * Return the current timezone difference in UTC offsets
+ * between Jan 1 and Jun 1 of the current year.
+ * No DST transitions will occur anywhere in the world on these two dates.
+ *
+ * @param {string} tz - Timezone.
+ * @returns {number} - Returns delta in minutes.
+ */
+function getOffsetDelta(tz) {
+    const janOffset = moment.tz({ month: 0,
+        day: 1 }, tz).utcOffset();
+    const junOffset = moment.tz({ month: 5,
+        day: 1 }, tz).utcOffset();
+
+    return Math.abs(junOffset - janOffset);
+}
+
+// Returns time by selected time and timezone
+export const getDateByLocalTimeAndTimezone = (date, timeZone) => {
+    const t = moment(date)
+        .clone()
+        .format()
+        .slice(0, 19);
+
+    return momentTZ.tz(t, timeZone);
 };
