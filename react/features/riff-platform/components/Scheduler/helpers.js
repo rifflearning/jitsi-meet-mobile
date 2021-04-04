@@ -108,6 +108,7 @@ export const getRecurringMonthlyEventsByOccurance = ({
                   .daysOfMonth()
                   .next(monthOccurances);
     }
+
     const recurrence = startDate
             .recur()
             .every(monthlyByWeekDay)
@@ -190,11 +191,11 @@ export const removeDstOffsetTimezoneTime = (date, timezone) => {
     const isDST = momentTZ.tz(date, timezone).isDST();
 
     if (!isDST) {
-        return momentTZ.tz(date, timezone);
+        return date;
     }
     const timezoneOffset = getOffsetDelta(timezone);
 
-    return momentTZ.tz(date, timezone)
+    return moment(date)
         .clone()
         .subtract(timezoneOffset, 'minutes');
 };
@@ -204,11 +205,11 @@ export const addDstOffsetTimezoneTime = (date, timezone) => {
     const isDST = momentTZ.tz(date, timezone).isDST();
 
     if (isDST) {
-        return momentTZ.tz(date, timezone).utc();
+        return date;
     }
     const timezoneOffset = getOffsetDelta(timezone);
 
-    return momentTZ.tz(date, timezone)
+    return moment(date)
         .clone()
         .add(timezoneOffset, 'minutes');
 };
@@ -231,7 +232,7 @@ function getOffsetDelta(tz) {
 }
 
 // Returns time by selected time and timezone
-export const getDateByLocalTimeAndTimezone = (date, timeZone) => {
+export const getDateByTimeAndTimezone = (date, timeZone) => {
     const t = moment(date)
         .clone()
         .format()
