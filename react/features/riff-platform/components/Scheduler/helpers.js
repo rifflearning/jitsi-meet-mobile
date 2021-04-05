@@ -186,51 +186,6 @@ export const getRecurringMonthlyEventsByEndDate = ({
 
 };
 
-// Removes timezone DST offset from date for recurring meetings.
-export const removeDstOffsetTimezoneTime = (date, timezone) => {
-    const isDST = momentTZ.tz(date, timezone).isDST();
-
-    if (!isDST) {
-        return date;
-    }
-    const timezoneOffset = getOffsetDelta(timezone);
-
-    return moment(date)
-        .clone()
-        .subtract(timezoneOffset, 'minutes');
-};
-
-// Adds timezone DST offset from date for recurring meetings.
-export const addDstOffsetTimezoneTime = (date, timezone) => {
-    const isDST = momentTZ.tz(date, timezone).isDST();
-
-    if (isDST) {
-        return date;
-    }
-    const timezoneOffset = getOffsetDelta(timezone);
-
-    return moment(date)
-        .clone()
-        .add(timezoneOffset, 'minutes');
-};
-
-/**
- * Return the current timezone difference in UTC offsets
- * between Jan 1 and Jun 1 of the current year.
- * No DST transitions will occur anywhere in the world on these two dates.
- *
- * @param {string} tz - Timezone.
- * @returns {number} - Returns delta in minutes.
- */
-function getOffsetDelta(tz) {
-    const janOffset = moment.tz({ month: 0,
-        day: 1 }, tz).utcOffset();
-    const junOffset = moment.tz({ month: 5,
-        day: 1 }, tz).utcOffset();
-
-    return Math.abs(junOffset - janOffset);
-}
-
 // Returns time by selected time and timezone
 export const getDateByTimeAndTimezone = (date, timeZone) => {
     const t = moment(date)

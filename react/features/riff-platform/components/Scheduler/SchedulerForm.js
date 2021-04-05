@@ -76,6 +76,9 @@ const useStyles = makeStyles(theme => {
         },
         timezoneList: {
             maxWidth: '260px'
+        },
+        datePickerInput: {
+            color: 'white !important'
         }
     };
 });
@@ -263,7 +266,8 @@ const setCorrectTimeToDate = (correctD, d, timezone) => {
     const m = correctD.minutes();
 
     return getDateByTimeAndTimezone(d, timezone).set('hour', h)
-    .set('minute', m);
+        .set('minute', m)
+        .toISOString();
 };
 
 const SchedulerForm = ({
@@ -455,7 +459,7 @@ const SchedulerForm = ({
             };
 
             if (endDateBy === 'endDateTime') {
-                const endDateCorrectTime = setCorrectTimeToDate(date, endDate, timezone).toISOString();
+                const endDateCorrectTime = setCorrectTimeToDate(date, endDate, timezone);
 
                 recurrenceOptions.dateEnd = endDateCorrectTime;
             } else {
@@ -543,7 +547,7 @@ const SchedulerForm = ({
     };
 
     // Passing true will change the time zone without changing the current time.
-    // WE need it for correct reccuring dates.
+    // We need it for correct reccuring dates.
     useEffect(() => {
         if (endDateBy === 'endDateTime') {
             const recurrence = calculateRecurringByEndDate({
@@ -771,6 +775,11 @@ const SchedulerForm = ({
                                         setChangesMadeByUserActions(true);
                                         setDateByTimezone(d, timezone);
                                     } }
+                                    InputProps = {{ readOnly: true,
+                                        classes: {
+                                            input: classes.datePickerInput
+                                        }
+                                    }}
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change date'
                                     }} />
@@ -783,6 +792,11 @@ const SchedulerForm = ({
                                     label = 'Time'
                                     value = { date }
                                     onChange = { d => setDateByTimezone(d, timezone) }
+                                    InputProps = {{ readOnly: true,
+                                        classes: {
+                                            input: classes.datePickerInput
+                                        }
+                                    }}
                                     KeyboardButtonProps = {{
                                         'aria-label': 'change time'
                                     }} />
@@ -1129,6 +1143,11 @@ const SchedulerForm = ({
                                         label = 'End Date'
                                         value = { endDate || date }
                                         onChange = { d => setEndDate(d) }
+                                        InputProps = {{ readOnly: true,
+                                            classes: {
+                                                input: classes.datePickerInput
+                                            }
+                                        }}
                                         KeyboardButtonProps = {{
                                             'aria-label': 'change date'
                                         }} />
