@@ -9,7 +9,7 @@ Scheduler functionality:
 
 - user can set 'Allow anonymous users' option which allows anonymous users to join the meeting;
 - user can set multiple numbers of rooms for one meeting;
-- meeting can be edited. In edit case, the current meeting is removed and created one new. If one occurrence is edited we pass the current `roomId`.
+- meeting can be edited. In edit case, the current meeting is removed and created one new. If one occurrence is edited we pass the current `roomId` and recurrence options to new meeting.
 
 Dates are stored in UTC time in database. Client uses time by timezone using function which set defined timezone to date:
 ```
@@ -35,7 +35,9 @@ In editing case meeting timezone is set to all date;
 1. For testing DST we need to schedule recurring meetings when DST starts or DST ends. 
 
 ***Result:***  we will have all recurring meetings have the same time.
+
 ***Example***: *11/07/2021 in USA  DST ends and if we have recurring meetings from 11/06/2021 to 11/08/2021 at 9 PM  and America/New_York timezone. Meetings have to be at 9 PM. If your local timezone has another DST date you will see a different time between 11/06/2021 and 11/07/2021*
+
 If you create 2 meetings with the same time(hh:mm) but different dates(dd:hh:mm) - DST/non DST will not make any difference in for time(hh:mm) for the meeting.
 
 2. To test weekly and monthly meetings recurrence:
