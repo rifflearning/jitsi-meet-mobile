@@ -90,8 +90,6 @@ const MeetingsRow = ({
         setisOpenDeleteDialog(false);
     };
 
-    // const isDstInTimezone = moment(moment(meeting?.dateStart), meeting?.timezone).isDST();
-
     const durationTime = meeting?.timezone
         ? formatDurationTime(momentTZ.tz(meeting.dateStart, meeting.timezone),
         momentTZ.tz(meeting.dateEnd, meeting.timezone))

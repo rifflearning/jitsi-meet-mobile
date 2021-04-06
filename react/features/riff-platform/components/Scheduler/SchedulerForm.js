@@ -226,6 +226,7 @@ const getDaysOfWeekObj = ({ daysOfWeekArr, selectedDaysOfWeekArr }) => daysOfWee
     return acc;
 }, {});
 
+// Returns start/end dates for recurring meetings with correct time by timezone in the ISO format.
 const getRecurringDatesWithTime = ({ dates, startDate, duration, timezone }) => {
 
     const hStart = startDate.hours();
@@ -261,6 +262,7 @@ const getMeetingDuration = ({ dateStart, dateEnd }) => {
         durationM };
 };
 
+// Sets date correct time by timezone, returns date in the ISO format.
 const setCorrectTimeToDate = (correctD, d, timezone) => {
     const h = correctD.hours();
     const m = correctD.minutes();
@@ -547,7 +549,8 @@ const SchedulerForm = ({
     };
 
     // Passing true will change the time zone without changing the current time.
-    // We need it for correct reccuring dates.
+    // We need it for correct reccuring dates using moment-recur.
+    // moment-recur handles dates only, time information is discarded.
     useEffect(() => {
         if (endDateBy === 'endDateTime') {
             const recurrence = calculateRecurringByEndDate({
