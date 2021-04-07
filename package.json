@@ -87,6 +87,7 @@
     "moment": "^2.29.1",
     "moment-duration-format": "2.2.2",
     "moment-recur": "^1.0.7",
+    "moment-timezone": "^0.5.33",
     "pixelmatch": "5.1.0",
     "react": "16.9",
     "react-dom": "16.9",
