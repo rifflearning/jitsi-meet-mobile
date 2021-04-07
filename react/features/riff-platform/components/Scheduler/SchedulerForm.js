@@ -78,7 +78,9 @@ const useStyles = makeStyles(theme => {
             maxWidth: '260px'
         },
         datePickerInput: {
-            color: 'white !important'
+            '&:read-only': {
+                color: '#ffffff'
+            }
         }
     };
 });
