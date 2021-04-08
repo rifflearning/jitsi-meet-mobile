@@ -62,6 +62,10 @@ body > .tooltip {
     box-sizing: border-box;
 }
 
+.videocontainer__toolbar {
+    background-image: linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));
+}
+
 // fix bottom difference between indicators for using text-overflow: ellipsis
 .indicator-container {
     overflow: hidden;
