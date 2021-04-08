@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 
 import { getLocalParticipant, getParticipantById, PARTICIPANT_ROLE } from '../../../base/participants';
 import { connect } from '../../../base/redux';
+import DisplayParticipantNameIndicator from '../../../riff-platform/components/DisplayParticipantNameIndicator';
 import { getCurrentLayout, LAYOUTS } from '../../../video-layout';
 
 import AudioMutedIndicator from './AudioMutedIndicator';
@@ -79,6 +80,10 @@ class StatusIndicators extends Component<Props> {
             <div>
                 { showAudioMutedIndicator ? <AudioMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
                 { showVideoMutedIndicator ? <VideoMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
+                <DisplayParticipantNameIndicator
+                    participantId = { this.props.participantID }
+                    tileView = { _currentLayout }
+                    tooltipPosition = { tooltipPosition } />
                 { _showModeratorIndicator ? <ModeratorIndicator tooltipPosition = { tooltipPosition } /> : null }
             </div>
         );
