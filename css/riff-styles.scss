@@ -61,3 +61,59 @@ body > .tooltip {
     width: 50% !important;
     box-sizing: border-box;
 }
+
+.videocontainer__toolbar {
+    background-image: linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));
+}
+
+// fix bottom difference between indicators for using text-overflow: ellipsis
+.indicator-container {
+    overflow: hidden;
+}
+
+.indicator-container:nth-child(1) .username-indicator {
+    margin-left: 0;
+}
+
+.username-indicator-container {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+    
+    &.username-indicator-filmstrip-view {
+        float: left !important;
+
+        .username-indicator {
+            margin-left: 10px;
+        }
+    }
+
+    div {
+        display: inline;
+    }
+}
+
+#localVideoContainer {
+
+    .username-indicator-filmstrip-view .username-indicator {
+        margin-left: 0;
+    }
+}
+
+.username-indicator {
+    font-size: 8pt;
+    text-align: center;
+    color: #fff;
+    width: 12px;
+    line-height: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    margin: 0 5px 0 5px;
+}
+
+// Participant name by default always show on video container
+// in order to improve the user experience.  
+.displayNameContainer {
+  display: none;
+}
