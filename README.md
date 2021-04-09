@@ -177,7 +177,8 @@ In order to customize *jitsi-meet* with riff theme, all features and set up a ne
     }
     disableDeepLinking: true,
     localRecording: {
-        enabled: true
+        enabled: true,
+        format: 'webm'
     },
     ```
     Also optional flags:
