@@ -1,5 +1,7 @@
 // @flow
 
+import EmotionsIcon from '@material-ui/icons/EmojiEmotions';
+
 import {
     createToolbarEvent,
     sendAnalytics
@@ -56,7 +58,7 @@ export type Props = AbstractButtonProps & {
  */
 export default class AbstractRecordButton<P: Props> extends AbstractButton<P, *> {
     accessibilityLabel = 'toolbar.accessibilityLabel.recording';
-    icon = IconToggleRecording;
+    icon = EmotionsIcon;
     label = 'dialog.startRecording';
     toggledLabel = 'dialog.stopRecording';
 
