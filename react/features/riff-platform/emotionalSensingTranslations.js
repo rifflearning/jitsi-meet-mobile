@@ -13,7 +13,7 @@ export default {
         limitNotificationDescriptionNative: 'Due to high demand your emotional sensing will be limited to {{limit}} min. For unlimited emotional sensings try <3>{{app}}</3>.',
         availableSpace: 'Available space: {{spaceLeft}} MB (approximately {{duration}} minutes of emotional sensing)',
         busy: 'We\'re working on freeing emotional sensing resources. Please try again in a few minutes.',
-        busyTitle: 'All emotional sensings are currently busy',
+        busyTitle: 'All emotional sensing services are currently busy',
         error: 'Emotional sensing failed. Please try again.',
         expandedOff: 'Emotional sensing has stopped',
         expandedOn: 'The meeting is currently being recorded.',
