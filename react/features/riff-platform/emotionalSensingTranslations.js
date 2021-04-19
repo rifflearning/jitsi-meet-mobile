@@ -4,8 +4,8 @@ export default {
         recording: 'Emotional sensing',
         recordingDisabledForGuestTooltip: 'Guests can\'t start emotional sensing.',
         recordingDisabledTooltip: 'Start emotional sensing disabled.',
-        startRecording: 'Start emotional sensing',
-        stopRecording: 'Stop emotional sensing',
+        startRecording: 'Start Emotional sensing',
+        stopRecording: 'Stop Emotional sensing',
         stopRecordingWarning: 'Are you sure you would like to stop the emotional sensing?'
     },
     recording: {
