@@ -40,13 +40,13 @@ export default ({ data = [] }) => {
 
     try {
       const res = await api.fetchUserNames(arrUids);
-      const arrData = res.map(({ _id, name }) => ({ id: _id, name, data: dataFormatted[id] }));
+      const arrData = res.map(({ _id, name }) => ({ id: _id, name, data: dataFormatted[_id] }));
       setGraphData(arrData);
     } catch (error) {
       console.error('Error in fetchUserNames', error);
       setGraphData([]);
     }
-  }
+  };
 
   useEffect(() => {
     mapUserNamesToData();
