@@ -26,10 +26,17 @@ export default ({ data = [] }) => {
   const mapUserNamesToData = async () => {
     // emotions data reduced by users: { [userId]: [arrayOfData] }
     const dataFormatted = data.reduce((acc, el) => {
+        // for correct timeline we need time in unix format
+        // for correct tooltip info each line has to have unique dataKey
+        const elFormatted = {
+          ...el, 
+          timestamp: new Date(el.timestamp).getTime(),
+          [`classification-${el.participant_id}`]: el.classification
+        };
       if(acc[el.participant_id]){
-        acc[el.participant_id].push(el);
+        acc[el.participant_id].push(elFormatted);
       } else {
-        acc[el.participant_id] = [el];
+        acc[el.participant_id] = [elFormatted];
       }
       return acc;
     }, {});
@@ -59,7 +66,10 @@ export default ({ data = [] }) => {
         >
           <XAxis
             dataKey="timestamp"
-            tickFormatter={el => new Date(el).toLocaleTimeString()} />
+            tickFormatter={el => new Date(el).toLocaleTimeString()} 
+            type='number'
+            domain={["dataMin", "dataMax"]}
+            />
           <YAxis
             padding={{ bottom: 10, top: 10 }}
             domain={[ -1, 1 ]}
@@ -72,7 +82,7 @@ export default ({ data = [] }) => {
           <Legend />
           {graphData.map((user, i) => (
             <Line dot={false}
-              dataKey="classification"
+              dataKey={`classification-${user.id}`}
               data={user.data}
               name={user.name || user.id}
               key={user.id}
