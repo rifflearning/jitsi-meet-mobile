@@ -18,4 +18,25 @@ frames via a message bus to various subscribers.
 * ![JitsiTrackError](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api#jitsitrackerror)
 
 
+### Build
+>NOTE: you need Node.js >= 12 and npm >= 6
+
+To build the library, just type:
+```sh
+npm install
+```
+
+To lint:
+
+npm run lint
+
+and to run unit tests:
+
+npm test
+
+if you need to rebuild lib-jitsi-meet.min.js
+
+npm run postinstall
+
+Both linting and units will also be done by a pre-commit hook.
 
