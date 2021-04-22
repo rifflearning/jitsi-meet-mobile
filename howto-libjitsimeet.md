@@ -47,6 +47,11 @@ npm run postinstall
 
 Both linting and units will also be done by a pre-commit hook.
 
+### Further reading
+
 ![lib-jitsi-meet Handbook](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-web)
+![lib-jitsi-meet low level APIs](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api)
+
+
 
 
