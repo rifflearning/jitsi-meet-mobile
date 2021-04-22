@@ -11,7 +11,7 @@ frames via a message bus to various subscribers.
 
 ## lib-jitsi-meet internals
 ### Components
-* JitsiMeetJS
+* ![JitsiMeetJS}(https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api#jitsimeetjs)
 * JitsiConnection
 * JitsiConference
 * JitsiTrack
