@@ -9,4 +9,11 @@ frames via a message bus to various subscribers.
 
 ![Image](https://github.com/rifflearning/riff-jitsi-platform/blob/main/docs/Jitsi-Meet-Pipeline.png)
 
+## lib-jitsi-meet internals
+### Components
+* JitsiMeetJS
+* JitsiConnection
+* JitsiConference
+* JitsiTrack
+* JitsiTrackError
 
