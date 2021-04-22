@@ -7,6 +7,6 @@ with a custom GUI.
 We intend to build a media capturing component which connects to a vidoebridge as an hidden user to aquire media tracks (video and audio) and distribute the media 
 frames via a message bus to various subscribers.
 
-![GitHub Logo](../riff-jitsi-platform/blob/main/docs/deployment/Emotional%20sensing.png)
+![Image](https://github.com/rifflearning/riff-jitsi-platform/blob/main/docs/Jitsi-Meet-Pipeline.png)
 
-![Image](https://github.com/rifflearning/riff-jitsi-platform/blob/main/docs/deployment/Emotional%20sensing.png)
+
