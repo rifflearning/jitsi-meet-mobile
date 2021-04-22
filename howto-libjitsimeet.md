@@ -19,6 +19,10 @@ frames via a message bus to various subscribers.
 
 
 ### Build
+
+#### Source Code
+![GitHub lib-jitsi-meet](https://github.com/jitsi/lib-jitsi-meet)
+
 >NOTE: you need Node.js >= 12 and npm >= 6
 
 To build the library, just type:
@@ -27,16 +31,22 @@ npm install
 ```
 
 To lint:
-
+```sh
 npm run lint
+```
 
 and to run unit tests:
-
+```sh
 npm test
+```
 
 if you need to rebuild lib-jitsi-meet.min.js
-
+```sh
 npm run postinstall
+```
 
 Both linting and units will also be done by a pre-commit hook.
+
+![lib-jitsi-meet Handbook](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-web)
+
 
