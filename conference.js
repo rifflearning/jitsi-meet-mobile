@@ -1854,6 +1854,7 @@ export default {
         if (this.videoSwitchInProgress) {
             return Promise.reject('Switch in progress.');
         }
+        const didHaveVideo = !this.isLocalVideoMuted();
 
         this.videoSwitchInProgress = true;
 
@@ -1888,6 +1889,12 @@ export default {
                 }
                 sendAnalytics(createScreenSharingEvent('started'));
                 logger.log('Screen sharing started');
+
+                // if there was a camera video being used, before switching to screen sharing,
+                // show presenter video
+                if (didHaveVideo) {
+                    this.muteVideo(false);
+                }
             })
             .catch(error => {
                 this.videoSwitchInProgress = false;
