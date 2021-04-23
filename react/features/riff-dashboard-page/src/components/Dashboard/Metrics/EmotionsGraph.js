@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import api from '../../../../../riff-platform/api';
 
@@ -26,10 +26,15 @@ export default ({ data = [] }) => {
   const mapUserNamesToData = async () => {
     // emotions data reduced by users: { [userId]: [arrayOfData] }
     const dataFormatted = data.reduce((acc, el) => {
+        // for correct timeline we need time in unix format
+        const elFormatted = {
+          ...el, 
+          timestamp: new Date(el.timestamp).getTime()
+        };
       if(acc[el.participant_id]){
-        acc[el.participant_id].push(el);
+        acc[el.participant_id].push(elFormatted);
       } else {
-        acc[el.participant_id] = [el];
+        acc[el.participant_id] = [elFormatted];
       }
       return acc;
     }, {});
@@ -40,13 +45,13 @@ export default ({ data = [] }) => {
 
     try {
       const res = await api.fetchUserNames(arrUids);
-      const arrData = res.map(({ _id, name }) => ({ id: _id, name, data: dataFormatted[id] }));
+      const arrData = res.map(({ _id, name }) => ({ id: _id, name, data: dataFormatted[_id] }));
       setGraphData(arrData);
     } catch (error) {
       console.error('Error in fetchUserNames', error);
       setGraphData([]);
     }
-  }
+  };
 
   useEffect(() => {
     mapUserNamesToData();
@@ -58,12 +63,16 @@ export default ({ data = [] }) => {
           margin={{left: 20, right: 20, top: 50, bottom: 5}}
         >
           <XAxis
-            dataKey="timestamp"
-            tickFormatter={el => new Date(el).toLocaleTimeString()} />
+            allowDuplicatedCategory={false}
+            dataKey='timestamp'
+            tickFormatter={el => new Date(el).toLocaleTimeString()} 
+            type='number'
+            domain={['dataMin', 'dataMax']}
+            />
           <YAxis
             padding={{ bottom: 10, top: 10 }}
             domain={[ -1, 1 ]}
-            dataKey="classification"
+            dataKey='classification'
             tickCount={3}
             tickFormatter={el => el > 0 ? 'Positive' : el < 0 ? 'Negative' : 'Neutral'} />
           <Tooltip
@@ -71,8 +80,9 @@ export default ({ data = [] }) => {
             labelFormatter={el => new Date(el).toLocaleTimeString()} />
           <Legend />
           {graphData.map((user, i) => (
-            <Line dot={false}
-              dataKey="classification"
+            <Line 
+              dot={false}
+              dataKey='classification'
               data={user.data}
               name={user.name || user.id}
               key={user.id}
