@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import api from '../../../../../riff-platform/api';
 
@@ -27,11 +27,9 @@ export default ({ data = [] }) => {
     // emotions data reduced by users: { [userId]: [arrayOfData] }
     const dataFormatted = data.reduce((acc, el) => {
         // for correct timeline we need time in unix format
-        // for correct tooltip info each line has to have unique dataKey
         const elFormatted = {
           ...el, 
-          timestamp: new Date(el.timestamp).getTime(),
-          [`classification-${el.participant_id}`]: el.classification
+          timestamp: new Date(el.timestamp).getTime()
         };
       if(acc[el.participant_id]){
         acc[el.participant_id].push(elFormatted);
@@ -65,15 +63,16 @@ export default ({ data = [] }) => {
           margin={{left: 20, right: 20, top: 50, bottom: 5}}
         >
           <XAxis
-            dataKey="timestamp"
+            allowDuplicatedCategory={false}
+            dataKey='timestamp'
             tickFormatter={el => new Date(el).toLocaleTimeString()} 
             type='number'
-            domain={["dataMin", "dataMax"]}
+            domain={['dataMin', 'dataMax']}
             />
           <YAxis
             padding={{ bottom: 10, top: 10 }}
             domain={[ -1, 1 ]}
-            dataKey="classification"
+            dataKey='classification'
             tickCount={3}
             tickFormatter={el => el > 0 ? 'Positive' : el < 0 ? 'Negative' : 'Neutral'} />
           <Tooltip
@@ -81,8 +80,9 @@ export default ({ data = [] }) => {
             labelFormatter={el => new Date(el).toLocaleTimeString()} />
           <Legend />
           {graphData.map((user, i) => (
-            <Line dot={false}
-              dataKey={`classification-${user.id}`}
+            <Line 
+              dot={false}
+              dataKey='classification'
               data={user.data}
               name={user.name || user.id}
               key={user.id}
