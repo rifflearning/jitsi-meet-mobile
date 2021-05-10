@@ -68,7 +68,7 @@ const getSpikes = (data, userData) => {
   let lowSpike = [];
   data.map(el => {
     const date = moment(el.timestamp).format('HH:mm:ss');
-    const sameTime = userData  && userData.find(el => moment(el.timestamp).format('HH:mm:ss') == date);
+    const sameTime = userData && userData.find(el => moment(el.timestamp).format('HH:mm:ss') == date);
 
     if (sameTime) {
       if (sameTime.classification >= el.area[1]) {
@@ -92,7 +92,7 @@ function getMinMax(arr) {
   let min = arr[0];
   let max = arr[0];
   let i = arr.length;
-    
+
   while (i--) {
     min = arr[i] < min ? arr[i] : min;
     max = arr[i] > max ? arr[i] : max;
@@ -101,7 +101,7 @@ function getMinMax(arr) {
 }
 
 export default ({ data = [], participantId }) => {
-  const [bandsData, setBandsData] = useState([]); 
+  const [bandsData, setBandsData] = useState([]);
   const [currentUserData, setCurrentUserData] = useState([])
   const [spikes, setSpikes] = useState([]);
   const [domainY, setDomainY] = useState({})
@@ -142,16 +142,16 @@ export default ({ data = [], participantId }) => {
 
   const renderCusomizedLegend = ({ payload }) => {
     const renderedPayload = payload.find(el => el.value === 'Your Emotion');
-    const { color, value } = renderedPayload
+    const { value } = renderedPayload;
     return (
       <>
         <Surface width={10} height={10}>
-          <Symbols cx={5} cy={5} type='square' size={50} fill={color} />
+          <Symbols cx={5} cy={5} size={50} fill="url(#emotionLegend)" />
         </Surface>
         <span >{value}</span>
       </>
     )
-}
+  }
 
   return (
     <ResponsiveContainer height={300}>
@@ -159,12 +159,19 @@ export default ({ data = [], participantId }) => {
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
         <defs>
-        <linearGradient id="emotion" x1="0%" y1="100%" x2="0%" y2="0%" gradientUnits="userSpaceOnUse">  
-            <stop offset="0%" stopColor="#540d6e" />
+          <linearGradient id="emotionLegend" gradientTransform="rotate(90)">
+            <stop offset="5%" stopColor="#ffdd21" />
+            <stop offset="75%" stopColor="#ff1a1a" />
+            <stop offset="100%" stopColor="#540d6e" />
+          </linearGradient>
+        </defs>
+        <defs>
+          <linearGradient id="emotion" x1="0%" y1="100%" x2="0%" y2="0%" gradientUnits="userSpaceOnUse">
+            <stop offset="25%" stopColor="#540d6e" />
             <stop offset="35%" stopColor="#c14bbb" />
             <stop offset="50%" stopColor="#ff1a1a" />
             <stop offset="65%" stopColor="#ff8317" />
-            <stop offset="100%" stopColor="#ffdd21" />
+            <stop offset="75%" stopColor="#ffdd21" />
           </linearGradient>
         </defs>
         <YAxis
