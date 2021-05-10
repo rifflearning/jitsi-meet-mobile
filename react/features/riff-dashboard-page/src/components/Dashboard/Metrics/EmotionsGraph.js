@@ -172,17 +172,17 @@ export default ({ data = [], participantId }) => {
         </defs>
         <defs>
           <linearGradient id="emotion" x1="0%" y1="100%" x2="0%" y2="0%" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#540d6e" />
+            <stop offset="5%" stopColor="#540d6e" />
             <stop offset="35%" stopColor="#983493" />
             <stop offset="50%" stopColor="#ff1a1a" />
             <stop offset="65%" stopColor="#ff8317" />
-            <stop offset="100%" stopColor="#ffdd21" />
+            <stop offset="95%" stopColor="#ffdd21" />
           </linearGradient>
         </defs>
         <YAxis
           padding={{ bottom: 10, top: 10 }}
           ticks={[-1, 0, 1]}
-          domain={[domainY.min - 0.1, domainY.max + 0.1]}
+          domain={[domainY.min, domainY.max]}
           tickFormatter={el => el > 0 ? 'Positive' : el < 0 ? 'Negative' : 'Neutral'} />
         <XAxis
           allowDuplicatedCategory={false}
@@ -192,7 +192,7 @@ export default ({ data = [], participantId }) => {
           tickFormatter={(unixTime) => moment(unixTime).format('h:mm A')}
           type='number'
         />
-        {/* <CartesianGrid strokeDasharray="3 3" /> */}
+       {/* <CartesianGrid strokeDasharray="3 3" />  */}
         {/* <Tooltip /> */}
         <Legend content={renderCusomizedLegend} />
         <Line
@@ -228,7 +228,7 @@ export default ({ data = [], participantId }) => {
           fillOpacity="0.6"
         />
         {/* for scatter size */}
-        <ZAxis range={[30, 30]} />
+        <ZAxis range={[40, 40]} />
         <Scatter
           data={spikes}
           dataKey='classification'
