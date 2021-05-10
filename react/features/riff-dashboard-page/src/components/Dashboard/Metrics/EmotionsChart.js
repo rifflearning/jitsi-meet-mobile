@@ -192,7 +192,7 @@ class EmotionsChart extends React.Component {
                 {emptyGraphText}
                 <div
                     className='amcharts-graph-container'>
-                    <EmotionsGraph data={this.state.emotionsData} />
+                    <EmotionsGraph data={this.state.emotionsData} participantId={this.props.participantId}/>
                 </div>
 
                 {/* {this.state.updatedLegendAt !== null &&
