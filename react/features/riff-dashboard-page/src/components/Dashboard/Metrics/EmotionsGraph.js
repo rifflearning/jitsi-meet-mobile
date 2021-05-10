@@ -192,7 +192,7 @@ export default ({ data = [], participantId }) => {
           tickFormatter={(unixTime) => moment(unixTime).format('h:mm A')}
           type='number'
         />
-       {/* <CartesianGrid strokeDasharray="3 3" />  */}
+        {/* <CartesianGrid strokeDasharray="3 3" />  */}
         {/* <Tooltip /> */}
         <Legend content={renderCusomizedLegend} />
         <Line
