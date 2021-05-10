@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   Scatter,
   Surface,
-  Symbols
+  Symbols,
+  ZAxis
 } from 'recharts';
 import api from '../../../../../riff-platform/api';
 import moment from 'moment'
@@ -66,22 +67,24 @@ const getSpikes = (data, userData) => {
   //for future use
   let highSpike = [];
   let lowSpike = [];
-  data.map(el => {
+  userData.forEach(el => {
     const date = moment(el.timestamp).format('HH:mm:ss');
-    const sameTime = userData && userData.find(el => moment(el.timestamp).format('HH:mm:ss') == date);
+    const sameTimeArr = data.filter(el => moment(el.timestamp).format('HH:mm:ss') === date);
 
-    if (sameTime) {
-      if (sameTime.classification >= el.area[1]) {
-        highSpike.push({
-          timestamp: sameTime.timestamp,
-          classification: sameTime.classification
-        })
-      } else if (sameTime.classification <= el.area[0]) {
-        lowSpike.push({
-          timestamp: sameTime.timestamp,
-          classification: sameTime.classification
-        })
-      }
+    if (sameTimeArr.length) {
+      sameTimeArr.forEach(d => {
+        if (el.classification >= d.area[1]) {
+          highSpike.push({
+            timestamp: el.timestamp,
+            classification: el.classification
+          })
+        } else if (el.classification <= d.area[0]) {
+          lowSpike.push({
+            timestamp: el.timestamp,
+            classification: el.classification
+          })
+        }
+      })
     }
   }
   )
@@ -123,12 +126,14 @@ export default ({ data = [], participantId }) => {
     }, {});
 
     const bollingerBandsData = getBollingerBands(n, k, data);
-    const userData = dataFormatted[participantId];
+    const userData = dataFormatted[participantId] || [];
     const emotionSpikes = getSpikes(bollingerBandsData, userData);
-    const classificationArr = bollingerBandsData.length && userData ? bollingerBandsData
-      .map(el => el.area[0])
-      .concat(bollingerBandsData.map(el => el.area[1]))
-      .concat(userData.map(el => el.classification)) : [];
+    const classificationArr = bollingerBandsData.length && userData.length
+      ? bollingerBandsData
+        .map(el => el.area[0])
+        .concat(bollingerBandsData.map(el => el.area[1]))
+        .concat(userData.map(el => el.classification))
+      : [];
 
     setBandsData(bollingerBandsData)
     setCurrentUserData(userData);
@@ -141,7 +146,7 @@ export default ({ data = [], participantId }) => {
   }, [data, participantId])
 
   const renderCusomizedLegend = ({ payload }) => {
-    const renderedPayload = payload.find(el => el.value === 'Your Emotion');
+    const renderedPayload = payload.find(el => el.value === 'Your Emotion Area');
     const { value } = renderedPayload;
     return (
       <>
@@ -167,11 +172,11 @@ export default ({ data = [], participantId }) => {
         </defs>
         <defs>
           <linearGradient id="emotion" x1="0%" y1="100%" x2="0%" y2="0%" gradientUnits="userSpaceOnUse">
-            <stop offset="25%" stopColor="#540d6e" />
-            <stop offset="35%" stopColor="#c14bbb" />
+            <stop offset="0%" stopColor="#540d6e" />
+            <stop offset="35%" stopColor="#983493" />
             <stop offset="50%" stopColor="#ff1a1a" />
             <stop offset="65%" stopColor="#ff8317" />
-            <stop offset="75%" stopColor="#ffdd21" />
+            <stop offset="100%" stopColor="#ffdd21" />
           </linearGradient>
         </defs>
         <YAxis
@@ -214,7 +219,7 @@ export default ({ data = [], participantId }) => {
         <Area
           dot={false}
           dataKey='classification'
-          name="Your Emotion"
+          name="Your Emotion Area"
           data={currentUserData}
           dot={false}
           fill="url(#emotion)"
@@ -223,15 +228,14 @@ export default ({ data = [], participantId }) => {
           fillOpacity="0.6"
         />
         {/* for scatter size */}
-        {/* <ZAxis range={[100, 100]} /> */}
+        <ZAxis range={[30, 30]} />
         <Scatter
           data={spikes}
           dataKey='classification'
-          fill="#93759E"
           stroke="rgb(0, 157, 249)"
-          strokeWidth={1}
-          fillOpacity={0.25}
-          fill="rgb(0, 157, 249)" />
+          strokeWidth={0}
+          //fillOpacity={0.25}
+          fill="#58d0ee" />
       </ComposedChart>
     </ResponsiveContainer>
   );
