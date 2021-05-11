@@ -13,32 +13,15 @@ import {
   Symbols,
   ZAxis
 } from 'recharts';
-import api from '../../../../../riff-platform/api';
 import moment from 'moment'
-import * as d3 from "d3-array";
-
-// need to get appropriate colors from riff-dashboard?
-const colors = ['#f4b642', '#93759d', '#8884d8', '#e380a1'];
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
-function getColor(i) {
-  return colors[i] || getRandomColor();
-}
-
-const n = 20;
-const k = 2;
+import * as d3 from 'd3-array';
 
 function getBollingerBands(n, k, data) {
+  if (n >= data.length) {
+    return [];
+  }
   const bands = []; //{ ma: 0, area:[0, 0] }
-  for (var i = n - 1, len = data.length; i < len; i++) {
+  for (let i = n - 1, len = data.length; i < len; i++) {
     const slice = data.slice(i + 1 - n, i);
     const mean = d3.mean(slice, function (d) {
       return d.classification;
@@ -103,11 +86,14 @@ function getMinMax(arr) {
   return { min, max };
 }
 
+const n = 20;
+const k = 2;
+
 export default ({ data = [], participantId }) => {
   const [bandsData, setBandsData] = useState([]);
   const [currentUserData, setCurrentUserData] = useState([])
   const [spikes, setSpikes] = useState([]);
-  const [domainY, setDomainY] = useState({})
+  const [domainY, setDomainY] = useState({});
 
   const mapUserNamesToData = async () => {
     // emotions data reduced by users: { [userId]: [arrayOfData] }
@@ -143,18 +129,22 @@ export default ({ data = [], participantId }) => {
 
   useEffect(() => {
     mapUserNamesToData();
-  }, [data, participantId])
+  }, [data, participantId]);
 
   const renderCusomizedLegend = ({ payload }) => {
-    const renderedPayload = payload.find(el => el.value === 'Your Emotion Area');
-    const { value } = renderedPayload;
+    const renderedPayload = payload.filter(el => el.dataKey !== 'ma');
+
     return (
-      <>
-        <Surface width={10} height={10}>
-          <Symbols cx={5} cy={5} size={50} fill="url(#emotionLegend)" />
-        </Surface>
-        <span >{value}</span>
-      </>
+      <div className='amcharts-legend-container emotion-container'>
+        {renderedPayload.map((el, i) => (
+          <span key={i} className='emotion-item'>
+            <Surface width={20} height={20}>
+              <Symbols cx={10} cy={10} size={150} fill={el.value === 'Your Emotion Area' ? 'url(#emotionLegend)' : el.color} />
+            </Surface>
+            <span className='emotion-label' >{el.value}</span>
+          </span>
+        ))}
+      </div>
     )
   }
 
@@ -164,19 +154,19 @@ export default ({ data = [], participantId }) => {
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
         <defs>
-          <linearGradient id="emotionLegend" gradientTransform="rotate(90)">
-            <stop offset="5%" stopColor="#ffdd21" />
-            <stop offset="75%" stopColor="#ff1a1a" />
-            <stop offset="100%" stopColor="#540d6e" />
+          <linearGradient id='emotionLegend' gradientTransform='rotate(90)'>
+            <stop offset='5%' stopColor='#ffdd21' />
+            <stop offset='75%' stopColor='#ff1a1a' />
+            <stop offset='100%' stopColor='#540d6e' />
           </linearGradient>
         </defs>
         <defs>
-          <linearGradient id="emotion" x1="0%" y1="100%" x2="0%" y2="0%" gradientUnits="userSpaceOnUse">
-            <stop offset="5%" stopColor="#540d6e" />
-            <stop offset="35%" stopColor="#983493" />
-            <stop offset="50%" stopColor="#ff1a1a" />
-            <stop offset="65%" stopColor="#ff8317" />
-            <stop offset="95%" stopColor="#ffdd21" />
+          <linearGradient id='emotion' x1='0%' y1='100%' x2='0%' y2='0%' gradientUnits='userSpaceOnUse'>
+            <stop offset='5%' stopColor='#540d6e' />
+            <stop offset='35%' stopColor='#983493' />
+            <stop offset='50%' stopColor='#ff1a1a' />
+            <stop offset='65%' stopColor='#ff8317' />
+            <stop offset='95%' stopColor='#ffdd21' />
           </linearGradient>
         </defs>
         <YAxis
@@ -192,50 +182,51 @@ export default ({ data = [], participantId }) => {
           tickFormatter={(unixTime) => moment(unixTime).format('h:mm A')}
           type='number'
         />
-        {/* <CartesianGrid strokeDasharray="3 3" />  */}
+        {/* <CartesianGrid strokeDasharray='3 3' />  */}
         {/* <Tooltip /> */}
         <Legend content={renderCusomizedLegend} />
         <Line
           data={bandsData}
-          type="monotone"
-          dataKey="ma"
-          stroke="#93759E"
+          dataKey='ma'
+          stroke='#93759E'
           isAnimationActive={false}
           dot={false}
+          name='Average Emotion Line'
         />
         <Area
           data={bandsData}
-          dataKey="area"
-          fill="#93759E"
-          stroke="#93759E"
-          stroke="#93759E"
-          fill="#93759E"
-          fillOpacity="0.4"
-          legendType="line"
+          dataKey='area'
+          fill='#93759E'
+          stroke='#93759E'
+          stroke='#93759E'
+          fill='#93759E'
+          fillOpacity='0.4'
+          legendType='line'
           isAnimationActive={false}
           dot={false}
+          name='Participants Emotion Area'
         />
 
         <Area
-          dot={false}
           dataKey='classification'
-          name="Your Emotion Area"
+          name='Your Emotion Area'
           data={currentUserData}
           dot={false}
-          fill="url(#emotion)"
-          stroke="url(#emotion)"
-          strokeWidth="1px"
-          fillOpacity="0.6"
+          fill='url(#emotion)'
+          stroke='url(#emotion)'
+          strokeWidth='1px'
+          fillOpacity='0.6'
         />
         {/* for scatter size */}
         <ZAxis range={[40, 40]} />
         <Scatter
+          name='Your Emotion Spike'
           data={spikes}
           dataKey='classification'
-          stroke="rgb(0, 157, 249)"
+          //stroke='rgb(0, 157, 249)'
           strokeWidth={0}
           //fillOpacity={0.25}
-          fill="#58d0ee" />
+          fill='#58d0ee' />
       </ComposedChart>
     </ResponsiveContainer>
   );

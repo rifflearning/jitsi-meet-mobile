@@ -121,3 +121,22 @@ body > .tooltip {
 .large-video-labels .circular-label.file {
     background: #99ae90;
 }
+
+.emotion-container {
+    justify-content: center;
+
+    .emotion-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .emotion-label {
+        font-size: 14px;
+        line-height: 1.43;
+        color: #4a4a4a;
+        margin-left: 5px;
+        margin-right: 10px;
+        font-weight: 700;
+    }
+}
