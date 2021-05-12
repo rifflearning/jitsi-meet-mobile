@@ -105,9 +105,9 @@ export default ({ data = [], participantId }) => {
     const [bandsData, setBandsData] = useState([]);
     const [currentUserData, setCurrentUserData] = useState([])
     const [spikes, setSpikes] = useState([]);
-    const [domainY, setDomainY] = useState({});
+    const [domainY, setDomainY] = useState({min: -1, max: 1});
 
-    const mapUserNamesToData = async () => {
+    const mapUserNamesToData = () => {
         // emotions data reduced by users: { [userId]: [arrayOfData] }
         const dataFormatted = data.reduce((acc, el) => {
             // for correct timeline we need time in unix format
@@ -123,8 +123,12 @@ export default ({ data = [], participantId }) => {
             return acc;
         }, {});
 
-        const bollingerBandsData = getBollingerBands(n, k, data);
+        const arrUids = Object.keys(dataFormatted);
         const userData = dataFormatted[participantId] || [];
+        setCurrentUserData(userData);
+
+        if(arrUids.length > 1) {
+        const bollingerBandsData = getBollingerBands(n, k, data);
         const emotionSpikes = getSpikes(bollingerBandsData, userData);
         const classificationArr = bollingerBandsData.length && userData.length
             ? bollingerBandsData
@@ -134,9 +138,9 @@ export default ({ data = [], participantId }) => {
             : [];
 
         setBandsData(bollingerBandsData)
-        setCurrentUserData(userData);
         setSpikes(emotionSpikes)
         setDomainY(getMinMax(classificationArr))
+        }
     };
 
     useEffect(() => {
@@ -144,7 +148,7 @@ export default ({ data = [], participantId }) => {
     }, [data, participantId]);
 
     const renderCusomizedLegend = ({ payload }) => {
-        const renderedPayload = payload.filter(el => el.dataKey !== 'ma');
+        const renderedPayload = payload.filter(el => el.dataKey !== 'ma' && el.payload.data.length);
 
         return (
             <div className='amcharts-legend-container emotion-container'>
