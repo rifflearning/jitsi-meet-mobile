@@ -249,7 +249,7 @@ export default ({ data = [], participantId }) => {
                     fill='url(#emotion)'
                     stroke='url(#emotion)'
                     strokeWidth='1px'
-                    fillOpacity='0.6'
+                   // fillOpacity='0.6'
                 />
                 {/* for scatter size */}
                 <ZAxis range={[45, 45]} />
@@ -259,7 +259,11 @@ export default ({ data = [], participantId }) => {
                     dataKey='classification'
                     strokeWidth={0}
                     fill='#58d0ee' />
-                <ReferenceLine y={0} strokeWidth={2} strokeDasharray='3 3' />
+                <ReferenceLine
+                    y={0}
+                    strokeWidth={1}
+                    strokeDasharray='3 3'
+                    stroke='#716B74' />
             </ComposedChart>
         </ResponsiveContainer>
     );
