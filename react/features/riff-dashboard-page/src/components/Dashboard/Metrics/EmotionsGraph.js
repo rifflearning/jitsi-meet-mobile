@@ -146,8 +146,6 @@ export default ({ data = [], participantId }) => {
     const renderCusomizedLegend = ({ payload }) => {
         const renderedPayload = payload.filter(el => el.dataKey !== 'ma');
 
-        console.log('renderedPayload', renderedPayload)
-
         return (
             <div className='amcharts-legend-container emotion-container'>
                 {renderedPayload.map((el, i) => (
@@ -249,7 +247,7 @@ export default ({ data = [], participantId }) => {
                     fill='url(#emotion)'
                     stroke='url(#emotion)'
                     strokeWidth='1px'
-                   // fillOpacity='0.6'
+                    fillOpacity='0.6'
                 />
                 {/* for scatter size */}
                 <ZAxis range={[45, 45]} />
