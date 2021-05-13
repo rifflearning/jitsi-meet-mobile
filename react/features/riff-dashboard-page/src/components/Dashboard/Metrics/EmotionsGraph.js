@@ -156,7 +156,7 @@ export default ({ data = [], participantId }) => {
                 ))}
             </div>
         )
-    }
+    };
 
     const EmotionTick = props => {
         const emojiObj = {
@@ -173,7 +173,7 @@ export default ({ data = [], participantId }) => {
             index={props.index}>
             {emojiObj[`${props.payload.value}`]}
         </foreignObject>
-    }
+    };
 
     return (
         <ResponsiveContainer height={300}>
