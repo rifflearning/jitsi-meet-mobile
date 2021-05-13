@@ -184,8 +184,8 @@ class EmotionsChart extends React.Component {
 
         return (
             <ChartCard
-                title={'Emotions Chart'}
-                chartInfo={'This chart shows emotions of each participant during the meeting.'}
+                title={'Emotions Chart (experimental feature)'}
+                chartInfo={'This chart shows how your emotions and the average emotional state of all the participants are changed during the meeting.'}
                 chartCardId={'EmotionsChartId'}
             >
                 {loadingDisplay}
