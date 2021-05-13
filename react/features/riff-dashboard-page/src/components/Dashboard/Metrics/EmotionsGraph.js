@@ -17,7 +17,7 @@ import {
 import moment from 'moment'
 import * as d3 from 'd3-array';
 
-function getBollingerBands(n, k, data) {
+const getBollingerBands = (n, k, data) => {
     if (n >= data.length) {
         return [];
     }
@@ -47,22 +47,22 @@ function getBollingerBands(n, k, data) {
     return bands;
 }
 
-const getSpikes = (data, userData) => {
+const getUserSpikes = (bbData, userData) => {
     //for future use
     let highSpike = [];
     let lowSpike = [];
     userData.forEach(el => {
         const date = moment(el.timestamp).format('HH:mm:ss');
-        const sameTimeArr = data.filter(el => moment(el.timestamp).format('HH:mm:ss') === date);
+        const sameTimeArr = bbData.filter(bbEl => moment(bbEl.timestamp).format('HH:mm:ss') === date);
 
         if (sameTimeArr.length) {
-            sameTimeArr.forEach(d => {
-                if (el.classification >= d.area[1]) {
+            sameTimeArr.forEach(data => {
+                if (el.classification >= data.area[1]) {
                     highSpike.push({
                         timestamp: el.timestamp,
                         classification: el.classification
                     })
-                } else if (el.classification <= d.area[0]) {
+                } else if (el.classification <= data.area[0]) {
                     lowSpike.push({
                         timestamp: el.timestamp,
                         classification: el.classification
@@ -70,22 +70,11 @@ const getSpikes = (data, userData) => {
                 }
             })
         }
-    }
-    )
+    })
     return highSpike.concat(lowSpike)
 }
 
-function getMinMax(arr) {
-    let min = arr[0];
-    let max = arr[0];
-    let i = arr.length;
-
-    while (i--) {
-        min = arr[i] < min ? arr[i] : min;
-        max = arr[i] > max ? arr[i] : max;
-    }
-    return { min, max };
-}
+const getMinMax = (arr) => ({ min: Math.min(...arr), max: Math.max(...arr) })
 
 const Emoji = ({ symbol, label }) => (
     <span
@@ -96,16 +85,17 @@ const Emoji = ({ symbol, label }) => (
     >
         {symbol}
     </span>
-);
+)
 
-const n = 20;
-const k = 2;
 
 export default ({ data = [], participantId }) => {
     const [bandsData, setBandsData] = useState([]);
     const [currentUserData, setCurrentUserData] = useState([])
     const [spikes, setSpikes] = useState([]);
-    const [domainY, setDomainY] = useState({min: -1, max: 1});
+    const [domainY, setDomainY] = useState({ min: -1, max: 1 });
+
+    const n = 20;
+    const k = 2;
 
     const mapUserNamesToData = () => {
         // emotions data reduced by users: { [userId]: [arrayOfData] }
@@ -127,19 +117,17 @@ export default ({ data = [], participantId }) => {
         const userData = dataFormatted[participantId] || [];
         setCurrentUserData(userData);
 
-        if(arrUids.length > 1) {
-        const bollingerBandsData = getBollingerBands(n, k, data);
-        const emotionSpikes = getSpikes(bollingerBandsData, userData);
-        const classificationArr = bollingerBandsData.length && userData.length
-            ? bollingerBandsData
-                .map(el => el.area[0])
-                .concat(bollingerBandsData.map(el => el.area[1]))
-                .concat(userData.map(el => el.classification))
-            : [];
+        if (arrUids.length > 1) {
+            const bollingerBandsData = getBollingerBands(n, k, data);
+            const emotionSpikes = getUserSpikes(bollingerBandsData, userData);
+            const bbClassificationArr = bollingerBandsData.length
+                ? bollingerBandsData.reduce((acc, v) => acc = acc.concat([v.area[0]]).concat([v.area[1]]), [])
+                : [];
+            const classificationArr = bbClassificationArr.concat(userData.length ? userData.map(el => el.classification) : []);
 
-        setBandsData(bollingerBandsData)
-        setSpikes(emotionSpikes)
-        setDomainY(getMinMax(classificationArr))
+            setBandsData(bollingerBandsData)
+            setSpikes(emotionSpikes)
+            setDomainY(getMinMax(classificationArr))
         }
     };
 
@@ -169,6 +157,7 @@ export default ({ data = [], participantId }) => {
             </div>
         )
     }
+
     const EmotionTick = props => {
         const emojiObj = {
             '1': <Emoji label='positive' symbol='🙂' />,
