@@ -26,10 +26,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>ai.riffanalytics.odin</string>
+			<string>ai.riffanalytics.odinn</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ai.riffanalytics.odin</string>
+				<string>ai.riffanalytics.odinn</string>
 			</array>
 		</dict>
 		<dict>
@@ -77,9 +77,9 @@
 		<string>org.jitsi.JitsiMeet.ios.conference</string>
 	</array>
 	<key>RTCAppGroupIdentifier</key>
-	<string>group.ai.riffanalytics.odin.appgroup</string>
+	<string>group.ai.riffanalytics.odinn.appgroup</string>
 	<key>RTCScreenSharingExtension</key>
-	<string>ai.riffanalytics.odin.broadcast.extension</string>
+	<string>ai.riffanalytics.odinn.broadcast.extension</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

@@ -35,7 +35,7 @@ class SampleUploader {
     
     init(connection: SocketConnection) {
         self.connection = connection
-        self.serialQueue = DispatchQueue(label: "ai.riffanalytics.odin.broadcast.sampleUploader")
+        self.serialQueue = DispatchQueue(label: "ai.riffanalytics.odinn.broadcast.sampleUploader")
       
         setupConnection()
     }
