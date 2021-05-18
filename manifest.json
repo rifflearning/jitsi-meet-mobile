@@ -1,13 +1,13 @@
 {
-  "android_package_name": "org.jitsi.meet",
+  "android_package_name": "ai.riffanalytics.connect",
   "prefer_related_applications": true,
   "related_applications": [
     {
-      "id": "org.jitsi.meet",
+      "id": "ai.riffanalytics.connect",
       "platform": "chromeos_play"
     }
   ],
-  "short_name": "Jitsi Meet",
+  "short_name": "Riff Connect",
   "name": "Jitsi Meet",
   "icons": [
     {

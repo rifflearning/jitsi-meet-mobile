@@ -96,7 +96,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
-      customArchiveName = "Odin"
+      customArchiveName = "RiffConnect"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
