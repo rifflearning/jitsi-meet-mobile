@@ -23,7 +23,6 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		3216D72CB43FD15A75E3769A /* libPods-Odin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A9D0F63D84D159B2D78231E4 /* libPods-Odin.a */; };
 		4E90F9402632D1AB001102D4 /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E90F93F2632D1AB001102D4 /* Atomic.swift */; };
 		4EB06024260E026600F524C5 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EC49B8625BED71300E76218 /* ReplayKit.framework */; };
 		4EB06027260E026600F524C5 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB06026260E026600F524C5 /* SampleHandler.swift */; };
@@ -31,6 +30,7 @@
 		4EB0603C260E09D000F524C5 /* SocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB06039260E09D000F524C5 /* SocketConnection.swift */; };
 		4EB0603D260E09D000F524C5 /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB0603A260E09D000F524C5 /* DarwinNotificationCenter.swift */; };
 		4EB0603E260E09D000F524C5 /* SampleUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB0603B260E09D000F524C5 /* SampleUploader.swift */; };
+		5E004C0C410291CE4A830952 /* libPods-RiffConnect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B23080CA761585D8C9AC030F /* libPods-RiffConnect.a */; };
 		DE050389256E904600DEE3A5 /* WebRTC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE050388256E904600DEE3A5 /* WebRTC.xcframework */; };
 		DE05038A256E904600DEE3A5 /* WebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DE050388256E904600DEE3A5 /* WebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DE4C456121DE1E4E00EA0709 /* FIRUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = DE4C455F21DE1E4E00EA0709 /* FIRUtilities.m */; };
@@ -140,6 +140,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		196A40E7451F7ED3D11085D7 /* Pods-RiffConnect.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RiffConnect.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-RiffConnect/Pods-RiffConnect.debug.xcconfig"; sourceTree = "<group>"; };
 		4670A512A688E2DC34528282 /* Pods-jitsi-meet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-jitsi-meet.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-jitsi-meet/Pods-jitsi-meet.debug.xcconfig"; sourceTree = "<group>"; };
 		4E90F93F2632D1AB001102D4 /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		4EB06023260E026600F524C5 /* RiffConnectBroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RiffConnectBroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -153,8 +154,9 @@
 		517820B8FC4A079F0281D4AC /* Pods-Odin.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Odin.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Odin/Pods-Odin.debug.xcconfig"; sourceTree = "<group>"; };
 		5FEF9D87A4D2A38AD7193308 /* Pods-JitsiMeet-JitsiMeetBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JitsiMeet-JitsiMeetBroadcastExtension.release.xcconfig"; path = "../Pods/Target Support Files/Pods-JitsiMeet-JitsiMeetBroadcastExtension/Pods-JitsiMeet-JitsiMeetBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		609CB2080B75F75A89923F3D /* Pods-JitsiMeet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JitsiMeet.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-JitsiMeet/Pods-JitsiMeet.debug.xcconfig"; sourceTree = "<group>"; };
+		A345CEA6A05B7BA0987AC35D /* Pods-RiffConnect.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RiffConnect.release.xcconfig"; path = "../Pods/Target Support Files/Pods-RiffConnect/Pods-RiffConnect.release.xcconfig"; sourceTree = "<group>"; };
 		A7B2827E068A0E05260054AC /* Pods-JitsiMeet-JitsiMeetBroadcastExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JitsiMeet-JitsiMeetBroadcastExtension.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-JitsiMeet-JitsiMeetBroadcastExtension/Pods-JitsiMeet-JitsiMeetBroadcastExtension.debug.xcconfig"; sourceTree = "<group>"; };
-		A9D0F63D84D159B2D78231E4 /* libPods-Odin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Odin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B23080CA761585D8C9AC030F /* libPods-RiffConnect.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RiffConnect.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3B083EB1D4955FF0069CEE7 /* app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app.entitlements; sourceTree = "<group>"; };
 		DE050388256E904600DEE3A5 /* WebRTC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = WebRTC.xcframework; path = "../../node_modules/react-native-webrtc/apple/WebRTC.xcframework"; sourceTree = "<group>"; };
 		DE4C455F21DE1E4E00EA0709 /* FIRUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FIRUtilities.m; sourceTree = "<group>"; };
@@ -180,7 +182,7 @@
 			files = (
 				DE050389256E904600DEE3A5 /* WebRTC.xcframework in Frameworks */,
 				DEA9F289258A6EA800D4CD74 /* JitsiMeetSDK.framework in Frameworks */,
-				3216D72CB43FD15A75E3769A /* libPods-Odin.a in Frameworks */,
+				5E004C0C410291CE4A830952 /* libPods-RiffConnect.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,7 +213,7 @@
 				DEFDBBDB25656E3B00344B23 /* WebRTC.xcframework */,
 				0BD6B4361EF82A6B00D1F4CD /* WebRTC.framework */,
 				4EC49B8625BED71300E76218 /* ReplayKit.framework */,
-				A9D0F63D84D159B2D78231E4 /* libPods-Odin.a */,
+				B23080CA761585D8C9AC030F /* libPods-RiffConnect.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -291,6 +293,8 @@
 				5FEF9D87A4D2A38AD7193308 /* Pods-JitsiMeet-JitsiMeetBroadcastExtension.release.xcconfig */,
 				517820B8FC4A079F0281D4AC /* Pods-Odin.debug.xcconfig */,
 				039B23D6CFF74553ACCA0CBA /* Pods-Odin.release.xcconfig */,
+				196A40E7451F7ED3D11085D7 /* Pods-RiffConnect.debug.xcconfig */,
+				A345CEA6A05B7BA0987AC35D /* Pods-RiffConnect.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -540,7 +544,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Odin-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-RiffConnect-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -827,7 +831,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 517820B8FC4A079F0281D4AC /* Pods-Odin.debug.xcconfig */;
+			baseConfigurationReference = 196A40E7451F7ED3D11085D7 /* Pods-RiffConnect.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDebug;
@@ -857,7 +861,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 039B23D6CFF74553ACCA0CBA /* Pods-Odin.release.xcconfig */;
+			baseConfigurationReference = A345CEA6A05B7BA0987AC35D /* Pods-RiffConnect.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconRelease;
