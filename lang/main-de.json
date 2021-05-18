@@ -359,7 +359,7 @@
         "answer": "Antworten",
         "audioCallTitle": "Eingehender Anruf",
         "decline": "OK",
-        "productLabel": "von Jitsi Meet",
+        "productLabel": "von Riff Connect",
         "videoCallTitle": "Eingehender Videoanruf"
     },
     "info": {
@@ -915,7 +915,7 @@
         "getHelp": "Hilfe",
         "go": "Los",
         "goSmall": "Los",
-        "headerTitle": "Jitsi Meet",
+        "headerTitle": "Riff Connect",
         "headerSubtitle": "Sichere und hochqualitative Meetings",
         "info": "Einwahlinformationen",
         "join": "ERSTELLEN / BEITRETEN",

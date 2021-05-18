@@ -1,8 +1,8 @@
 {
-  "packageId": "org.jitsi.meet",
+  "packageId": "ai.riffanalytics.connect",
   "host": "meet.jit.si",
-  "name": "Jitsi Meet",
-  "launcherName": "Jitsi Meet",
+  "name": "Riff Connect",
+  "launcherName": "Riff Connect",
   "display": "standalone",
   "themeColor": "#17A0DB",
   "navigationColor": "#000000",
