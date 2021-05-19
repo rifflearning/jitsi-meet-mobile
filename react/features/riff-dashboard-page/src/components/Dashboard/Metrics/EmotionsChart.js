@@ -39,7 +39,7 @@ import {
 import { ChartCard } from './ChartCard';
 
 import { AmChartsLegend } from './AmChartsLegend';
-import EmotionsGraph from './EmotionsGraph';
+import EmotionsGraph from './EmotionsGraph'
 
 import api from '../../../../../riff-platform/api'
 /* ******************************************************************************
@@ -192,7 +192,12 @@ class EmotionsChart extends React.Component {
                 {emptyGraphText}
                 <div
                     className='amcharts-graph-container'>
-                    <EmotionsGraph data={this.state.emotionsData} participantId={this.props.participantId}/>
+                    <EmotionsGraph
+                        data={this.state.emotionsData}
+                        participantId={this.props.participantId}
+                        startTime={timelineData?.startTime}
+                        endTime={timelineData?.endTime}
+                        dashboardGraphLoaded={this.props.dashboardGraphLoaded} />
                 </div>
 
                 {/* {this.state.updatedLegendAt !== null &&
