@@ -1,10 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react'
-import * as am4core from "@amcharts/amcharts4/core";
-import { Colors } from 'libs/utils';
-import * as am4charts from "@amcharts/amcharts4/charts";
-import moment from 'moment'
+import React, { useRef, useEffect, useState } from 'react';
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import moment from 'moment';
 import * as d3 from 'd3-array';
+import { Colors } from 'libs/utils';
 import { AmChartsLegend } from './AmChartsLegend';
+
+const formatTime = (dt) => new Date(dt).getTime()
 
 const getBollingerBands = (n, k, data) => {
   if (n >= data.length) {
@@ -33,19 +35,33 @@ const getBollingerBands = (n, k, data) => {
   }
   return bands;
 }
-const getMinMax = (arr) => ({ min: Math.min(...arr), max: Math.max(...arr) });
 
-function formatTime(dt) {
-  /** Use d3 to create a datetime formatter */
-  //const d3Format = d3.timeFormat('%I:%M:%S %p');
+const getUserSpikes = (bbData, userData) => {
+  const emotionsSike = [];
+  userData.forEach(el => {
+    const date = moment(el.timestamp).format('HH:mm:ss');
+    const sameTimeArr = bbData.filter(bbEl => moment(bbEl.timestamp).format('HH:mm:ss') === date);
 
-  return (new Date(dt).getTime());
+    if (sameTimeArr.length) {
+      sameTimeArr.forEach(data => {
+        if (el.classification >= data.higth || el.classification <= data.low) {
+          emotionsSike.push({
+            timestamp: el.timestamp,
+            classification: el.classification
+          });
+        }
+      })
+    }
+  })
+  return emotionsSike;
 }
+
+const getMinMax = (arr) => ({ min: Math.min(...arr), max: Math.max(...arr) });
 
 const createXAxis = (chart) => {
   const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
 
-  // This creates an accuracy of 1 millisecond for utterances and events
+  // This creates an accuracy of 1 millisecond for data
   dateAxis.baseInterval = { count: 1, timeUnit: 'millisecond' };
   dateAxis.strictMinMax = true;
   dateAxis.renderer.tooltipLocation = 0;
@@ -86,6 +102,7 @@ const createYAxis = (chart) => {
     }
     range.label.html = emojiObj[value];
   }
+
   const customTicks = [1, 0, -1];
   customTicks.map(el => createCustomLabels(el));
 
@@ -94,36 +111,15 @@ const createYAxis = (chart) => {
 
 const createUserEmotionGradient = () => {
   const gradient = new am4core.LinearGradient();
-  gradient.addColor(am4core.color("#540d6e"));
-  gradient.addColor(am4core.color("#983493"));
-  gradient.addColor(am4core.color("#ff1a1a"));
-  gradient.addColor(am4core.color("#ff8317"));
-  gradient.addColor(am4core.color("#ffdd21"));
-  gradient.gradientUnits = "userSpaceOnUse";
+  gradient.addColor(am4core.color('#540d6e'));
+  gradient.addColor(am4core.color('#983493'));
+  gradient.addColor(am4core.color('#ff1a1a'));
+  gradient.addColor(am4core.color('#ff8317'));
+  gradient.addColor(am4core.color('#ffdd21'));
+  gradient.gradientUnits = 'userSpaceOnUse';
   gradient.rotation = 270;
 
   return gradient;
-}
-
-const getUserSpikes = (bbData, userData) => {
-  const emotionsSike = [];
-  userData.forEach(el => {
-    const date = moment(el.timestamp).format('HH:mm:ss');
-    const sameTimeArr = bbData.filter(bbEl => moment(bbEl.timestamp).format('HH:mm:ss') === date);
-
-    if (sameTimeArr.length) {
-      sameTimeArr.forEach(data => {
-        if (el.classification >= data.higth || el.classification <= data.low) {
-          emotionsSike.push({
-            ...el,
-            timestamp: el.timestamp,
-            classification: el.classification
-          })
-        }
-      })
-    }
-  })
-  return emotionsSike
 }
 
 const createUserSeries = (chart) => {
@@ -132,9 +128,9 @@ const createUserSeries = (chart) => {
 
   userSeries.dateFormatter = new am4core.DateFormatter();
   userSeries.dateFormatter.dateFormat = 'hh:mm:ss';
-  userSeries.dataFields.valueY = "classification";
-  userSeries.dataFields.dateX = "timestamp";
-  userSeries.name = "name";
+  userSeries.dataFields.valueY = 'classification';
+  userSeries.dataFields.dateX = 'timestamp';
+  userSeries.name = 'user';
   userSeries.fill = gradient;
   userSeries.stroke = gradient;
   userSeries.strokeWidth = 1;
@@ -147,22 +143,22 @@ const createSpikesSerie = (chart) => {
   const emotionsSpikesSerie = chart.series.push(new am4charts.LineSeries());
   emotionsSpikesSerie.dateFormatter = new am4core.DateFormatter();
   emotionsSpikesSerie.dateFormatter.dateFormat = 'hh:mm:ss';
-  emotionsSpikesSerie.dataFields.valueY = "classification";
-  emotionsSpikesSerie.dataFields.dateX = "timestamp";
-  emotionsSpikesSerie.name = "spikes";
+  emotionsSpikesSerie.dataFields.valueY = 'classification';
+  emotionsSpikesSerie.dataFields.dateX = 'timestamp';
+  emotionsSpikesSerie.name = 'spikes';
   emotionsSpikesSerie.strokeWidth = 0;
 
   const bullet = emotionsSpikesSerie.bullets.push(new am4charts.Bullet());
 
   // Add a circle user`s emotions spikes
   const circle = bullet.createChild(am4core.Circle);
-  circle.horizontalCenter = "middle";
-  circle.verticalCenter = "middle";
-  circle.stroke = am4core.color("#58d0ee");
-  circle.direction = "top";
+  circle.horizontalCenter = 'middle';
+  circle.verticalCenter = 'middle';
+  circle.stroke = am4core.color('#58d0ee');
+  circle.direction = 'top';
   circle.width = 10;
   circle.height = 10;
-  circle.fill = am4core.color("#58d0ee")
+  circle.fill = am4core.color('#58d0ee');
 
   return emotionsSpikesSerie;
 }
@@ -208,7 +204,9 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       const bbClassificationArr = bollingerBandsData.length
         ? bollingerBandsData.reduce((acc, v) => acc = acc.concat([v.low]).concat([v.higth]), [])
         : [];
-      const classificationArr = bbClassificationArr.concat(userData.length ? userData.map(el => el.classification) : []).concat([-1, 0, 1]);
+      const classificationArr = bbClassificationArr
+        .concat(userData.length ? userData.map(el => el.classification) : [])
+        .concat([-1, 0, 1]);
 
       setBandsData(bollingerBandsData)
       setSpikes(emotionSpikes)
@@ -239,29 +237,29 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       const middleBBSeries = chartRef.current.series.push(new am4charts.LineSeries());
       middleBBSeries.dateFormatter = new am4core.DateFormatter();
       middleBBSeries.dateFormatter.dateFormat = 'hh:mm:ss';
-      middleBBSeries.dataFields.dateX = "timestamp";
-      middleBBSeries.dataFields.valueY = "ma";
-      middleBBSeries.name = "median";
-      middleBBSeries.stroke = am4core.color("#93759E");
-      middleBBSeries.hiddenInLegend = true; 
+      middleBBSeries.dataFields.dateX = 'timestamp';
+      middleBBSeries.dataFields.valueY = 'ma';
+      middleBBSeries.name = 'median';
+      middleBBSeries.stroke = am4core.color('#93759E');
+      middleBBSeries.hiddenInLegend = true;
 
       const lowBBSeries = chartRef.current.series.push(new am4charts.LineSeries());
       lowBBSeries.dateFormatter = new am4core.DateFormatter();
       lowBBSeries.dateFormatter.dateFormat = 'hh:mm:ss';
-      lowBBSeries.dataFields.dateX = "timestamp";
-      lowBBSeries.dataFields.valueY = "low";
-      lowBBSeries.stroke = am4core.color("#93759E");
-      lowBBSeries.name = "low";
+      lowBBSeries.dataFields.dateX = 'timestamp';
+      lowBBSeries.dataFields.valueY = 'low';
+      lowBBSeries.stroke = am4core.color('#93759E');
+      lowBBSeries.name = 'low';
       lowBBSeries.hiddenInLegend = true;
 
       const upperBBSeries = chartRef.current.series.push(new am4charts.LineSeries());
-      upperBBSeries.dataFields.dateX = "timestamp";
-      upperBBSeries.dataFields.valueY = "higth";
-      upperBBSeries.dataFields.openValueY = "low";
+      upperBBSeries.dataFields.dateX = 'timestamp';
+      upperBBSeries.dataFields.valueY = 'higth';
+      upperBBSeries.dataFields.openValueY = 'low';
       upperBBSeries.fillOpacity = 0.3;
-      upperBBSeries.stroke = am4core.color("#93759E");
-      upperBBSeries.fill = am4core.color("#93759E");
-      upperBBSeries.name = "higth";
+      upperBBSeries.stroke = am4core.color('#93759E');
+      upperBBSeries.fill = am4core.color('#93759E');
+      upperBBSeries.name = 'higth';
 
       // Add user`s emotions spikes series
       emotionSpikesSeries.current = createSpikesSerie(chartRef.current);
@@ -301,6 +299,7 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       dateAxis.current.min = new Date(startTime).getTime();
       dateAxis.current.max = new Date(endTime).getTime();
     }
+
   }, [bandsData, currentUserData, spikes, domainYxis, startTime, endTime]);
 
   // Handle component unmounting, dispose chart
@@ -328,34 +327,32 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       }
     ]
     eventsSeries.forEach((series, index) => {
-        legendItems.push(
-            <div
-                className={`legend-item timeline `}
-                key={`timeline-legend-item-${index}`}
-                style={{ cursor: 'inherit'}}
-            >
-                <span
-                    className='peer-color'
-                    style={{ background: series.color }}
-                />
-                <span className='label'>
-                   {series.title}
-                </span>
-            </div>
-        );
+      legendItems.push(
+        <div
+          className={`legend-item timeline `}
+          key={`timeline-legend-item-${index}`}
+          style={{ cursor: 'inherit' }}
+        >
+          <span
+            className='peer-color'
+            style={{ background: series.color }}
+          />
+          <span className='label'>
+            {series.title}
+          </span>
+        </div>
+      );
     });
 
     return legendItems;
-}
+  }
 
   return (
     <>
       <div
         id='emotion_chart'
         className='amcharts-graph-container timeline-plot-div'
-        style={{
-          width: "100%"
-        }}
+        style={{ width: '100%' }}
       />
       <AmChartsLegend
         graphType={'timeline'}
