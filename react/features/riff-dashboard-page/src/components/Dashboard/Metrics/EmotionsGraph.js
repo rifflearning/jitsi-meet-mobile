@@ -352,9 +352,9 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
     <>
       <div
         id='emotion_chart'
+        className='amcharts-graph-container timeline-plot-div'
         style={{
-          width: "100%",
-          height: "300px",
+          width: "100%"
         }}
       />
       <AmChartsLegend

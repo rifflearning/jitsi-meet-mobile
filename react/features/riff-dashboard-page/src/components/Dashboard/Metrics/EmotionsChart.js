@@ -190,23 +190,12 @@ class EmotionsChart extends React.Component {
             >
                 {loadingDisplay}
                 {emptyGraphText}
-                <div
-                    className='amcharts-graph-container'>
                     <EmotionsGraph
                         data={this.state.emotionsData}
                         participantId={this.props.participantId}
                         startTime={timelineData?.startTime}
                         endTime={timelineData?.endTime}
                         dashboardGraphLoaded={this.props.dashboardGraphLoaded} />
-                </div>
-
-                {/* {this.state.updatedLegendAt !== null &&
-                    <AmChartsLegend
-                        graphType={this.props.graphType}
-                        getLegendItems={this.getLegendItems}
-                        updatedLegendAt={this.state.updatedLegendAt}
-                    />
-                } */}
             </ChartCard>
         );
     }
