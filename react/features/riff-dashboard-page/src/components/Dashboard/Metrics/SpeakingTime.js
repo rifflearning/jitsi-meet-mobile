@@ -1,21 +1,21 @@
 /* ******************************************************************************
  * SpeakingTime.js                                                              *
  * *************************************************************************/ /**
- *
- * @fileoverview React component to visualize the distribution of speaking
- * time in a meeting.
- *
- * TODO: Tweak this component to be a generic pie chart to display any
- * categorical data. Instead of expecting an array of participants with
- * total utterance lengths, expect an array of the unexpected.
- *
- * Created on       October 28, 2019
- * @author          Brec Hanson
- *
- * @copyright (c) 2019-present Riff Learning Inc.,
- *            MIT License (see https://opensource.org/licenses/MIT)
- *
- * ******************************************************************************/
+*
+* @fileoverview React component to visualize the distribution of speaking
+* time in a meeting.
+*
+* TODO: Tweak this component to be a generic pie chart to display any
+* categorical data. Instead of expecting an array of participants with
+* total utterance lengths, expect an array of the unexpected.
+*
+* Created on       October 28, 2019
+* @author          Brec Hanson
+*
+* @copyright (c) 2019-present Riff Learning Inc.,
+*            MIT License (see https://opensource.org/licenses/MIT)
+*
+* ******************************************************************************/
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -36,10 +36,10 @@ import { AmChartsLegend } from './AmChartsLegend';
 
 /* ******************************************************************************
  * SpeakingTime                                                            */ /**
- *
- * React component to visualize the distribution of speaking time in a meeting.
- *
- ********************************************************************************/
+*
+* React component to visualize the distribution of speaking time in a meeting.
+*
+********************************************************************************/
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
@@ -68,7 +68,7 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * constructor                                                         */ /**
-     */
+    */
     constructor(props) {
         super(props);
 
@@ -85,21 +85,21 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * componentDidMount                                                   */ /**
-     */
+    */
     componentDidMount() {
         this.initGraph();
     }
 
     /* **************************************************************************
      * componentWillUnmount                                                */ /**
-     */
+    */
     componentWillUnmount() {
         this.disposeChart();
     }
 
     /* **************************************************************************
      * componentDidUpdate                                                  */ /**
-     */
+    */
     componentDidUpdate(prevProps, prevState) {
         const { isLoaded } = this.getDatasetStatus(prevProps);
 
@@ -112,10 +112,10 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * render                                                              */ /**
-     *
-     * Required method of a React component.
-     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-     */
+    *
+    * Required method of a React component.
+    * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+    */
     render() {
         // get the config for this graph type
         const config = GraphConfigs[this.props.graphType];
@@ -135,7 +135,7 @@ class SpeakingTime extends React.PureComponent {
         if (!isLoaded) {
             loadingDisplay = (
                 <div className='loading-overlay'>
-                    {<ScaleLoader color={Colors.lightRoyal} background={Colors.selago}/>}
+                    {<ScaleLoader color={Colors.lightRoyal} background={Colors.white} />}
                 </div>
             );
         }
@@ -151,24 +151,24 @@ class SpeakingTime extends React.PureComponent {
                 <div
                     className={'amcharts-graph-container speaking-time-graph-div'}
                 />
-                {this.state.updatedLegendAt !== null &&
+                {/* {this.state.updatedLegendAt !== null &&
                     <AmChartsLegend
                         graphType={this.props.graphType}
                         getLegendItems={this.getLegendItems}
                         updatedLegendAt={this.state.updatedLegendAt}
                     />
-                }
+                } */}
             </ChartCard>
         );
     }
 
     /* ******************************************************************************
      * toggleSlice                                                             */ /**
-     *
-     * Toggle an event series in the bar graph chart on or off.
-     *
-     * @param {number} idx the index of the slice that we want to toggle
-     */
+    *
+    * Toggle an event series in the bar graph chart on or off.
+    *
+    * @param {number} idx the index of the slice that we want to toggle
+    */
     toggleSlice(idx) {
         const slice = this.pieSeries.dataItems.getIndex(idx);
 
@@ -193,10 +193,10 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getLegendItems                                                          */ /**
-     *
-     * Return the legend items for this graph.
-     *
-     */
+    *
+    * Return the legend items for this graph.
+    *
+    */
     getLegendItems() {
         const legendItems = [];
 
@@ -236,22 +236,45 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getGraphData                                                            */ /**
-     *
-     * For each participant in a meeting, create config objects for the pie chart
-     *
-     * @returns {array} containing the prepared data for the graph
-     */
+    *
+    * For each participant in a meeting, create config objects for the pie chart
+    *
+    * @returns {array} containing the prepared data for the graph
+    */
     getGraphData() {
         const participantColors = getColorMap(this.props.meeting.participants, this.props.participantId);
 
-        const graphData = this.props.graphDataset.data.map((participant) => {
+        const graphData = this.props.graphDataset.data.map((participant, i) => {
             const name = participant.participantId === this.props.participantId ? 'You' : participant.name;
             const lengthUtterances = participant.lengthUtterances;
+            const participantName = name.split(' ')[0];
+
+            const getGradientByColors = (colorOne, colorSecond) => {
+                const gradient = new am4core.LinearGradient();
+                gradient.addColor(am4core.color(colorOne));
+                gradient.addColor(am4core.color(colorSecond));
+            
+                // gradient.stops.push({color:am4core.color(colorOne)})
+                // gradient.stops.push({color:am4core.color(colorSecond)})
+                return gradient;
+            }
+
+            const gradient = new am4core.LinearGradient();
+                gradient.addColor(am4core.color('#F8EFFC'));
+                gradient.addColor(am4core.color('#E0D8E3'));
+            
+            
+            // const colorsGradient = {
+            //     lightPurple: getGradientByColors('#F8EFFC', '#E0D8E3'),
+            //     purple: getGradientByColors('#F8EFkk', '#E08E3h'),
+            // }
 
             const config = {
+                name: participantName,
                 participant: name,
                 lengthUtterances,
-                color: participantColors.get(participant.participantId),
+               color: participantColors.get(participant.participantId),
+             // color: gradient,
             };
 
             const tooltip = GraphConfigs[this.props.graphType].getTooltip(config);
@@ -266,11 +289,11 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * drawGraph                                                               */ /**
-     *
-     * Initialise the graph, add the categories, and populate with data.
-     * - if an empty dataset is passed, return
-     *
-     */
+    *
+    * Initialise the graph, add the categories, and populate with data.
+    * - if an empty dataset is passed, return
+    *
+    */
     drawGraph() {
         logger.debug('SpeakingTime: drawGraph', this.props.graphType);
         const chart = this.chart;
@@ -278,6 +301,7 @@ class SpeakingTime extends React.PureComponent {
         const chartData = this.getGraphData();
         chart.data = chartData;
 
+        console.log('chartData', chartData)
         // Is this component trying to visualise an empty dataset?
         const emptyDataset = chartData.length === 0;
         if (emptyDataset) {
@@ -291,51 +315,93 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * createSeries                                                            */ /**
-     *
-     * Create the graph series
-     *
-     * For more info on amcharts PieSeries, see:
-     * https://www.amcharts.com/docs/v4/reference/pieseries/
-     *
-     * @param {object} chart - the chart object for this SpeakingTime
-     *
-     * @returns {object} containing the graph series for this graph type
-     */
+    *
+    * Create the graph series
+    *
+    * For more info on amcharts PieSeries, see:
+    * https://www.amcharts.com/docs/v4/reference/pieseries/
+    *
+    * @param {object} chart - the chart object for this SpeakingTime
+    *
+    * @returns {object} containing the graph series for this graph type
+    */
     createSeries(chart) {
         const series = chart.series.push(new am4charts.PieSeries());
 
         series.dataFields.value = 'lengthUtterances';
         series.dataFields.category = 'participant';
-        series.labels.template.disabled = true;
         series.padding = 0;
 
         const slices = series.slices.template;
         slices.propertyFields.fill = 'color';
         slices.cornerRadius = 1;
         slices.tooltipText = '{tooltipText}';
-        slices.stroke = am4core.color('#fff');
         slices.strokeWidth = 1;
         slices.strokeOpacity = 1;
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
-        series.legendSettings.labelText = '{name}';
-        series.legendSettings.valueText = '[bold]{value.percent}[/]%';
+       const rgm = new am4core.LinearGradientModifier();
+        rgm.brightnesses.push(0, -0.05, -0.15);
+       // rgm.opacities = [1, 1, 0];
+        //rgm.offsets = [0.3, 0.7];
+        series.slices.template.fillModifier = rgm;
+        series.labels.labelText = '{name}';
+        series.labels.template.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
         series.legendSettings.paddingLeft = 0;
+
+        series.ticks.template.disabled = true;
+        series.labels.textAlign = "middle";
+
+        series.labels.template.radius = am4core.percent(-70);
+        series.labels.template.fill = am4core.color("white");
+        series.labels.template.paddingBottom = 0;
+        series.labels.template.fontSize = 10;
+        series.labels.template.maxWidth = 100;
+        series.labels.template.wrap = true;
+
+        series.labels.template.adapter.add("radius", function(radius, target) {
+            
+            if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
+              return 0;
+            }
+            return radius;
+          });
+
+          series.ticks.template.adapter.add("disabled", function(disabled, target) {
+            if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
+              return false;
+            }
+            return true;
+          });
+          
+          series.labels.template.adapter.add("fill", function(color, target) {
+              console.log('target', target)
+            if (target.dataItem && ((target.dataItem.values.value.percent < 10)) || target.dataItem.dataContext.color === '#f8effc'){
+              return am4core.color("#333333");
+            }
+            return color;
+          });
+
+                // //Add a shadow to chart
+                // const shadow = series.filters.push(new am4core.DropShadowFilter);
+                // shadow.dx = 0;
+                // shadow.dy = 3;
+                // shadow.blur = 2;
 
         return series;
     }
 
     /* ******************************************************************************
      * initGraph                                                               */ /**
-     *
-     * Initialise the chart and bind to the appropriate html element.
-     *
-     * For more info on amcharts PieChart, see:
-     * https://www.amcharts.com/docs/v4/reference/PieChart/
-     * https://www.amcharts.com/docs/v4/chart-types/pie-chart/
-     *
-     * @returns {object} containing a reference to the chart
-     */
+    *
+    * Initialise the chart and bind to the appropriate html element.
+    *
+    * For more info on amcharts PieChart, see:
+    * https://www.amcharts.com/docs/v4/reference/PieChart/
+    * https://www.amcharts.com/docs/v4/chart-types/pie-chart/
+    *
+    * @returns {object} containing a reference to the chart
+    */
     initGraph() {
         logger.debug('SpeakingTime.initGraph', this.props.graphType);
 
@@ -344,9 +410,9 @@ class SpeakingTime extends React.PureComponent {
 
         // Create chart and place it inside the html element with id speaking-time-graph-div
         const chart = am4core.create('speaking-time-graph-div', am4charts.PieChart);
-        chart.background.fill = Colors.selago;
+        chart.background.fill = Colors.white;
         chart.numberFormatter.numberFormat = '##.#';
-        chart.radius = '75%';
+        chart.radius = '85%';
 
         // Fired when graph's data gets updated
         chart.events.on('datavalidated', () => {
@@ -368,9 +434,9 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * disposeChart                                                            */ /**
-     *
-     * This is called when it is appropriate to dispose of the chart, for efficiency.
-     */
+    *
+    * This is called when it is appropriate to dispose of the chart, for efficiency.
+    */
     disposeChart() {
         if (this.chart) {
             this.chart.dispose();
@@ -381,16 +447,16 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getDatasetStatus                                                        */ /**
-     *
-     * Check if the dataset passed in this.props.graphDataset is loaded.
-     *
-     * @param {object} prevProps optional, containing the previous props
-     *
-     * @returns {object} containing three booleans:
-     *      1. wasLoading  - Was the dataset previously loading?
-     *      2. isLoaded   - Is the dataset loaded?
-     *      3. loadingNewData - Is new data being fetched?
-     */
+    *
+    * Check if the dataset passed in this.props.graphDataset is loaded.
+    *
+    * @param {object} prevProps optional, containing the previous props
+    *
+    * @returns {object} containing three booleans:
+    *      1. wasLoading  - Was the dataset previously loading?
+    *      2. isLoaded   - Is the dataset loaded?
+    *      3. loadingNewData - Is new data being fetched?
+    */
     getDatasetStatus(prevProps) {
         const currentStatus = this.props.graphDataset.status;
         const isLoaded = currentStatus === EStatus.LOADED;
