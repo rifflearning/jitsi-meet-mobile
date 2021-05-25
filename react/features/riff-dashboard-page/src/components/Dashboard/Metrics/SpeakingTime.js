@@ -108,8 +108,6 @@ const getGradient = (first, second) => {
 
     const checkColorText = (color) => {
         const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
-        console.log('darkTextColorArr', darkTextColorArr);
-        console.log('color', color)
         return darkTextColorArr.includes(color.toUpperCase())
     }
     
@@ -405,7 +403,7 @@ class SpeakingTime extends React.PureComponent {
         series.labels.textAlign = "middle";
         series.labels.template.padding(0, 0, 0, 0);
 
-        series.labels.template.fill = am4core.color("#333333");
+        series.labels.template.fill = am4core.color("#ffffff");
         series.labels.template.paddingBottom = 0;
         series.labels.template.fontSize = 10;
         series.labels.template.maxWidth = 55;
@@ -419,11 +417,18 @@ class SpeakingTime extends React.PureComponent {
         series.labels.template.events.on("visibilitychanged", hideSmall);
 
         series.labels.template.adapter.add("radius", function(radius, target) {
-            if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
+            if (target.dataItem && target.dataItem.values.value.percent < 10) {
               target.fill = am4core.color("#333333");
               return 10;
             }
             return radius;
+          });
+
+          series.labels.template.adapter.add("fill", function(fill, target) {
+            if (target.dataItem && checkColorText(target.dataItem._dataContext.color)) {
+              return am4core.color("#333333");
+            }
+            return fill;
           });
 
           function hideSmall(ev) {

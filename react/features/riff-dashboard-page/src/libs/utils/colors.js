@@ -135,7 +135,6 @@ const PeerColors = [
    Colors.darkGray,
     Colors.gray,
     Colors.lightGray,
-    Colors.whiteGray,
     Colors.silver,
     Colors.riffVioletDark,
     Colors.riffViolet,
@@ -246,7 +245,6 @@ function getColorMap(setIds, selfId) {
 
     const colorMap = new Map();
 
-    console.log('colorMap', colorMap)
     let i = 0;
     for (const id of setIds) {
         if (id === selfId) {

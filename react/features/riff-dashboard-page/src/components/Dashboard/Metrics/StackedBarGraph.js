@@ -306,7 +306,7 @@ class StackedBarGraph extends React.PureComponent {
         .filter(participant => participant.totalRelations > 0);
 
         logger.debug('StackedBarGraph: chartData', { chartData });
-console.log('chartData', chartData)
+
         return chartData;
     }
 

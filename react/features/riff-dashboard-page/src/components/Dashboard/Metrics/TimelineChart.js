@@ -304,7 +304,7 @@ class TimelineChart extends React.Component {
         // Create chart and place it inside the html element with id timeline-plot-div
         const chart = am4core.create('timeline-plot-div', am4charts.XYChart);
 
-        chart.background.fill = Colors.selago;
+        chart.background.fill = Colors.white;
 
         // Create dateAxis axis
         const dateAxis = this.createXAxis(chart);
@@ -462,7 +462,12 @@ class TimelineChart extends React.Component {
      * @param {object} timelineData the timeline data for a meeting
      */
     addParticipantData(participantNames, timelineData) {
-        const participantColors = getColorMap(this.props.meeting.participants, this.props.participantId);
+        const sortingArr = this.props.graphDatasets?.meeting_stats?.data || [];
+
+        const sortedParticipantsIds = sortingArr
+        .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
+        .map(participant => participant.participantId) || this.props.meeting.participants
+        const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
 
         const participantSeriesData = [];
         timelineData.utts.map((utt) => {
@@ -512,6 +517,12 @@ class TimelineChart extends React.Component {
         participantSeries.columns.template.strokeOpacity = 1;
         participantSeries.hiddenInLegend = true; // No legend items for other participants utt's
         participantSeries.columns.template.height = am4core.percent(60); // height of horizontal columns
+
+
+        const rgm = new am4core.LinearGradientModifier();
+        rgm.brightnesses.push(0, -0.08);
+        participantSeries.columns.template.fillModifier = rgm;
+
 
         participantSeries.events.on('validated', () => {
             this.props.dashboardGraphLoaded(this.props.graphType);
