@@ -40,6 +40,80 @@ import { AmChartsLegend } from './AmChartsLegend';
 * React component to visualize the distribution of speaking time in a meeting.
 *
 ********************************************************************************/
+
+const getGradient = (first, second) => {
+    const  gradient = new am4core.LinearGradient();
+    gradient.addColor(am4core.color(first));
+    gradient.addColor(am4core.color(second));
+    return gradient;
+    }  
+    
+    
+    // const gr = {
+    //     lightPurple: getGradient('#F8EFFC', '#E0D8E3'),
+    //     riffVioletMedium: getGradient('#F8EFkk', '#E08E3h'),
+    //     darkGray: getGradient('#828282', '#5A5A5A'),
+    //     gray: getGradient('#C4C4C4', '#8F8F8E'),
+    //     lightGray: getGradient('#E5E5E5', '#C4C4C4'),
+    //     silver: getGradient('#F9F9F9', '#E5E5E5'),
+    // }
+
+    // const PeerColors = [
+    //     gr.riffVioletMedium,
+    //     gr.lightPurple,
+    //     gr.darkGray,
+    //     gr.gray,
+    //     gr.lightGray,
+    //     gr.silver,
+    //     gr.darkGray,
+    //     gr.gray,
+    //     gr.lightGray,
+    //     gr.silver,
+    //     gr.darkGray,
+    //     gr.gray,
+    //     gr.lightGray,
+    //     gr.silver,
+    // ];
+
+    // function getColorForOther(n) {
+    //     const i = n % (PeerColors.length - 1) + 1;
+    //     return PeerColors[i];
+    // }
+    // function getColorForSelf() {
+    //     return PeerColors[0];
+    // }
+
+    // function getColorMap(setIds, selfId) {
+    //     if (setIds.size > PeerColors.length) {
+    //         // This warning may be off by one because it assumes that selfId is in setIds
+    //         logger.warn(`getColorMap: Not enough distinct colors (${PeerColors.length}) for all ids (${setIds.size})`);
+    //     }
+    
+    //     const colorMap = new Map();
+    
+    //     console.log('colorMap', colorMap)
+    //     let i = 0;
+    //     for (const id of setIds) {
+    //         if (id === selfId) {
+    //             colorMap.set(id, getColorForSelf());
+    //         }
+    //         else {
+    //             colorMap.set(id, getColorForOther(i));
+    //             i++;
+    //         }
+    //     }
+    
+    //     return colorMap;
+    // }
+
+    const checkColorText = (color) => {
+        const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
+        console.log('darkTextColorArr', darkTextColorArr);
+        console.log('color', color)
+        return darkTextColorArr.includes(color.toUpperCase())
+    }
+    
+                
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
@@ -242,39 +316,19 @@ class SpeakingTime extends React.PureComponent {
     * @returns {array} containing the prepared data for the graph
     */
     getGraphData() {
-        const participantColors = getColorMap(this.props.meeting.participants, this.props.participantId);
-
-        const graphData = this.props.graphDataset.data.map((participant, i) => {
+        const sortedParticipantsIds = this.props.graphDataset.data.sort((a, b) => b.lengthUtterances - a.lengthUtterances).map(participant => participant.participantId)
+        const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
+        
+        const graphData = this.props.graphDataset.data.map((participant) => {
             const name = participant.participantId === this.props.participantId ? 'You' : participant.name;
             const lengthUtterances = participant.lengthUtterances;
             const participantName = name.split(' ')[0];
-
-            const getGradientByColors = (colorOne, colorSecond) => {
-                const gradient = new am4core.LinearGradient();
-                gradient.addColor(am4core.color(colorOne));
-                gradient.addColor(am4core.color(colorSecond));
-            
-                // gradient.stops.push({color:am4core.color(colorOne)})
-                // gradient.stops.push({color:am4core.color(colorSecond)})
-                return gradient;
-            }
-
-            const gradient = new am4core.LinearGradient();
-                gradient.addColor(am4core.color('#F8EFFC'));
-                gradient.addColor(am4core.color('#E0D8E3'));
-            
-            
-            // const colorsGradient = {
-            //     lightPurple: getGradientByColors('#F8EFFC', '#E0D8E3'),
-            //     purple: getGradientByColors('#F8EFkk', '#E08E3h'),
-            // }
 
             const config = {
                 name: participantName,
                 participant: name,
                 lengthUtterances,
                color: participantColors.get(participant.participantId),
-             // color: gradient,
             };
 
             const tooltip = GraphConfigs[this.props.graphType].getTooltip(config);
@@ -301,7 +355,6 @@ class SpeakingTime extends React.PureComponent {
         const chartData = this.getGraphData();
         chart.data = chartData;
 
-        console.log('chartData', chartData)
         // Is this component trying to visualise an empty dataset?
         const emptyDataset = chartData.length === 0;
         if (emptyDataset) {
@@ -341,31 +394,47 @@ class SpeakingTime extends React.PureComponent {
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
        const rgm = new am4core.LinearGradientModifier();
-        rgm.brightnesses.push(0, -0.05, -0.15);
+       rgm.brightnesses.push(0, -0.07, -0.18);
        // rgm.opacities = [1, 1, 0];
         //rgm.offsets = [0.3, 0.7];
         series.slices.template.fillModifier = rgm;
         series.labels.labelText = '{name}';
         series.labels.template.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
-        series.legendSettings.paddingLeft = 0;
 
         series.ticks.template.disabled = true;
         series.labels.textAlign = "middle";
+        series.labels.template.padding(0, 0, 0, 0);
 
-        series.labels.template.radius = am4core.percent(-70);
-        series.labels.template.fill = am4core.color("white");
+        series.labels.template.fill = am4core.color("#333333");
         series.labels.template.paddingBottom = 0;
         series.labels.template.fontSize = 10;
-        series.labels.template.maxWidth = 100;
-        series.labels.template.wrap = true;
+        series.labels.template.maxWidth = 55;
+        series.labels.template.truncate = true;
+        series.labels.template.radius = am4core.percent(-40);
+        series.alignLabels = false;
+
+        series.ticks.template.events.on("ready", hideSmall);
+        series.ticks.template.events.on("visibilitychanged", hideSmall);
+        series.labels.template.events.on("ready", hideSmall);
+        series.labels.template.events.on("visibilitychanged", hideSmall);
 
         series.labels.template.adapter.add("radius", function(radius, target) {
-            
             if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
-              return 0;
+              target.fill = am4core.color("#333333");
+              return 10;
             }
             return radius;
           });
+
+          function hideSmall(ev) {
+            if (ev.target.dataItem && (ev.target.dataItem.values.value.percent < 5)) {
+              ev.target.hide();
+            }
+            else {
+              ev.target.show();
+            }
+          }
+
 
           series.ticks.template.adapter.add("disabled", function(disabled, target) {
             if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
@@ -374,13 +443,6 @@ class SpeakingTime extends React.PureComponent {
             return true;
           });
           
-          series.labels.template.adapter.add("fill", function(color, target) {
-              console.log('target', target)
-            if (target.dataItem && ((target.dataItem.values.value.percent < 10)) || target.dataItem.dataContext.color === '#f8effc'){
-              return am4core.color("#333333");
-            }
-            return color;
-          });
 
                 // //Add a shadow to chart
                 // const shadow = series.filters.push(new am4core.DropShadowFilter);

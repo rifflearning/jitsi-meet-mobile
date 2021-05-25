@@ -16,6 +16,8 @@
  * ******************************************************************************/
 
 import { logger } from './logger';
+import * as am4core from '@amcharts/amcharts4/core';
+
 
 /**
  * Give some name to colors we may want to use
@@ -25,49 +27,84 @@ import { logger } from './logger';
  * in order to determine where the same color is used in the code.
  * Keep this enum sorted by color value to make it easier to find a color.
  */
+// const Colors = {
+//     black:           '#000000',
+//     denim:           '#0f4ebd',
+//     turkoise:        '#128ead',
+//     aquamarine:      '#1b998b',
+//     eggplant:        '#321325',
+//     mineShaft:       '#333333',
+//     darkFern:        '#3c493f',
+//     tundora:         '#4a4a4a',
+//     lightAnchor:     '#576066',
+//     turquoiseBlue:   '#58d0ee',
+//     lightAnchor2:    '#607071',
+//     sage:            '#7caf5f',
+//     riffVioletDark:  '#775e80',
+//     babyBlue:        '#77adff',
+//     mauve:           '#85638c',
+//     lightRoyal:      '#8a6a94',
+//     africanLollipop: '#923a92',
+//     vibrantGreen:    '#92ff77',
+//     riffViolet:      '#93759e',
+//     deepRed:         '#ab0000',
+//     brightPlum:      '#ab45ab',
+//     lightGreen:      '#b0e890',
+//     lightLava:       '#bdc3c7',
+//     lightGrey:       '#d3d3d3',
+//     mischka:         '#e0d8e3',
+//     deepBlush:       '#e380a1',
+//     lighterGrey:     '#ededed',
+//     linen:           '#fbeae5',
+//     apricot:         '#f2a466',
+//     brightRed:       '#f44336',
+//     casablanca:      '#f5b642',
+//     reddishPeach:    '#f56b6b',
+//     darkYellow:      '#f6da5c',
+//     purpleWhite:     '#f6f0fb',
+//     selago:          '#f8effc',
+//     purplishWhite:   '#f9f6fc',
+//     redPunch:        '#ff6384',
+//     pink:            '#ff7792',
+//     orange:          '#ff6c3f',
+//     cornflowerLilac: '#ffadad',
+//     lightOrange:     '#ffad77',
+//     white:           '#ffffff',
+// };
+
 const Colors = {
     black:           '#000000',
-    denim:           '#0f4ebd',
-    turkoise:        '#128ead',
-    aquamarine:      '#1b998b',
-    eggplant:        '#321325',
     mineShaft:       '#333333',
-    darkFern:        '#3c493f',
     tundora:         '#4a4a4a',
-    lightAnchor:     '#576066',
-    turquoiseBlue:   '#58d0ee',
-    lightAnchor2:    '#607071',
-    sage:            '#7caf5f',
     riffVioletDark:  '#775e80',
-    babyBlue:        '#77adff',
-    mauve:           '#85638c',
-    lightRoyal:      '#8a6a94',
-    africanLollipop: '#923a92',
-    vibrantGreen:    '#92ff77',
     riffViolet:      '#93759e',
     deepRed:         '#ab0000',
-    brightPlum:      '#ab45ab',
-    lightGreen:      '#b0e890',
-    lightLava:       '#bdc3c7',
     lightGrey:       '#d3d3d3',
     mischka:         '#e0d8e3',
     deepBlush:       '#e380a1',
-    lighterGrey:     '#ededed',
-    linen:           '#fbeae5',
-    apricot:         '#f2a466',
-    brightRed:       '#f44336',
-    casablanca:      '#f5b642',
-    reddishPeach:    '#f56b6b',
     darkYellow:      '#f6da5c',
-    purpleWhite:     '#f6f0fb',
+    purpleLight:     '#F8EFFC',
     selago:          '#f8effc',
-    purplishWhite:   '#f9f6fc',
-    redPunch:        '#ff6384',
-    pink:            '#ff7792',
-    orange:          '#ff6c3f',
-    cornflowerLilac: '#ffadad',
-    lightOrange:     '#ffad77',
     white:           '#ffffff',
+    scorpion:        '#5a5a5a',
+    doublePear:      '#fcf1cd',
+    iceBlue:         '#eff9f9',
+    zanah:           '#e3f1df',
+    starDust: "#8f8f8f",
+   // silver: '#c4c4c4',
+    mercury: '#e5e5e5',
+    riffVioletMedium: '#BE99CB',
+    lightPurple: '#F8EFFC',
+    darkGray: '#828282',
+    gray: '#C4C4C4',
+    lightGray: '#E5E5E5',
+    whiteGray: '#e6e6e6',
+    silver: '#F9F9F9',
+    violet1: '#a991b1',
+    violet2: '#beacc5',
+    lightRoyal:      '#8a6a94',
+
+
 };
 
 /**
@@ -79,16 +116,33 @@ const Colors = {
  * so this list also exist and needs to be kept in sync w/ what's in
  * sass/components/_bulma.scss
  */
+// const PeerColors = [
+//     Colors.riffViolet,
+//     Colors.casablanca,
+//     Colors.turquoiseBlue,
+//     Colors.lightGreen,
+//     Colors.cornflowerLilac,
+//     Colors.apricot,
+//     Colors.eggplant,
+//     Colors.darkFern,
+//     Colors.aquamarine,
+// ];
+
+
 const PeerColors = [
+    Colors.riffVioletMedium,
+    Colors.lightPurple,
+   Colors.darkGray,
+    Colors.gray,
+    Colors.lightGray,
+    Colors.whiteGray,
+    Colors.silver,
+    Colors.riffVioletDark,
     Colors.riffViolet,
-    Colors.casablanca,
-    Colors.turquoiseBlue,
-    Colors.lightGreen,
-    Colors.cornflowerLilac,
-    Colors.apricot,
-    Colors.eggplant,
-    Colors.darkFern,
-    Colors.aquamarine,
+    Colors.violet1,
+    Colors.violet2,
+    // Colors.tundora,
+    // Colors.mischka,
 ];
 
 /**
@@ -191,6 +245,8 @@ function getColorMap(setIds, selfId) {
     }
 
     const colorMap = new Map();
+
+    console.log('colorMap', colorMap)
     let i = 0;
     for (const id of setIds) {
         if (id === selfId) {

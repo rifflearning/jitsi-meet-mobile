@@ -16,7 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import InfoIcon from '@material-ui/icons/Info';
+import InfoIcon from '../../../../assets/info.svg';
 
 import { logger } from 'libs/utils';
 

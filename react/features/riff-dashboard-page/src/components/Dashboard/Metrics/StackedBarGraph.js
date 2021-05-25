@@ -17,6 +17,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import * as d3 from 'd3-array';
 
 import { ScaleLoader } from 'react-spinners';
 
@@ -85,6 +86,7 @@ class StackedBarGraph extends React.PureComponent {
 
         this.chart = null;
         this.series = [];
+        this.valueAxis = null;
 
         this.toggleSeries = this.toggleSeries.bind(this);
         this.getLegendItems = this.getLegendItems.bind(this);
@@ -94,7 +96,7 @@ class StackedBarGraph extends React.PureComponent {
      * componentDidMount                                                   */ /**
      */
     componentDidMount() {
-        this.initGraph();
+         this.initGraph();
     }
 
     /* **************************************************************************
@@ -114,10 +116,21 @@ class StackedBarGraph extends React.PureComponent {
 
         // If the dataset's current status is 'loaded', then draw graph
         // Also, don't re-draw graph if we only want to update the legend
+
         if (isLoaded && this.state.updatedLegendAt === prevState.updatedLegendAt) {
             logger.debug('StackedBarGraph.didUpdate: drawing graph', this.props.graphType, this.props);
+            if(this.chart !== null) {
+                this.disposeChart();
+                this.chart = null;
+            }
+            this.series = [];
+            this.valueAxis = null;
+
+            this.initGraph();
             this.drawGraph();
+            this.createLabels();
         }
+        
     }
 
     /* **************************************************************************
@@ -166,11 +179,12 @@ class StackedBarGraph extends React.PureComponent {
                 <div
                     className={`amcharts-graph-container ${this.props.graphType}-grouped-bar-graph-div`}
                 />
-                {this.state.updatedLegendAt !== null &&
+                {this.state.updatedLegendAt === null &&
                     <AmChartsLegend
                         graphType={this.props.graphType}
                         getLegendItems={this.getLegendItems}
-                        updatedLegendAt={this.state.updatedLegendAt}
+                       // updatedLegendAt={this.state.updatedLegendAt}
+                       updatedLegendAt={new Date()}
                     />
                 }
             </ChartCard>
@@ -212,8 +226,10 @@ class StackedBarGraph extends React.PureComponent {
         this.series.forEach((series) => {
             const graphConfig = GraphConfigs[series.graphType];
 
-            const hidden = series.isHiding || !series.visible || series.noData;
+           // const hidden = series.isHiding || !series.visible || series.noData;
             const legendItemColor = series.noData ? '#999999' : graphConfig.color;
+
+            const hidden = series.isHiding;
 
             const hiddenClass = hidden ? 'hidden' : '';
             const emptyDatasetClass = series.noData ? 'empty-dataset' : '';
@@ -221,7 +237,7 @@ class StackedBarGraph extends React.PureComponent {
             legendItems.push(
                 <div
                     className={`legend-item stacked-bar ${hiddenClass} ${emptyDatasetClass}`}
-                    onClick={() => this.toggleSeries(series)}
+                    //onClick={() => this.toggleSeries(series)}
                     key={`stacked-bar-legend-item-${series.graphType}`}
                 >
                     <span
@@ -261,10 +277,13 @@ class StackedBarGraph extends React.PureComponent {
 
             seriesEvents.forEach((event) => {
 
+
+                const participantName = event.otherParticipantName.split(' ')[0];
                 // If an entry hasn't been created for the participant that this event took place with,
                 // create one
                 if (!chartData[event.otherUtt.participant]) {
                     chartData[event.otherUtt.participant] = {
+                        name: participantName,
                         participant: event.otherParticipantName,
                         totalRelations: 0,
                     };
@@ -287,7 +306,7 @@ class StackedBarGraph extends React.PureComponent {
         .filter(participant => participant.totalRelations > 0);
 
         logger.debug('StackedBarGraph: chartData', { chartData });
-
+console.log('chartData', chartData)
         return chartData;
     }
 
@@ -333,6 +352,7 @@ class StackedBarGraph extends React.PureComponent {
                 series.show();
             }
         });
+        chart.dx = 10;
 
         chart.data = chartData;
     }
@@ -355,7 +375,7 @@ class StackedBarGraph extends React.PureComponent {
 
         series.graphType = graphType;
         series.dataFields.valueY = config.legendLabel;
-        series.dataFields.categoryX = 'participant';
+        series.dataFields.categoryX = 'name';
         series.name = config.legendLabel;
         series.columns.template.fill = config.color;
         series.columns.template.stroke = config.color;
@@ -363,6 +383,12 @@ class StackedBarGraph extends React.PureComponent {
         series.stacked = true;
         series.columns.template.width = am4core.percent(95);
         series.columns.template.maxWidth = 150;
+
+        //series.columns.template.dx = 100;
+
+        const rgm = new am4core.LinearGradientModifier();
+        rgm.brightnesses.push(0, -0.07, -0.18);
+        series.columns.template.fillModifier = rgm;
 
         this.series.push(series);
     }
@@ -381,6 +407,10 @@ class StackedBarGraph extends React.PureComponent {
         valueAxis.min = 0;
         valueAxis.maxPrecision = 0; // Makes the axis steps integers
         valueAxis.title.disabled = true;
+        //valueAxis.calculateTotals = true;
+
+        valueAxis.renderer.grid.template.disabled = true;
+        valueAxis.renderer.labels.template.disabled = true;
 
         return valueAxis;
     }
@@ -404,16 +434,26 @@ class StackedBarGraph extends React.PureComponent {
         // names, etc. need to address this but not sure how
         // - jr 05.08.20
         const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-        categoryAxis.dataFields.category = 'participant';
+        categoryAxis.dataFields.category = 'name';
         categoryAxis.renderer.grid.template.location = 0;
         categoryAxis.renderer.grid.template.disabled = true;
         categoryAxis.renderer.minGridDistance = 20;
         categoryAxis.renderer.cellStartLocation = 0.1;
         categoryAxis.renderer.cellEndLocation = 0.9;
+        categoryAxis.renderer.line.strokeWidth = 2;
+        categoryAxis.renderer.line.stroke = am4core.color('#5A5A5A');
+
+       // categoryAxis.renderer.labels.labelText = {name};
+
         const label = categoryAxis.renderer.labels.template;
         label.fontSize = 10;
         label.truncate = true;
-        label.tooltipText = '{category}';
+        label.tooltipText = '{participant}';
+
+        label.adapter.add("textOutput", function(text) {
+            return `[font-weight: 600 text-transform: uppercase]${text}`
+          });
+
         categoryAxis.events.on('sizechanged', (ev) => {
             const axis = ev.target;
             const cellWidth = axis.pixelWidth / (axis.endIndex - axis.startIndex);
@@ -443,13 +483,13 @@ class StackedBarGraph extends React.PureComponent {
         // Create chart and place it inside the html element with id {graphType}-grouped-bar-graph-div
         const chart = am4core.create(`${this.props.graphType}-grouped-bar-graph-div`, am4charts.XYChart);
 
-        chart.background.fill = Colors.selago;
+        chart.background.fill = Colors.white;
 
         // Fired when graph's data gets updated
         chart.events.on('datavalidated', () => {
             this.props.dashboardGraphLoaded(this.props.graphType);
             // Update legend
-            this.setState({ updatedLegendAt: new Date() });
+            //this.setState({ updatedLegendAt: new Date() });
         });
 
         // Create categoryAxis axis
@@ -461,6 +501,7 @@ class StackedBarGraph extends React.PureComponent {
         // Disable lint because this variable might be useful in future
         // eslint-disable-next-line no-unused-vars
         const valueAxis = this.createYAxis(chart);
+        this.valueAxis = valueAxis;
 
         // Create a graph series for each embedded graph type
         this.props.embeddedGraphTypes.forEach((graphType) => {
@@ -505,6 +546,25 @@ class StackedBarGraph extends React.PureComponent {
         const loadingNewData = wasLoaded && !isLoaded;
 
         return { wasLoading, isLoaded, loadingNewData };
+    }
+
+    createLabels() {
+
+        const chartData = this.getGraphData();
+        const sum = d3.sum(chartData, d => d.totalRelations || 0);
+        const count = chartData.length + 1
+        const avr = sum / count;
+        const title = 'average';
+
+        const range = this.valueAxis.axisRanges.create();
+        range.value = avr;
+        range.grid.stroke = am4core.color('#333333');
+        range.grid.strokeDasharray = '4, 4';
+        range.grid.strokeWidth = 2;
+        range.label.fill = am4core.color('#4A4A4A');
+        range.label.text = `[text-transform: uppercase]${title}`;
+        //range.label.inside = true;
+        range.label.dy = -10;
     }
 }
 
