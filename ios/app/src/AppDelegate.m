@@ -37,7 +37,7 @@
         [builder setFeatureFlag:@"resolution" withValue:@(360)];
         [builder setFeatureFlag:@"ios.screensharing.enabled" withBoolean:YES];
         builder.serverURL = [NSURL URLWithString:@"https://dev-jitsi.riffplatform.com"];
-        builder.welcomePageEnabled = NO; //Jerry riff: was yes, let's see if this fixes splash screen issue
+        builder.welcomePageEnabled = YES; //Jerry riff: was yes, let's see if this fixes splash screen issue
 
         // Apple rejected our app because they claim requiring a
         // Dropbox account for recording is not acceptable.
