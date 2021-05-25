@@ -4,9 +4,9 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:alpha.jitsi.net</string>
-		<string>applinks:beta.meet.jit.si</string>
-		<string>applinks:meet.jit.si</string>
+		<string>applinks:dev-jitsi.riffplatform.com</string>
+		<string>applinks:riffai.riffremote.com</string>
+		<string>applinks:ai.remote.com</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
