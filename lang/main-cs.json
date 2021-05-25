@@ -44,7 +44,7 @@
     },
     "calendarSync": {
         "addMeetingURL": "Přidejte odkaz na setkání",
-        "confirmAddLink": "Chcete k této události přidat odkaz Jitsi?",
+        "confirmAddLink": "Chcete k této události přidat odkaz Riff Connect?",
         "error": {
             "appConfiguration": "Integrace kalendáře není správně nastavena.",
             "generic": "Došlo k chybě. Zkontrolujte nastavení kalendáře nebo zkuste obnovit kalendář.",
@@ -939,7 +939,7 @@
         "headerSubtitle": "Bezpečné a kvalitní setkávání",
         "headerTitle": "Riff Connect",
         "info": "Informace o vytáčení",
-        "jitsiOnMobile": "Jitsi na mobilu – stáhněte si naše aplikace a spusťte hovor odkudkoliv",
+        "RiffConnectOnMobile": "Riff Connect na mobilu – stáhněte si naše aplikace a spusťte hovor odkudkoliv",
         "join": "VYTVOŘIT / PŘIPOJIT",
         "moderatedMessage": "Nebo si předem <a href=\"{{url}}\" rel=\"noopener noreferrer\" target=\"_blank\">rezervujte adresu setkání</a>, kde budete jediný moderátor.",
         "privacy": "Soukromí",

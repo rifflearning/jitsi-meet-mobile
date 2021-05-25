@@ -44,7 +44,7 @@
     },
     "calendarSync": {
         "addMeetingURL": "Shtoni një lidhje takimi",
-        "confirmAddLink": "Doni të shtohet një lidhje Jitsi te kjo veprimtari?",
+        "confirmAddLink": "Doni të shtohet një lidhje Riff Connect te kjo veprimtari?",
         "error": {
             "appConfiguration": "Integrimi i kalendarëve s’është formësuar si duhet.",
             "generic": "Ndodhi një gabim. Ju lutemi, kontrolloni rregullimet për kalendarin tuaj, ose provoni të rifreskoni kalendarin.",
@@ -913,7 +913,7 @@
         "headerSubtitle": "Takime me siguri dhe me cilësi të lartë",
         "info": "Dial-in info",
         "join": "CREATE / JOIN",
-        "jitsiOnMobile": "Jitsi në celular – Shkarkoni aplikacione tona dhe nisni një takim prej ngado",
+        "RiffConnectOnMobile": "Riff Connect në celular – Shkarkoni aplikacione tona dhe nisni një takim prej ngado",
         "moderatedMessage": "Ose <a href=\"{{url}}\" rel=\"noopener noreferrer\" target=\"_blank\">rezervoni një URL takimi</a> paraprakisht, kur jeni i vetmi moderator.",
         "privacy": "Privatësi",
         "recentList": "Recent",

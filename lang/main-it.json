@@ -45,7 +45,7 @@
     },
     "calendarSync": {
         "addMeetingURL": "Aggiungi un collegamento alla riunione",
-        "confirmAddLink": "Vuoi aggiungere un collegamento Jitsi a questo evento?",
+        "confirmAddLink": "Vuoi aggiungere un collegamento Riff Connect a questo evento?",
         "error": {
             "appConfiguration": "L'integrazione del calendario non è configurata in modo appropriato.",
             "generic": "È stato riscontrato un errore. Controllare le impostazioni del calendario o ricaricare la pagina.",
@@ -933,7 +933,7 @@
         "headerSubtitle": "Riunioni sicure e di alta qualità",
         "info": "Informazioni chiamata",
         "join": "CREA / UNISCITI",
-        "jitsiOnMobile": "Jitsi su mobile – scarica le nostre app e dai inizio ad una riunione dovunque tu sia",
+        "RiffConnectOnMobile": "Riff Connect su mobile – scarica le nostre app e dai inizio ad una riunione dovunque tu sia",
         "moderatedMessage": "O <a href=\"{{url}}\" rel=\"noopener noreferrer\" target=\"_blank\">prepara una URL</a> in anticipo, per le riunioni di cui sei il moderatore.",
         "privacy": "Riservatezza",
         "recentList": "Recenti",
