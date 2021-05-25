@@ -45,7 +45,7 @@
     },
     "calendarSync": {
         "addMeetingURL": "Ajouter un lien de conférence",
-        "confirmAddLink": "Voulez-vous ajouter un lien Jitsi à cet événement ?",
+        "confirmAddLink": "Voulez-vous ajouter un lien Riff Connect à cet événement ?",
         "error": {
             "appConfiguration": "L'intégration du calendrier n'est pas correctement configurée.",
             "generic": "Une erreur s'est produite. Veuillez vérifier les paramètres de votre calendrier ou tenter de l'actualiser.",
@@ -923,7 +923,7 @@
         "headerSubtitle": "Conférences sécurisées et de haute qualité",
         "info": "Infos",
         "join": "CRÉER / REJOINDRE",
-        "jitsiOnMobile": "Jitsi sur mobile – télécharger notre application et démarrez des conférences de n'import où",
+        "RiffConnectOnMobile": "Riff Connect sur mobile – télécharger notre application et démarrez des conférences de n'import où",
         "moderatedMessage": "Ou <a href=\"{{url}}\" rel=\"noopener noreferrer\" target=\"_blank\">réserver une URL de réunion</a> à l'avance et où vous êtes le seul modérateur.",
         "privacy": "Confidentialité",
         "recentList": "Récent",
