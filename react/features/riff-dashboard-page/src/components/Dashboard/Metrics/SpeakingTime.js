@@ -409,6 +409,7 @@ class SpeakingTime extends React.PureComponent {
         series.labels.template.maxWidth = 55;
         series.labels.template.truncate = true;
         series.labels.template.radius = am4core.percent(-40);
+        series.ticks.template.disabled = true;
         series.alignLabels = false;
 
         series.ticks.template.events.on("ready", hideSmall);
@@ -419,7 +420,7 @@ class SpeakingTime extends React.PureComponent {
         series.labels.template.adapter.add("radius", function(radius, target) {
             if (target.dataItem && target.dataItem.values.value.percent < 10) {
               target.fill = am4core.color("#333333");
-              return 10;
+              return 3;
             }
             return radius;
           });
@@ -440,13 +441,12 @@ class SpeakingTime extends React.PureComponent {
             }
           }
 
-
-          series.ticks.template.adapter.add("disabled", function(disabled, target) {
-            if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
-              return false;
-            }
-            return true;
-          });
+        //   series.ticks.template.adapter.add("disabled", function(disabled, target) {
+        //     if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
+        //       return false;
+        //     }
+        //     return true;
+        //   });
           
 
                 // //Add a shadow to chart

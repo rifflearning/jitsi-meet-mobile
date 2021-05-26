@@ -99,7 +99,7 @@ const Colors = {
     gray: '#C4C4C4',
     lightGray: '#E5E5E5',
     whiteGray: '#e6e6e6',
-    silver: '#F9F9F9',
+    silver: '#f3f3f3',
     violet1: '#a991b1',
     violet2: '#beacc5',
     lightRoyal:      '#8a6a94',
@@ -132,7 +132,7 @@ const Colors = {
 const PeerColors = [
     Colors.riffVioletMedium,
     Colors.lightPurple,
-   Colors.darkGray,
+    Colors.darkGray,
     Colors.gray,
     Colors.lightGray,
     Colors.silver,

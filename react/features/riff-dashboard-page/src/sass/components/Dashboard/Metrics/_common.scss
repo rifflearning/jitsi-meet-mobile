@@ -147,9 +147,16 @@
 
     .legend-item {
         max-width: 100%;
+        padding-left: 0;
+        cursor: inherit;
         .label {
             font-size: 10px;
             font-weight: 500;
+        }
+        .peer-color {
+            margin-right: 3px;
+            width: 10px;
+            height: 10px;
         }
     }
 }
