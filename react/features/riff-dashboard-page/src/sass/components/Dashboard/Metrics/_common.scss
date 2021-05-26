@@ -105,13 +105,14 @@
             width: 14px;
             height: 14px;
             border-radius: 2px;
-            margin-right: 12px;
+            margin-right: 5px;
         }
 
         .label {
-            font-size: 14px;
+            font-size: 12px;
             line-height: 1.43;
             color: $color-tundora;
+            font-weight: 500;
         }
 
         &.timeline {

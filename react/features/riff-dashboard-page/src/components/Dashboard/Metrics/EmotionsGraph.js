@@ -154,11 +154,11 @@ const createSpikesSerie = (chart) => {
   const circle = bullet.createChild(am4core.Circle);
   circle.horizontalCenter = 'middle';
   circle.verticalCenter = 'middle';
-  circle.stroke = am4core.color('#58d0ee');
+  circle.stroke = am4core.color(Colors.riffVioletMedium);
   circle.direction = 'top';
   circle.width = 10;
   circle.height = 10;
-  circle.fill = am4core.color('#58d0ee');
+  circle.fill = am4core.color(Colors.riffVioletMedium);
 
   return emotionsSpikesSerie;
 }
@@ -224,7 +224,7 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       chartRef.current = am4core.create('emotion_chart', am4charts.XYChart);
       chartRef.current.hiddenState.properties.opacity = 0;
 
-      chartRef.current.background.fill = Colors.selago;
+      chartRef.current.background.fill = Colors.white;
       chartRef.current.data = bandsData;
 
       // Add X Axis
@@ -240,7 +240,7 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       middleBBSeries.dataFields.dateX = 'timestamp';
       middleBBSeries.dataFields.valueY = 'ma';
       middleBBSeries.name = 'median';
-      middleBBSeries.stroke = am4core.color('#93759E');
+      middleBBSeries.stroke = am4core.color(Colors.riffVioletDark);
       middleBBSeries.hiddenInLegend = true;
 
       const lowBBSeries = chartRef.current.series.push(new am4charts.LineSeries());
@@ -248,7 +248,7 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       lowBBSeries.dateFormatter.dateFormat = 'hh:mm:ss';
       lowBBSeries.dataFields.dateX = 'timestamp';
       lowBBSeries.dataFields.valueY = 'low';
-      lowBBSeries.stroke = am4core.color('#93759E');
+      lowBBSeries.stroke = am4core.color(Colors.riffVioletDark);
       lowBBSeries.name = 'low';
       lowBBSeries.hiddenInLegend = true;
 
@@ -257,8 +257,8 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       upperBBSeries.dataFields.valueY = 'higth';
       upperBBSeries.dataFields.openValueY = 'low';
       upperBBSeries.fillOpacity = 0.3;
-      upperBBSeries.stroke = am4core.color('#93759E');
-      upperBBSeries.fill = am4core.color('#93759E');
+      upperBBSeries.stroke = am4core.color(Colors.riffVioletDark);
+      upperBBSeries.fill = am4core.color(Colors.riffVioletMedium);
       upperBBSeries.name = 'higth';
 
       // Add user`s emotions spikes series
@@ -323,7 +323,7 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime, dashboard
       },
       {
         title: 'Your Emotion Spike',
-        color: '#58d0ee'
+        color: Colors.riffVioletMedium
       }
     ]
     eventsSeries.forEach((series, index) => {

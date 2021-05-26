@@ -616,6 +616,10 @@ class TimelineChart extends React.Component {
         categoryAxis.renderer.grid.template.location = 0;
         categoryAxis.labelColorField = 'color';
 
+        categoryAxis.renderer.labels.template.adapter.add("textOutput", function (text) {
+            return `[font-weight: 600 text-transform: uppercase]${text}`
+        });
+
         return categoryAxis;
     }
 

@@ -41,77 +41,10 @@ import { AmChartsLegend } from './AmChartsLegend';
 *
 ********************************************************************************/
 
-const getGradient = (first, second) => {
-    const  gradient = new am4core.LinearGradient();
-    gradient.addColor(am4core.color(first));
-    gradient.addColor(am4core.color(second));
-    return gradient;
-    }  
-    
-    
-    // const gr = {
-    //     lightPurple: getGradient('#F8EFFC', '#E0D8E3'),
-    //     riffVioletMedium: getGradient('#F8EFkk', '#E08E3h'),
-    //     darkGray: getGradient('#828282', '#5A5A5A'),
-    //     gray: getGradient('#C4C4C4', '#8F8F8E'),
-    //     lightGray: getGradient('#E5E5E5', '#C4C4C4'),
-    //     silver: getGradient('#F9F9F9', '#E5E5E5'),
-    // }
-
-    // const PeerColors = [
-    //     gr.riffVioletMedium,
-    //     gr.lightPurple,
-    //     gr.darkGray,
-    //     gr.gray,
-    //     gr.lightGray,
-    //     gr.silver,
-    //     gr.darkGray,
-    //     gr.gray,
-    //     gr.lightGray,
-    //     gr.silver,
-    //     gr.darkGray,
-    //     gr.gray,
-    //     gr.lightGray,
-    //     gr.silver,
-    // ];
-
-    // function getColorForOther(n) {
-    //     const i = n % (PeerColors.length - 1) + 1;
-    //     return PeerColors[i];
-    // }
-    // function getColorForSelf() {
-    //     return PeerColors[0];
-    // }
-
-    // function getColorMap(setIds, selfId) {
-    //     if (setIds.size > PeerColors.length) {
-    //         // This warning may be off by one because it assumes that selfId is in setIds
-    //         logger.warn(`getColorMap: Not enough distinct colors (${PeerColors.length}) for all ids (${setIds.size})`);
-    //     }
-    
-    //     const colorMap = new Map();
-    
-    //     console.log('colorMap', colorMap)
-    //     let i = 0;
-    //     for (const id of setIds) {
-    //         if (id === selfId) {
-    //             colorMap.set(id, getColorForSelf());
-    //         }
-    //         else {
-    //             colorMap.set(id, getColorForOther(i));
-    //             i++;
-    //         }
-    //     }
-    
-    //     return colorMap;
-    // }
-
-    const checkColorText = (color) => {
-        const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
-        return darkTextColorArr.includes(color.toUpperCase())
-    }
-    
-                
+const checkColorText = (color) => {
+    const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
+    return darkTextColorArr.includes(color.toLowerCase())
+}               
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
