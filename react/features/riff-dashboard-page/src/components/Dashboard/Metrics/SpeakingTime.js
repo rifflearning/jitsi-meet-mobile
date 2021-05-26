@@ -249,6 +249,8 @@ class SpeakingTime extends React.PureComponent {
     getGraphData() {
         const sortedParticipantsIds = this.props.graphDataset.data.sort((a, b) => b.lengthUtterances - a.lengthUtterances).map(participant => participant.participantId)
         const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
+
+        let youData = {};
         
         const graphData = this.props.graphDataset.data.map((participant) => {
             const name = participant.participantId === this.props.participantId ? 'You' : participant.name;
@@ -259,17 +261,23 @@ class SpeakingTime extends React.PureComponent {
                 name: participantName,
                 participant: name,
                 lengthUtterances,
-               color: participantColors.get(participant.participantId),
+                color: participantColors.get(participant.participantId),
             };
+            //refactor it
+            if (participant.participantId === this.props.participantId) {
+                youData = config;
+            }
 
             const tooltip = GraphConfigs[this.props.graphType].getTooltip(config);
             config.tooltipText = tooltip;
 
             return config;
-        }).sort((a, b) => b.lengthUtterances - a.lengthUtterances);
+        })
+        .filter(participant => participant.name !== 'You')
+        .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
 
         logger.debug('SpeakingTime: graphData', { graphData });
-        return graphData;
+        return [youData].concat(graphData);
     }
 
     /* ******************************************************************************
@@ -320,7 +328,7 @@ class SpeakingTime extends React.PureComponent {
         slices.propertyFields.fill = 'color';
         slices.cornerRadius = 1;
         slices.tooltipText = '{tooltipText}';
-        slices.strokeWidth = 1;
+        slices.strokeWidth = 0;
         slices.strokeOpacity = 1;
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
@@ -345,8 +353,6 @@ class SpeakingTime extends React.PureComponent {
         series.ticks.template.disabled = true;
         series.alignLabels = false;
 
-        series.ticks.template.events.on("ready", hideSmall);
-        series.ticks.template.events.on("visibilitychanged", hideSmall);
         series.labels.template.events.on("ready", hideSmall);
         series.labels.template.events.on("visibilitychanged", hideSmall);
 
@@ -373,20 +379,6 @@ class SpeakingTime extends React.PureComponent {
               ev.target.show();
             }
           }
-
-        //   series.ticks.template.adapter.add("disabled", function(disabled, target) {
-        //     if (target.dataItem && (target.dataItem.values.value.percent < 10)) {
-        //       return false;
-        //     }
-        //     return true;
-        //   });
-          
-
-                // //Add a shadow to chart
-                // const shadow = series.filters.push(new am4core.DropShadowFilter);
-                // shadow.dx = 0;
-                // shadow.dy = 3;
-                // shadow.blur = 2;
 
         return series;
     }
