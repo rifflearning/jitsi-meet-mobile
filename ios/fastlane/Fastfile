@@ -22,20 +22,20 @@ platform :ios do
     update_app_identifier(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "src/Info.plist",
-      app_identifier: "com.atlassian.JitsiMeet.ios"
+      app_identifier: "ai.riffanalytics.ai"
     )
 
     # Set the broadcast extension identifier
     update_app_identifier(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "broadcast-extension/Info.plist",
-      app_identifier: "com.atlassian.JitsiMeet.ios.broadcast"
+      app_identifier: "ai.riffanalytics.connect.broadcast"
     )
     update_info_plist(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "src/Info.plist",
       block: proc do |plist|
-        plist["RTCScreenSharingExtension"] = "com.atlassian.JitsiMeet.ios.broadcast"
+        plist["RTCScreenSharingExtension"] = "ai.riffanalytics.connect.broadcast"
       end
     )
 
@@ -43,21 +43,21 @@ platform :ios do
     update_app_identifier(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "watchos/app/Info.plist",
-      app_identifier: "com.atlassian.JitsiMeet.ios.watchkit"
+      app_identifier: "ai.riffanalytics.connect.watchkit"
     )
 
     # Set the (watch) extension identifier
     update_app_identifier(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "watchos/extension/Info.plist",
-      app_identifier: "com.atlassian.JitsiMeet.ios.watchkit.extension"
+      app_identifier: "ai.riffanalytics.connect.watchkit.extension"
     )
 
     update_info_plist(
       xcodeproj: "app/app.xcodeproj",
       plist_path: "watchos/app/Info.plist",
       block: proc do |plist|
-        plist["WKCompanionAppBundleIdentifier"] = "com.atlassian.JitsiMeet.ios"
+        plist["WKCompanionAppBundleIdentifier"] = "ai.riffanalytics.connect"
       end
     )
 
@@ -65,7 +65,7 @@ platform :ios do
       xcodeproj: "app/app.xcodeproj",
       plist_path: "watchos/extension/Info.plist",
       block: proc do |plist|
-        plist["NSExtension"]["NSExtensionAttributes"]["WKAppBundleIdentifier"] = "com.atlassian.JitsiMeet.ios.watchkit"
+        plist["NSExtension"]["NSExtensionAttributes"]["WKAppBundleIdentifier"] = "ai.riffanalytics.connect.watchkit"
       end
     )
 
