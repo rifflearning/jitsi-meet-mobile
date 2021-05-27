@@ -82,7 +82,7 @@ deploy-local:
 	([ ! -x deploy-local.sh ] || ./deploy-local.sh)
 
 deploy-aws: all
-	sh ./deploy-aws.sh
+	bash ./deploy-aws.sh
 
 .NOTPARALLEL:
 dev: deploy-init deploy-css deploy-rnnoise-binary deploy-lib-jitsi-meet deploy-libflac

@@ -90,20 +90,11 @@ const Colors = {
     doublePear:      '#fcf1cd',
     iceBlue:         '#eff9f9',
     zanah:           '#e3f1df',
-    starDust: "#8f8f8f",
-    mercury: '#e5e5e5',
-    riffVioletMedium: '#be99cb',
-    lightPurple: '#f8effc',
-    darkGray: '#828282',
-    gray: '#c4c4c4',
-    lightGray: '#e5e5e5',
-    whiteGray: '#e6e6e6',
-    silver: '#f3f3f3',
-    violet1: '#a991b1',
-    violet2: '#beacc5',
-    lightRoyal:      '#8a6a94',
-
-
+    starDust:        "#8f8f8f",
+    mercury:         '#e5e5e5',
+    riffVioletMedium:'#be99cb',
+    lightPurple:     '#f8effc',
+    darkGray:        '#828282',
 };
 
 /**
@@ -179,13 +170,19 @@ function getColorForSecond() {
  *
  * @returns {ColorString} a color string for the nth other.
  */
-function getColorForOther(n, color) {
+function getColorForOther(n, currentColor, currentTextColor) {
     const k = n % 5;
+    let color = currentColor;
+    let textColor = currentTextColor;
     if(k === 0) {
         const i = (n/5) % (PeerColors.length - 2) + 2;
-        return PeerColors[i] 
+        color =  PeerColors[i];
+        textColor = Colors.white;
     }
-    return color;
+    if (n && n % 3 === 0 ) {
+        textColor = Colors.mineShaft;
+    }
+    return { color, textColor, level: k/5 };
 }
 
 /* ******************************************************************************
@@ -249,20 +246,24 @@ function getColorMap(setIds, selfId) {
 
     for (const id of mainColorsIds) {
         if (id === selfId) {
-            colorMap.set(id, { color: getColorForSelf(), level: 0 });
+            colorMap.set(id, { color: getColorForSelf(), textColor: Colors.white, level: 0 });
         }
         else {
-            colorMap.set(id, { color: getColorForSecond(), level: 0 });
+            colorMap.set(id, { color: getColorForSecond(), textColor: Colors.mineShaft, level: 0 });
         }
     }
     let color = PeerColors[2];
+    let textColor = Colors.white;
 
     let i = 0;
     for (const id of gradientColorsIds) {
-        color = getColorForOther(i, color);
-        colorMap.set(id, { color, level: getColorLevelForOther(i) });
+        color = getColorForOther(i, color, textColor).color;
+        textColor = getColorForOther(i, color, textColor).textColor;
+        const level =  getColorForOther(i, color, textColor).level;
+        colorMap.set(id, { color, level, textColor });
         i++;
     }
+    console.log('colorMap', colorMap)
     return colorMap;
 }
 

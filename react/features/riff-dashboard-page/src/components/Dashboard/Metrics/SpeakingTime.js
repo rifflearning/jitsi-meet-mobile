@@ -251,13 +251,14 @@ class SpeakingTime extends React.PureComponent {
             const lengthUtterances = participant.lengthUtterances;
             const participantName = name.split(' ')[0];
 
-            const { color, level } = participantColors.get(participant.participantId)
+            const { color, level, textColor } = participantColors.get(participant.participantId)
 
             const config = {
                 name: participantName,
                 participant: name,
                 lengthUtterances,
                 color: am4core.color(color).brighten(level),
+                textColor
             };
             //refactor it
             if (participant.participantId === this.props.participantId) {
@@ -340,7 +341,7 @@ class SpeakingTime extends React.PureComponent {
         series.labels.textAlign = "middle";
         series.labels.template.padding(0, 0, 0, 0);
 
-        series.labels.template.fill = am4core.color(Color.white);
+        series.labels.template.fill = am4core.color(Colors.white);
         series.labels.template.paddingBottom = 0;
         series.labels.template.fontSize = 10;
         series.labels.template.maxWidth = 55;
@@ -358,8 +359,8 @@ class SpeakingTime extends React.PureComponent {
           });
 
           series.labels.template.adapter.add("fill", function(fill, target) {
-            if (target.dataItem && checkColorText(target.dataItem._dataContext.color.hex)) {
-              return am4core.color(Colors.mineShaft);
+            if (target.dataItem && target.dataItem._dataContext.textColor) {
+              return am4core.color(target.dataItem._dataContext.textColor); 
             }
             return fill;
           });
