@@ -27,7 +27,7 @@ import { ScaleLoader } from 'react-spinners';
 import {
     Colors,
     getColorMap,
-    logger,
+    logger 
 } from 'libs/utils';
 import { EStatus, GraphConfigs, GraphTypes } from 'libs/utils/constants';
 
@@ -44,7 +44,8 @@ import { AmChartsLegend } from './AmChartsLegend';
 const checkColorText = (color) => {
     const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
     return darkTextColorArr.includes(color.toLowerCase())
-}               
+}    
+
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
@@ -156,13 +157,6 @@ class SpeakingTime extends React.PureComponent {
                 <div
                     className={'amcharts-graph-container speaking-time-graph-div'}
                 />
-                {/* {this.state.updatedLegendAt !== null &&
-                    <AmChartsLegend
-                        graphType={this.props.graphType}
-                        getLegendItems={this.getLegendItems}
-                        updatedLegendAt={this.state.updatedLegendAt}
-                    />
-                } */}
             </ChartCard>
         );
     }
@@ -257,11 +251,13 @@ class SpeakingTime extends React.PureComponent {
             const lengthUtterances = participant.lengthUtterances;
             const participantName = name.split(' ')[0];
 
+            const { color, level } = participantColors.get(participant.participantId)
+
             const config = {
                 name: participantName,
                 participant: name,
                 lengthUtterances,
-                color: participantColors.get(participant.participantId),
+                color: am4core.color(color).brighten(level),
             };
             //refactor it
             if (participant.participantId === this.props.participantId) {
@@ -328,15 +324,15 @@ class SpeakingTime extends React.PureComponent {
         slices.propertyFields.fill = 'color';
         slices.cornerRadius = 1;
         slices.tooltipText = '{tooltipText}';
+
         slices.strokeWidth = 0;
         slices.strokeOpacity = 1;
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
        const rgm = new am4core.LinearGradientModifier();
        rgm.brightnesses.push(0, -0.07, -0.18);
-       // rgm.opacities = [1, 1, 0];
-        //rgm.offsets = [0.3, 0.7];
         series.slices.template.fillModifier = rgm;
+
         series.labels.labelText = '{name}';
         series.labels.template.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
 
@@ -349,12 +345,9 @@ class SpeakingTime extends React.PureComponent {
         series.labels.template.fontSize = 10;
         series.labels.template.maxWidth = 55;
         series.labels.template.truncate = true;
-        series.labels.template.radius = am4core.percent(-40);
+        series.labels.template.radius = am4core.percent(-45);
         series.ticks.template.disabled = true;
         series.alignLabels = false;
-
-        series.labels.template.events.on("ready", hideSmall);
-        series.labels.template.events.on("visibilitychanged", hideSmall);
 
         series.labels.template.adapter.add("radius", function(radius, target) {
             if (target.dataItem && target.dataItem.values.value.percent < 10) {
@@ -365,20 +358,18 @@ class SpeakingTime extends React.PureComponent {
           });
 
           series.labels.template.adapter.add("fill", function(fill, target) {
-            if (target.dataItem && checkColorText(target.dataItem._dataContext.color)) {
+            if (target.dataItem && checkColorText(target.dataItem._dataContext.color.hex)) {
               return am4core.color("#333333");
             }
             return fill;
           });
 
-          function hideSmall(ev) {
-            if (ev.target.dataItem && (ev.target.dataItem.values.value.percent < 5)) {
-              ev.target.hide();
+          series.labels.template.adapter.add("disabled", function(disabled, target) {
+            if (target.dataItem && target.dataItem.values.value.percent < 5) {
+              return true;
             }
-            else {
-              ev.target.show();
-            }
-          }
+            return false;
+          });
 
         return series;
     }
@@ -420,6 +411,7 @@ class SpeakingTime extends React.PureComponent {
 
         this.chart = chart;
         this.pieSeries = pieSeries;
+
 
         return chart;
     }

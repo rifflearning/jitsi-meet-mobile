@@ -132,15 +132,16 @@ const PeerColors = [
     Colors.riffVioletMedium,
     Colors.lightPurple,
     Colors.darkGray,
-    Colors.gray,
-    Colors.lightGray,
-    Colors.silver,
     Colors.riffVioletDark,
-    Colors.riffViolet,
-    Colors.violet1,
-    Colors.violet2,
-    // Colors.tundora,
-    // Colors.mischka,
+    //Colors.gray,
+    // Colors.lightGray,
+    // Colors.silver,
+    // Colors.riffVioletDark,
+    //Colors.riffViolet,
+    //Colors.violet1,
+    //Colors.violet2,
+    Colors.iceBlue,
+   // Colors.mischka,
 ];
 
 /**
@@ -171,6 +172,9 @@ function rgbaColor(hexColor, opacity) {
 function getColorForSelf() {
     return PeerColors[0];
 }
+function getColorForSecond() {
+    return PeerColors[1]
+}
 
 /**
  * Get the color to use for the nth other.
@@ -183,9 +187,13 @@ function getColorForSelf() {
  *
  * @returns {ColorString} a color string for the nth other.
  */
-function getColorForOther(n) {
-    const i = n % (PeerColors.length - 1) + 1;
-    return PeerColors[i];
+function getColorForOther(n, color) {
+    const k = n % 5;
+    if(k === 0) {
+        const i = (n/5) % (PeerColors.length - 2) + 2;
+        return PeerColors[i] 
+    }
+    return color;
 }
 
 /* ******************************************************************************
@@ -242,21 +250,34 @@ function getColorMap(setIds, selfId) {
         logger.warn(`getColorMap: Not enough distinct colors (${PeerColors.length}) for all ids (${setIds.size})`);
     }
 
+    const gradientColorsIds = setIds.filter((id, index) => index !== 0 && id !== selfId);
+    const mainColorsIds = setIds.filter((id, index) => index === 0 || id === selfId);
+
     const colorMap = new Map();
 
-    let i = 0;
-    for (const id of setIds) {
+    for (const id of mainColorsIds) {
         if (id === selfId) {
-            colorMap.set(id, getColorForSelf());
+            colorMap.set(id, { color: getColorForSelf(), level: 0 });
         }
         else {
-            colorMap.set(id, getColorForOther(i));
-            i++;
+            colorMap.set(id, { color: getColorForSecond(), level: 0 });
         }
     }
+    let color = PeerColors[2];
 
+    let i = 0;
+    for (const id of gradientColorsIds) {
+        color = getColorForOther(i, color);
+        colorMap.set(id, { color, level: getColorLevelForOther(i) });
+        i++;
+    }
     return colorMap;
 }
+
+function getColorLevelForOther(n) {
+    return n % 5/ 5;
+}
+
 
 /* **************************************************************************** *
  * Module exports                                                               *
