@@ -398,10 +398,10 @@ class StackedBarGraph extends React.PureComponent {
         valueAxis.renderer.labels.template.disabled = true;
 
         const range = valueAxis.axisRanges.create();
-        range.grid.stroke = am4core.color('#333333');
+        range.grid.stroke = am4core.color(Colors.mineShaft);
         range.grid.strokeDasharray = '4, 4';
         range.grid.strokeWidth = 2;
-        range.label.fill = am4core.color('#4A4A4A');
+        range.label.fill = am4core.color(Colors.tundora);
         range.label.text = `[text-transform: uppercase]average`;
         range.label.verticalCenter = "middle";
 
@@ -437,12 +437,12 @@ class StackedBarGraph extends React.PureComponent {
         categoryAxis.renderer.cellEndLocation = 0.9;
         categoryAxis.renderer.line.strokeOpacity = 1;
         categoryAxis.renderer.line.strokeWidth = 2;
-        categoryAxis.renderer.line.stroke = am4core.color('#5A5A5A');
+        categoryAxis.renderer.line.stroke = am4core.color(Colors.scorpion);
 
         const label = categoryAxis.renderer.labels.template;
         label.fontSize = 10;
         label.truncate = true;
-        label.fill = am4core.color('#333333');
+        label.fill = am4core.color(Colors.mineShaft);
         label.tooltipText = '{participant}';
 
         label.adapter.add("textOutput", function(text) {

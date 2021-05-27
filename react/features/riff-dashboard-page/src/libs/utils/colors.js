@@ -133,15 +133,7 @@ const PeerColors = [
     Colors.lightPurple,
     Colors.darkGray,
     Colors.riffVioletDark,
-    //Colors.gray,
-    // Colors.lightGray,
-    // Colors.silver,
-    // Colors.riffVioletDark,
-    //Colors.riffViolet,
-    //Colors.violet1,
-    //Colors.violet2,
-    Colors.iceBlue,
-   // Colors.mischka,
+    Colors.riffViolet,
 ];
 
 /**

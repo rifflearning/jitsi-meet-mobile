@@ -340,7 +340,7 @@ class SpeakingTime extends React.PureComponent {
         series.labels.textAlign = "middle";
         series.labels.template.padding(0, 0, 0, 0);
 
-        series.labels.template.fill = am4core.color("#ffffff");
+        series.labels.template.fill = am4core.color(Color.white);
         series.labels.template.paddingBottom = 0;
         series.labels.template.fontSize = 10;
         series.labels.template.maxWidth = 55;
@@ -351,7 +351,7 @@ class SpeakingTime extends React.PureComponent {
 
         series.labels.template.adapter.add("radius", function(radius, target) {
             if (target.dataItem && target.dataItem.values.value.percent < 10) {
-              target.fill = am4core.color("#333333");
+              target.fill = am4core.color(Colors.mineShaft);
               return 3;
             }
             return radius;
@@ -359,7 +359,7 @@ class SpeakingTime extends React.PureComponent {
 
           series.labels.template.adapter.add("fill", function(fill, target) {
             if (target.dataItem && checkColorText(target.dataItem._dataContext.color.hex)) {
-              return am4core.color("#333333");
+              return am4core.color(Colors.mineShaft);
             }
             return fill;
           });
