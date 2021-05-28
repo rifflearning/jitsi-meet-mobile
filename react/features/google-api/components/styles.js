@@ -47,7 +47,7 @@ export default createStyleSheet({
      * Text of the sign out button.
      */
     signOutButtonText: {
-        color: ColorPalette.blue,
+        color: ColorPalette.purple,
         fontSize: 14,
         fontWeight: 'bold'
     }

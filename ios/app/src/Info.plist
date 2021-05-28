@@ -44,7 +44,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>FirebaseCrashlyticsCollectionEnabled</key>
 	<string>false</string>
 	<key>FirebaseScreenReportingEnabled</key>
@@ -79,7 +79,7 @@
 	<key>RTCAppGroupIdentifier</key>
 	<string>group.ai.riffanalytics.connect.appgroup</string>
 	<key>RTCScreenSharingExtension</key>
-	<string>ai.riffanalytics.connect.broadcast.extension</string>
+	<string>ai.riffanalytics.connect.broadcastextension</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

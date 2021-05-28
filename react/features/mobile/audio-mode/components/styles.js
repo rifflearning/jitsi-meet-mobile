@@ -41,6 +41,6 @@ export default createStyleSheet({
      * Style for a row which is marked as selected.
      */
     selectedText: {
-        color: ColorPalette.blue
+        color: ColorPalette.purple
     }
 });
