@@ -93,7 +93,7 @@ class StackedBarGraph extends React.PureComponent {
      * componentDidMount                                                   */ /**
      */
     componentDidMount() {
-         this.initGraph();
+        this.initGraph();
     }
 
     /* **************************************************************************
@@ -116,8 +116,7 @@ class StackedBarGraph extends React.PureComponent {
         if (isLoaded && this.state.updatedLegendAt === prevState.updatedLegendAt) {
             logger.debug('StackedBarGraph.didUpdate: drawing graph', this.props.graphType, this.props);
             this.drawGraph();
-        }
-        
+        }       
     }
 
     /* **************************************************************************
@@ -137,6 +136,7 @@ class StackedBarGraph extends React.PureComponent {
         // TODO: Determine empty dataset better.
         // getGraphData is called in drawGraph as well, but we don't want to set
         // state there because it will cause a re-render.
+        
         let emptyGraphText = null;
         const graphData = this.getGraphData();
 

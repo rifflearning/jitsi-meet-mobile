@@ -33,7 +33,7 @@ import {
     getColorForSelf,
     getColorMap,
     getCountOtherColors,
-    rgbaColor
+    rgbaColor,
 } from './colors';
 import {
     formatDuration,

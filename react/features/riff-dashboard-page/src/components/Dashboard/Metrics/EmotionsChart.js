@@ -37,9 +37,9 @@ import {
 } from 'libs/utils/constants';
 
 import { ChartCard } from './ChartCard';
-import EmotionsGraph from './EmotionsGraph'
+import EmotionsGraph from './EmotionsGraph';
 
-import api from '../../../../../riff-platform/api'
+import api from '../../../../../riff-platform/api';
 /* ******************************************************************************
  * EmotionsChart                                                           */ /**
  *

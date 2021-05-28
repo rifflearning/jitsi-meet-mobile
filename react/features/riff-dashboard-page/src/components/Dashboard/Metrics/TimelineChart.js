@@ -467,8 +467,8 @@ class TimelineChart extends React.Component {
         const sortingArr = this.props.graphDatasets?.meeting_stats?.data || [];
 
         const sortedParticipantsIds = sortingArr
-        .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
-        .map(participant => participant.participantId) || this.props.meeting.participants
+            .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
+            .map(participant => participant.participantId) || this.props.meeting.participants
         const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
 
         const participantSeriesData = [];
@@ -521,7 +521,6 @@ class TimelineChart extends React.Component {
         participantSeries.columns.template.strokeOpacity = 1;
         participantSeries.hiddenInLegend = true; // No legend items for other participants utt's
         participantSeries.columns.template.height = am4core.percent(60); // height of horizontal columns
-
 
         const rgm = new am4core.LinearGradientModifier();
         rgm.brightnesses.push(0, -0.08);
