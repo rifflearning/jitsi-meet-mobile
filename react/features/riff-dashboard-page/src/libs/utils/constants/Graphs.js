@@ -12,7 +12,8 @@
  *
  * ******************************************************************************/
 
-import { Colors, formatDuration, getColorForSelf } from 'libs/utils';
+import { formatDuration } from 'libs/utils';
+import { Colors, getColorForSelf } from '../../../components/Dashboard/Metrics/colorsHelpers';
 
 /**
  * identifiers for datasets that are used on the dashboard
