@@ -10,6 +10,56 @@ html body {
         h2 {
             color: #ffffff;
         }
+
+        #riff-chart-card.chart-card-component {
+                box-shadow: 0 1px 5px 0 rgba(#000000, 0.13);
+                background-color: #ffffff;
+        
+                .chart-card-title {
+                    line-height: 1.75;
+                    text-transform: uppercase;
+                    margin-bottom: 20px;
+                }        
+        
+            .loading-overlay {
+                background: #ffffff;
+            } 
+        
+            .empty-graph-text {
+                background: #ffffff;
+            }
+        
+            .amcharts-legend-container {
+                background: unset;
+            }
+        
+            .grouped_influences, .grouped_affirmations, .grouped_interruptions {
+                position: absolute;
+                background: #ffffff;
+                display: flex;
+                align-items: flex-start;
+                bottom: 0;
+                margin-bottom: 30px;
+                flex-direction: column;
+           
+                .legend-item {
+                    max-width: 100%;
+                    padding-left: 0;
+                    cursor: inherit;
+                    .label {
+                        font-size: 10px;
+                        font-weight: 500;
+                    }
+                    .peer-color {
+                        margin-right: 3px;
+                        width: 10px;
+                        height: 10px;
+                    }
+                  
+                }
+            }
+
+        }
     }
 }
 

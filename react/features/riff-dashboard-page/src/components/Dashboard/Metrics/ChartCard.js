@@ -99,7 +99,7 @@ class ChartCard extends React.Component {
         const infoId = `chart-info-${this.props.chartCardId}`;
 
         return (
-            <div className='chart-card-component card has-text-centered is-centered'>
+            <div className='chart-card-component card has-text-centered is-centered' id='riff-chart-card'>
                 {/* Use a column flexbox to allow the chart to adjust to the space not
                     occupied by the card title, remember only the direct children of the
                     flex container will be adjusted. */}
