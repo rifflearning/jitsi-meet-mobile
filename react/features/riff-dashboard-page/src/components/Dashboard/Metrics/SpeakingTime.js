@@ -249,7 +249,7 @@ class SpeakingTime extends React.PureComponent {
         const otherData = sortedParticipants.filter(el => el.participantId !== this.props.participantId);
 
         const graphData = selfData.concat(otherData).map(({ lengthUtterances, participantId, name }) => {
-            const { color, level, textColor } = participantColors.get(participantId);
+            const { color, level, textColor } = participantColors.get(participantId) || {};
             const config = {
                 name: name.split(' ')[0],
                 participant: name,

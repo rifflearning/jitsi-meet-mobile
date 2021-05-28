@@ -475,7 +475,7 @@ class TimelineChart extends React.Component {
         const participantSeriesData = [];
         timelineData.utts.map((utt) => {
 
-            const { color, level } = participantColors.get(utt.participant);
+            const { color, level } = participantColors.get(utt.participant) || {};
 
             const name = participantNames[utt.participant];
             const fromDate = new Date(utt.startDate);
