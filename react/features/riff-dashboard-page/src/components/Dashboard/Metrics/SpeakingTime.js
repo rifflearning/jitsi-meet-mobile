@@ -330,27 +330,25 @@ class SpeakingTime extends React.PureComponent {
         slices.strokeOpacity = 1;
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
-       const rgm = new am4core.LinearGradientModifier();
-       rgm.brightnesses.push(0, -0.07, -0.18);
-        series.slices.template.fillModifier = rgm;
+        const rgm = new am4core.LinearGradientModifier();
+        rgm.brightnesses.push(0, -0.07, -0.18);
+        slices.fillModifier = rgm;
 
         series.labels.labelText = '{name}';
-        series.labels.template.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
-
         series.ticks.template.disabled = true;
         series.labels.textAlign = "middle";
-        series.labels.template.padding(0, 0, 0, 0);
-
-        series.labels.template.fill = am4core.color(Colors.white);
-        series.labels.template.paddingBottom = 0;
-        series.labels.template.fontSize = 10;
-        series.labels.template.maxWidth = 55;
-        series.labels.template.truncate = true;
-        series.labels.template.radius = am4core.percent(-45);
-        series.ticks.template.disabled = true;
         series.alignLabels = false;
 
-        series.labels.template.adapter.add("radius", function(radius, target) {
+        const labels = series.labels.template;
+        labels.fill = am4core.color(Colors.white);
+        labels.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
+        labels.padding(0, 0, 0, 0);
+        labels.fontSize = 10;
+        labels.maxWidth = 55;
+        labels.truncate = true;
+        labels.radius = am4core.percent(-45);
+
+        labels.adapter.add("radius", function(radius, target) {
             if (target.dataItem && target.dataItem.values.value.percent < 10) {
               target.fill = am4core.color(Colors.mineShaft);
               return 3;
@@ -358,14 +356,14 @@ class SpeakingTime extends React.PureComponent {
             return radius;
           });
 
-          series.labels.template.adapter.add("fill", function(fill, target) {
+          labels.adapter.add("fill", function(fill, target) {
             if (target.dataItem && target.dataItem._dataContext.textColor) {
               return am4core.color(target.dataItem._dataContext.textColor); 
             }
             return fill;
           });
 
-          series.labels.template.adapter.add("disabled", function(disabled, target) {
+          labels.adapter.add("disabled", function(disabled, target) {
             if (target.dataItem && target.dataItem.values.value.percent < 5) {
               return true;
             }

@@ -472,6 +472,8 @@ class TimelineChart extends React.Component {
         const participantSeriesData = [];
         timelineData.utts.map((utt) => {
 
+            const { color, level } = participantColors.get(utt.participant);
+
             const name = participantNames[utt.participant];
             const fromDate = new Date(utt.startDate);
             const toDate = new Date(utt.endDate);
@@ -480,7 +482,7 @@ class TimelineChart extends React.Component {
                 categoryY: participantNames[utt.participant],
                 fromDate,
                 toDate,
-                color: participantColors.get(utt.participant),
+                color: am4core.color(color).brighten(level),
                 tooltipHTML: this.getUttTooltip(fromDate, toDate, name),
             };
 
@@ -522,7 +524,6 @@ class TimelineChart extends React.Component {
         const rgm = new am4core.LinearGradientModifier();
         rgm.brightnesses.push(0, -0.08);
         participantSeries.columns.template.fillModifier = rgm;
-
 
         participantSeries.events.on('validated', () => {
             this.props.dashboardGraphLoaded(this.props.graphType);

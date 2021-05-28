@@ -78,6 +78,7 @@ const Colors = {
     tundora:         '#4a4a4a',
     riffVioletDark:  '#775e80',
     riffViolet:      '#93759e',
+    lightRoyal:      '#8a6a94',
     deepRed:         '#ab0000',
     lightGrey:       '#d3d3d3',
     mischka:         '#e0d8e3',
@@ -263,12 +264,7 @@ function getColorMap(setIds, selfId) {
         colorMap.set(id, { color, level, textColor });
         i++;
     }
-    console.log('colorMap', colorMap)
     return colorMap;
-}
-
-function getColorLevelForOther(n) {
-    return n % 5/ 5;
 }
 
 
