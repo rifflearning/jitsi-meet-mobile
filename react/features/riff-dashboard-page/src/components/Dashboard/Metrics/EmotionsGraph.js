@@ -3,7 +3,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import moment from 'moment';
 import * as d3 from 'd3-array';
-import { Colors } from 'libs/utils';
+import { Colors } from './colorsHelpers';
 import { AmChartsLegend } from './AmChartsLegend';
 
 const formatTime = (dt) => new Date(dt).getTime()

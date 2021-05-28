@@ -24,15 +24,14 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import { ScaleLoader } from 'react-spinners';
 
+import { logger } from 'libs/utils';
 import {
     Colors,
     getColorMap,
-    logger 
-} from 'libs/utils';
+} from './colorsHelpers';
 import { EStatus, GraphConfigs, GraphTypes } from 'libs/utils/constants';
 
 import { ChartCard } from './ChartCard';
-import { AmChartsLegend } from './AmChartsLegend';
 
 /* ******************************************************************************
  * SpeakingTime                                                            */ /**

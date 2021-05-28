@@ -21,13 +21,15 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { ScaleLoader } from 'react-spinners';
 
 import { d3 } from 'libs/d3';
+import { 
+    logger, 
+    formatDuration, 
+    getDurationInSeconds 
+} from 'libs/utils';
 import {
     Colors,
-    formatDuration,
     getColorMap,
-    getDurationInSeconds,
-    logger,
-} from 'libs/utils';
+} from './colorsHelpers';
 
 import {
     EStatus,
