@@ -28,7 +28,7 @@
 
 .loading-overlay {
     z-index: 2 /* Overlay on top of AmChartsContainer and EmptyGraphText */;
-    background: $color-white;
+    background: $color-selago;
     position: absolute;
     top: 0;
     left: 0;
@@ -56,8 +56,7 @@
     align-items: center;
     padding: 0 2rem;
     justify-content: center;
-   // background: $color-selago;
-    background: white;
+    background: $color-selago;
     z-index: 1;
 
     @media (max-width: 1070px) {
@@ -66,7 +65,7 @@
 }
 
 .amcharts-legend-container {
-   // background: $color-mischka;
+    background: $color-mischka;
     border-radius: 4px;
     flex-wrap: wrap;
     display: flex;
@@ -105,14 +104,13 @@
             width: 14px;
             height: 14px;
             border-radius: 2px;
-            margin-right: 5px;
+            margin-right: 12px;
         }
 
         .label {
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.43;
             color: $color-tundora;
-            font-weight: 500;
         }
 
         &.timeline {
@@ -133,31 +131,6 @@
                 line-height: 1.43;
                 color: rgba(0, 0, 0, 0.87);
             }
-        }
-    }
-}
-
-.grouped_influences, .grouped_affirmations, .grouped_interruptions {
-    position: absolute;
-    background: transparent;
-    display: flex;
-    align-items: flex-start;
-    bottom: 0;
-    margin-bottom: 30px;
-    flex-direction: column;
-
-    .legend-item {
-        max-width: 100%;
-        padding-left: 0;
-        cursor: inherit;
-        .label {
-            font-size: 10px;
-            font-weight: 500;
-        }
-        .peer-color {
-            margin-right: 3px;
-            width: 10px;
-            height: 10px;
         }
     }
 }
