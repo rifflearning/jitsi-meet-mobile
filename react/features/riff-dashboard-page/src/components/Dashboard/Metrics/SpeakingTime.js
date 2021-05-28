@@ -40,11 +40,6 @@ import { ChartCard } from './ChartCard';
 *
 ********************************************************************************/
 
-const checkColorText = (color) => {
-    const darkTextColorArr = [Colors.lightPurple, Colors.lightGray, Colors.whiteGray, Colors.silver, Colors.violet2];
-    return darkTextColorArr.includes(color.toLowerCase())
-}    
-
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
@@ -240,40 +235,34 @@ class SpeakingTime extends React.PureComponent {
     * @returns {array} containing the prepared data for the graph
     */
     getGraphData() {
-        const sortedParticipantsIds = this.props.graphDataset.data.sort((a, b) => b.lengthUtterances - a.lengthUtterances).map(participant => participant.participantId)
+        const sortedParticipants = this.props.graphDataset.data.sort((a, b) => b.lengthUtterances - a.lengthUtterances);
+
+        const sortedParticipantsIds = sortedParticipants.map(participant => participant.participantId);
         const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
 
-        let youData = {};
-        
-        const graphData = this.props.graphDataset.data.map((participant) => {
-            const name = participant.participantId === this.props.participantId ? 'You' : participant.name;
-            const lengthUtterances = participant.lengthUtterances;
-            const participantName = name.split(' ')[0];
+        const selfData = [{
+            ...(this.props.graphDataset.data.find(el => el.participantId === this.props.participantId) || {}),
+            name: 'You',
+            participant: 'You'
+        }];
 
-            const { color, level, textColor } = participantColors.get(participant.participantId)
+        const otherData = sortedParticipants.filter(el => el.participantId !== this.props.participantId);
 
+        const graphData = selfData.concat(otherData).map(({ lengthUtterances, participantId, name }) => {
+            const { color, level, textColor } = participantColors.get(participantId);
             const config = {
-                name: participantName,
+                name: name.split(' ')[0],
                 participant: name,
                 lengthUtterances,
                 color: am4core.color(color).brighten(level),
                 textColor
             };
-            //refactor it
-            if (participant.participantId === this.props.participantId) {
-                youData = config;
-            }
-
-            const tooltip = GraphConfigs[this.props.graphType].getTooltip(config);
-            config.tooltipText = tooltip;
-
+            config.tooltipText = GraphConfigs[this.props.graphType].getTooltip(config);;
             return config;
         })
-        .filter(participant => participant.name !== 'You')
-        .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
 
         logger.debug('SpeakingTime: graphData', { graphData });
-        return [youData].concat(graphData);
+        return graphData;
     }
 
     /* ******************************************************************************

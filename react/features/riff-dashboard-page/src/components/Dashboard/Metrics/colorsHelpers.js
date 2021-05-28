@@ -74,13 +74,13 @@
      let color = currentColor;
      let textColor = currentTextColor;
      if(k === 0) {
-         const i = (n/5) % (PeerColors.length - 2) + 2;
+         const i = (n / 5) % (PeerColors.length - 2) + 2;
          color =  PeerColors[i];
          textColor = Colors.white;
      } else if (n && n % 3 === 0 ) {
          textColor = Colors.mineShaft;
      }
-     return { color, textColor, level: k/5 };
+     return { color, textColor, level: k / 5 };
  }
  
  /* ******************************************************************************
@@ -115,15 +115,15 @@
  
      let i = 0;
      for (const id of gradientColorsIds) {
-         color = getColorForOther(i, color, textColor).color;
-         textColor = getColorForOther(i, color, textColor).textColor;
-         const level =  getColorForOther(i, color, textColor).level;
+         const colorConfig = getColorForOther(i, color, textColor);
+         color = colorConfig.color;
+         textColor = colorConfig.textColor;
+         const level =  colorConfig.level;
          colorMap.set(id, { color, level, textColor });
          i++;
      }
      return colorMap;
  }
- 
  
  /* **************************************************************************** *
   * Module exports                                                               *

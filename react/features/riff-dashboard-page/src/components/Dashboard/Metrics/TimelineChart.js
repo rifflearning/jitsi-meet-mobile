@@ -464,11 +464,12 @@ class TimelineChart extends React.Component {
      * @param {object} timelineData the timeline data for a meeting
      */
     addParticipantData(participantNames, timelineData) {
-        const sortingArr = this.props.graphDatasets?.meeting_stats?.data || [];
-
-        const sortedParticipantsIds = sortingArr
+        const participantsData = this.props.graphDatasets?.meeting_stats?.data || [];
+        //sorted participants ids are required for generating correct colors   
+        const sortedParticipantsIds = participantsData
             .sort((a, b) => b.lengthUtterances - a.lengthUtterances)
-            .map(participant => participant.participantId) || this.props.meeting.participants
+            .map(participant => participant.participantId);
+
         const participantColors = getColorMap(sortedParticipantsIds, this.props.participantId);
 
         const participantSeriesData = [];
