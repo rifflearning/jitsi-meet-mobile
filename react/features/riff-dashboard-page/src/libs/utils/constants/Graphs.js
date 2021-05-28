@@ -12,7 +12,8 @@
  *
  * ******************************************************************************/
 
-import { Colors, formatDuration, getColorForSelf } from 'libs/utils';
+import { formatDuration } from 'libs/utils';
+import { Colors, getColorForSelf } from '../../../components/Dashboard/Metrics/colorsHelpers';
 
 /**
  * identifiers for datasets that are used on the dashboard
@@ -118,7 +119,7 @@ const GraphConfigs = {
         },
         whatIsCounted: 'Influences',
         legendLabel: 'Their Influences',
-        color: Colors.deepBlush,
+        color: Colors.lightPurple,
         datasetType: GraphDatasetTypes.INFLUENCES,
     },
 
@@ -172,7 +173,7 @@ const GraphConfigs = {
         },
         whatIsCounted: 'Interruptions',
         legendLabel: 'Their Interruptions',
-        color: Colors.deepBlush,
+        color: Colors.lightPurple,
         datasetType: GraphDatasetTypes.INTERRUPTIONS,
     },
 
@@ -211,7 +212,7 @@ const GraphConfigs = {
         legendLabel: 'Their Affirmations',
         whatIsCounted: 'Affirmations',
         relationshipType: 'Their Affirmations',
-        color: Colors.deepBlush,
+        color: Colors.lightPurple,
         eventsFilter: (events, uid) => {
             return events.filter((event) => {
                 return event.earlierUtt.utt.participant === uid;
