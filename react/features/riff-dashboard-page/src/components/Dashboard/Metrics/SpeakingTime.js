@@ -1,21 +1,21 @@
 /* ******************************************************************************
  * SpeakingTime.js                                                              *
  * *************************************************************************/ /**
-*
-* @fileoverview React component to visualize the distribution of speaking
-* time in a meeting.
-*
-* TODO: Tweak this component to be a generic pie chart to display any
-* categorical data. Instead of expecting an array of participants with
-* total utterance lengths, expect an array of the unexpected.
-*
-* Created on       October 28, 2019
-* @author          Brec Hanson
-*
-* @copyright (c) 2019-present Riff Learning Inc.,
-*            MIT License (see https://opensource.org/licenses/MIT)
-*
-* ******************************************************************************/
+ *
+ * @fileoverview React component to visualize the distribution of speaking
+ * time in a meeting.
+ *
+ * TODO: Tweak this component to be a generic pie chart to display any
+ * categorical data. Instead of expecting an array of participants with
+ * total utterance lengths, expect an array of the unexpected.
+ *
+ * Created on       October 28, 2019
+ * @author          Brec Hanson
+ *
+ * @copyright (c) 2019-present Riff Learning Inc.,
+ *            MIT License (see https://opensource.org/licenses/MIT)
+ *
+ * ******************************************************************************/
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -35,10 +35,10 @@ import { ChartCard } from './ChartCard';
 
 /* ******************************************************************************
  * SpeakingTime                                                            */ /**
-*
-* React component to visualize the distribution of speaking time in a meeting.
-*
-********************************************************************************/
+ *
+ * React component to visualize the distribution of speaking time in a meeting.
+ *
+ ********************************************************************************/
 
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
@@ -68,7 +68,7 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * constructor                                                         */ /**
-    */
+     */
     constructor(props) {
         super(props);
 
@@ -85,21 +85,21 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * componentDidMount                                                   */ /**
-    */
+     */
     componentDidMount() {
         this.initGraph();
     }
 
     /* **************************************************************************
      * componentWillUnmount                                                */ /**
-    */
+     */
     componentWillUnmount() {
         this.disposeChart();
     }
 
     /* **************************************************************************
      * componentDidUpdate                                                  */ /**
-    */
+     */
     componentDidUpdate(prevProps, prevState) {
         const { isLoaded } = this.getDatasetStatus(prevProps);
 
@@ -112,10 +112,10 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * render                                                              */ /**
-    *
-    * Required method of a React component.
-    * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-    */
+     *
+     * Required method of a React component.
+     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+     */
     render() {
         // get the config for this graph type
         const config = GraphConfigs[this.props.graphType];
@@ -157,11 +157,11 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * toggleSlice                                                             */ /**
-    *
-    * Toggle an event series in the bar graph chart on or off.
-    *
-    * @param {number} idx the index of the slice that we want to toggle
-    */
+     *
+     * Toggle an event series in the bar graph chart on or off.
+     *
+     * @param {number} idx the index of the slice that we want to toggle
+     */
     toggleSlice(idx) {
         const slice = this.pieSeries.dataItems.getIndex(idx);
 
@@ -186,10 +186,10 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getLegendItems                                                          */ /**
-    *
-    * Return the legend items for this graph.
-    *
-    */
+     *
+     * Return the legend items for this graph.
+     *
+     */
     getLegendItems() {
         const legendItems = [];
 
@@ -229,11 +229,11 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getGraphData                                                            */ /**
-    *
-    * For each participant in a meeting, create config objects for the pie chart
-    *
-    * @returns {array} containing the prepared data for the graph
-    */
+     *
+     * For each participant in a meeting, create config objects for the pie chart
+     *
+     * @returns {array} containing the prepared data for the graph
+     */
     getGraphData() {
         const sortedParticipants = this.props.graphDataset.data.sort((a, b) => b.lengthUtterances - a.lengthUtterances);
 
@@ -267,11 +267,11 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * drawGraph                                                               */ /**
-    *
-    * Initialise the graph, add the categories, and populate with data.
-    * - if an empty dataset is passed, return
-    *
-    */
+     *
+     * Initialise the graph, add the categories, and populate with data.
+     * - if an empty dataset is passed, return
+     *
+     */
     drawGraph() {
         logger.debug('SpeakingTime: drawGraph', this.props.graphType);
         const chart = this.chart;
@@ -292,16 +292,16 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * createSeries                                                            */ /**
-    *
-    * Create the graph series
-    *
-    * For more info on amcharts PieSeries, see:
-    * https://www.amcharts.com/docs/v4/reference/pieseries/
-    *
-    * @param {object} chart - the chart object for this SpeakingTime
-    *
-    * @returns {object} containing the graph series for this graph type
-    */
+     *
+     * Create the graph series
+     *
+     * For more info on amcharts PieSeries, see:
+     * https://www.amcharts.com/docs/v4/reference/pieseries/
+     *
+     * @param {object} chart - the chart object for this SpeakingTime
+     *
+     * @returns {object} containing the graph series for this graph type
+     */
     createSeries(chart) {
         const series = chart.series.push(new am4charts.PieSeries());
 
@@ -363,15 +363,15 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * initGraph                                                               */ /**
-    *
-    * Initialise the chart and bind to the appropriate html element.
-    *
-    * For more info on amcharts PieChart, see:
-    * https://www.amcharts.com/docs/v4/reference/PieChart/
-    * https://www.amcharts.com/docs/v4/chart-types/pie-chart/
-    *
-    * @returns {object} containing a reference to the chart
-    */
+     *
+     * Initialise the chart and bind to the appropriate html element.
+     *
+     * For more info on amcharts PieChart, see:
+     * https://www.amcharts.com/docs/v4/reference/PieChart/
+     * https://www.amcharts.com/docs/v4/chart-types/pie-chart/
+     *
+     * @returns {object} containing a reference to the chart
+     */
     initGraph() {
         logger.debug('SpeakingTime.initGraph', this.props.graphType);
 
@@ -405,9 +405,9 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * disposeChart                                                            */ /**
-    *
-    * This is called when it is appropriate to dispose of the chart, for efficiency.
-    */
+     *
+     * This is called when it is appropriate to dispose of the chart, for efficiency.
+     */
     disposeChart() {
         if (this.chart) {
             this.chart.dispose();
@@ -418,16 +418,16 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * getDatasetStatus                                                        */ /**
-    *
-    * Check if the dataset passed in this.props.graphDataset is loaded.
-    *
-    * @param {object} prevProps optional, containing the previous props
-    *
-    * @returns {object} containing three booleans:
-    *      1. wasLoading  - Was the dataset previously loading?
-    *      2. isLoaded   - Is the dataset loaded?
-    *      3. loadingNewData - Is new data being fetched?
-    */
+     *
+     * Check if the dataset passed in this.props.graphDataset is loaded.
+     *
+     * @param {object} prevProps optional, containing the previous props
+     *
+     * @returns {object} containing three booleans:
+     *      1. wasLoading  - Was the dataset previously loading?
+     *      2. isLoaded   - Is the dataset loaded?
+     *      3. loadingNewData - Is new data being fetched?
+     */
     getDatasetStatus(prevProps) {
         const currentStatus = this.props.graphDataset.status;
         const isLoaded = currentStatus === EStatus.LOADED;
