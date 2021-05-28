@@ -2,7 +2,7 @@
 
 import { ColorPalette, createStyleSheet } from '../../../base/styles';
 
-export const LIVE_LABEL_COLOR = ColorPalette.blue;
+export const LIVE_LABEL_COLOR = ColorPalette.purple;
 export const REC_LABEL_COLOR = ColorPalette.red;
 
 /**

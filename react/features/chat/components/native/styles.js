@@ -24,7 +24,7 @@ export default {
     },
 
     chatLink: {
-        color: ColorPalette.blue
+        color: ColorPalette.purple
     },
 
     /**

@@ -12,8 +12,8 @@ export default createStyleSheet({
      * Button style of the open settings button.
      */
     noPermissionMessageButton: {
-        backgroundColor: ColorPalette.blue,
-        borderColor: ColorPalette.blue,
+        backgroundColor: ColorPalette.purple,
+        borderColor: ColorPalette.purple,
         borderRadius: 4,
         borderWidth: 1,
         height: 30,
