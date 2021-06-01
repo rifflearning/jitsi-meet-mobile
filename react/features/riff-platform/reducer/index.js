@@ -1,3 +1,4 @@
+import { metricsRedux } from '@rifflearning/riff-metrics';
 import { combineReducers } from 'redux';
 
 import { ReducerRegistry } from '../../base/redux';
@@ -12,6 +13,8 @@ import scheduler from './scheduler';
 import signIn from './signIn';
 import signUp from './signUp';
 
+console.log('metricsRedux', metricsRedux)
+
 ReducerRegistry.register('features/riff-platform',
   combineReducers({
       signIn,
@@ -22,6 +25,7 @@ ReducerRegistry.register('features/riff-platform',
       riff,
       resetPassword,
       meetingMediator,
-      localRecording
+      localRecording,
+      metrics: metricsRedux.reducer
   })
 );

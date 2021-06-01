@@ -6,6 +6,7 @@
 import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
+import { initialize as initRiffMetrics } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
@@ -14,9 +15,13 @@ import {
 } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
-import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
-import * as ROUTES from '../constants/routes';
+import * as actionTypes from '../constants/actionTypes';
 
+ import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
+import * as ROUTES from '../constants/routes';
+import { app as riffdataApp } from '../libs/riffdata-client';
+
+import Dashboard from './Dashboard/DashboardView';
 import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
@@ -30,6 +35,9 @@ import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Verify from './Verify';
 import Waiting from './Waiting';
+
+
+
 
 const useStyles = makeStyles(theme => {
     return {
@@ -77,7 +85,7 @@ function Meetings() {
     );
 }
 
-const Main = ({ user }) => {
+const Main = ({ user, metrics, state }) => {
     const classes = useStyles();
 
     const loggedInRoutes = (
@@ -88,8 +96,9 @@ const Main = ({ user }) => {
                 <Profile />
             </Route>
             <Route
-                component = { DashboardPage }
-                path = { ROUTES.DASHBOARD } />
+                path = { ROUTES.DASHBOARD } >
+                <Dashboard />
+            </Route>
             <Route
                 path = { ROUTES.MEETINGS }
                 component = { Meetings } />
@@ -159,12 +168,16 @@ const Main = ({ user }) => {
 };
 
 Main.propTypes = {
+    metrics: PropTypes.object,
     user: PropTypes.object
 };
 
 const mapStateToProps = state => {
+
     return {
-        user: state['features/riff-platform'].signIn.user
+        user: state['features/riff-platform'].signIn.user,
+        metrics: state['features/riff-platform'].metrics,
+        state: state['features/riff-platform']
     };
 };
 
