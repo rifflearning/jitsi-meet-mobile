@@ -27,8 +27,6 @@ import { EStatus, GraphConfigs, GraphTypes } from 'libs/utils/constants';
 
 import { ChartCard } from './ChartCard';
 
-import { AmChartsLegend } from './AmChartsLegend';
-
 /* ******************************************************************************
  * StackedBarGraph                                                         */ /**
  *
@@ -86,7 +84,6 @@ class StackedBarGraph extends React.PureComponent {
         this.avrAxisRange = 0;
 
         this.toggleSeries = this.toggleSeries.bind(this);
-        this.getLegendItems = this.getLegendItems.bind(this);
     }
 
     /* **************************************************************************
@@ -165,13 +162,6 @@ class StackedBarGraph extends React.PureComponent {
                 <div
                     className={`amcharts-graph-container ${this.props.graphType}-grouped-bar-graph-div`}
                 />
-                {this.state.updatedLegendAt !== null &&
-                    <AmChartsLegend
-                        graphType={this.props.graphType}
-                        getLegendItems={this.getLegendItems}
-                        updatedLegendAt={this.state.updatedLegendAt}
-                    />
-                }
             </ChartCard>
         );
     }
@@ -198,43 +188,6 @@ class StackedBarGraph extends React.PureComponent {
 
         // Update legend
         this.setState({ updatedLegendAt: new Date() });
-    }
-
-    /* ******************************************************************************
-     * getLegendItems                                                          */ /**
-     *
-     * Return the legend items for this graph.
-     *
-     */
-    getLegendItems() {
-        const legendItems = [];
-        this.series.forEach((series) => {
-            const graphConfig = GraphConfigs[series.graphType];
-
-            const hidden = series.isHiding || !series.visible || series.noData;
-            const legendItemColor = series.noData ? '#999999' : graphConfig.color;
-
-            const hiddenClass = hidden ? 'hidden' : '';
-            const emptyDatasetClass = series.noData ? 'empty-dataset' : '';
-
-            legendItems.push(
-                <div
-                    className={`legend-item stacked-bar ${hiddenClass} ${emptyDatasetClass}`}
-                    //onClick={() => this.toggleSeries(series)}
-                    key={`stacked-bar-legend-item-${series.graphType}`}
-                >
-                    <span
-                        className='peer-color'
-                        style={{ background: legendItemColor }}
-                    />
-                    <span className='label'>
-                        {graphConfig.legendLabel}
-                    </span>
-                </div>
-            );
-        });
-
-        return legendItems;
     }
 
     /* ******************************************************************************
@@ -499,8 +452,47 @@ class StackedBarGraph extends React.PureComponent {
             this.createSeries(chart, graphType);
         });
 
+        this.createLegend(chart);
+
         this.chart = chart;
         return chart;
+    }
+
+
+    /* ******************************************************************************
+     * createLegend                                                            */ /**
+     *
+     * Create the graph legend
+     *
+     * For more info on amcharts createLegend, see:
+     * https://www.amcharts.com/docs/v4/concepts/legend/
+     *
+     * @param {object} chart - the chart object for this StackedBarGraph
+     *
+     */
+     createLegend(chart) {
+        chart.legend = new am4charts.Legend();
+
+        // disabling toggling of items in legend
+        chart.legend.itemContainers.template.clickable = false;
+        chart.legend.itemContainers.template.focusable = false;
+        chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;
+
+        chart.legend.parent = chart.tooltipContainer;
+        chart.legend.contentAlign = "left";
+        chart.legend.position = "absolute";
+        chart.legend.valign = "bottom";
+        chart.legend.labels.template.fill = am4core.color(Colors.tundora);
+        chart.legend.labels.template.text = "[font-size: 10px]{name}";
+        chart.legend.width = 130;
+
+        // legend positioning
+        chart.legend.dx = -10;
+        chart.legend.dy = -35;
+
+        const markerTemplate = chart.legend.markers.template;
+        markerTemplate.width = 10;
+        markerTemplate.height = 10;
     }
 
     /* ******************************************************************************
