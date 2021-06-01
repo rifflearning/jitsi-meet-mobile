@@ -35,7 +35,7 @@ html body {
         
             .grouped_influences, .grouped_affirmations, .grouped_interruptions {
                 position: absolute;
-                background: #ffffff;
+                background: unset;
                 display: flex;
                 align-items: flex-start;
                 bottom: 0;
