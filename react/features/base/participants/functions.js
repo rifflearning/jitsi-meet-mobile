@@ -3,6 +3,7 @@
 import { getGravatarURL } from '@jitsi/js-utils/avatar';
 import type { Store } from 'redux';
 
+import { maybeExtractIdFromDisplayName } from '../../riff-dashboard-page/functions';
 import { JitsiParticipantConnectionStatus } from '../lib-jitsi-meet';
 import { MEDIA_TYPE, shouldRenderVideoTrack } from '../media';
 import { toState } from '../redux';
@@ -170,7 +171,7 @@ export function getParticipantDisplayName(
 
     if (participant) {
         if (participant.name) {
-            return participant.name;
+            return maybeExtractIdFromDisplayName(participant.name).displayName;
         }
 
         if (participant.local) {
@@ -309,7 +310,9 @@ export function isIconUrl(icon: ?string | ?Object) {
  * to the Redux state.
  * @returns {boolean}
  */
-export function isLocalParticipantModerator(stateful: Object | Function) {
+export function isLocalParticipantModerator(
+        stateful: Object | Function,
+        ignoreToken: ?boolean = false) {
     const state = toState(stateful);
     const localParticipant = getLocalParticipant(state);
 
@@ -317,7 +320,11 @@ export function isLocalParticipantModerator(stateful: Object | Function) {
         return false;
     }
 
-    return localParticipant.role === PARTICIPANT_ROLE.MODERATOR;
+    return (
+        localParticipant.role === PARTICIPANT_ROLE.MODERATOR
+        && (ignoreToken
+                || !state['features/base/config'].enableUserRolesBasedOnToken
+                || !state['features/base/jwt'].isGuest));
 }
 
 /**

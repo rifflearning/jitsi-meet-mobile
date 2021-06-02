@@ -1,9 +1,21 @@
 /* global __dirname */
 
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const dotenv = require('dotenv');
+const p = require('path');
 const process = require('process');
 const webpack = require('webpack');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
+// get .env variables
+const env = dotenv.config().parsed || {};
+
+// reduce it to a nice object, the same as before
+const envKeys = Object.keys(env).reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+
+    return prev;
+}, {});
 
 /**
  * The URL of the Jitsi Meet deployment to be proxy to in the context of
@@ -185,8 +197,17 @@ const config = {
     ].filter(Boolean),
     resolve: {
         alias: {
-            'focus-visible': 'focus-visible/dist/focus-visible.min.js',
-            jquery: `jquery/dist/jquery${minimize ? '.min' : ''}.js`
+            jquery: `jquery/dist/jquery${minimize ? '.min' : ''}.js`,
+
+            // aliases for imports in riff components
+            Images: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'assets'),
+            Components: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'components'),
+            components: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'components'),
+            Redux: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'redux'),
+            Actions: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'redux', 'actions'),
+            Selectors: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'redux', 'selectors'),
+            RiffUtils: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'libs', 'utils'),
+            libs: p.resolve(__dirname, 'react/features/riff-dashboard-page', 'src', 'libs')
         },
         aliasFields: [
             'browser'
@@ -212,6 +233,12 @@ module.exports = [
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
         ],
         performance: getPerformanceHints(4 * 1024 * 1024)
+    }),
+    Object.assign({}, config, {
+        entry: {
+            'device_selection_popup_bundle': './react/features/settings/popup.js'
+        },
+        performance: getPerformanceHints(750 * 1024)
     }),
     Object.assign({}, config, {
         entry: {
@@ -266,13 +293,28 @@ module.exports = [
     }),
     Object.assign({}, config, {
         entry: {
-            'close3': './static/close3.js'
+            'video-blur-effect': './react/features/stream-effects/blur/index.js'
         },
-        plugins: [
-            ...config.plugins,
-            ...getBundleAnalyzerPlugin('close3')
-        ],
-        performance: getPerformanceHints(128 * 1024)
+        output: Object.assign({}, config.output, {
+            library: [ 'JitsiMeetJS', 'app', 'effects' ],
+            libraryTarget: 'window',
+            filename: '[name].min.js',
+            sourceMapFilename: '[name].min.map'
+        }),
+        performance: getPerformanceHints(1 * 1024 * 1024)
+    }),
+
+    Object.assign({}, config, {
+        entry: {
+            'rnnoise-processor': './react/features/stream-effects/rnnoise/index.js'
+        },
+        output: Object.assign({}, config.output, {
+            library: [ 'JitsiMeetJS', 'app', 'effects', 'rnnoise' ],
+            libraryTarget: 'window',
+            filename: '[name].min.js',
+            sourceMapFilename: '[name].min.map'
+        }),
+        performance: getPerformanceHints(30 * 1024)
     }),
 
     Object.assign({}, config, {
