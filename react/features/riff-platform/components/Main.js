@@ -21,7 +21,7 @@ import * as actionTypes from '../constants/actionTypes';
 import * as ROUTES from '../constants/routes';
 import { app as riffdataApp } from '../libs/riffdata-client';
 
-import Dashboard from './Dashboard/DashboardView';
+import Dashboard from './Dashboard';
 import EditMeeting from './EditMeeting';
 import Footer from './Footer';
 import Join from './Join';
@@ -205,7 +205,7 @@ Main.propTypes = {
 };
 
 const mapStateToProps = state => {
-
+console.log('state', state)
     return {
         user: state['features/riff-platform'].signIn.user,
         metrics: state['features/riff-platform'].metrics
