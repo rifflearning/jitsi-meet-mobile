@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* global process */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-sort-props */
@@ -8,16 +9,15 @@ import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { initialize as initRiffMetrics } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect } from 'react';
 import {
     Switch,
     Route, Redirect
 } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
+import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as actionTypes from '../constants/actionTypes';
-
- import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as ROUTES from '../constants/routes';
 import { app as riffdataApp } from '../libs/riffdata-client';
 
@@ -35,9 +35,6 @@ import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Verify from './Verify';
 import Waiting from './Waiting';
-
-
-
 
 const useStyles = makeStyles(theme => {
     return {
@@ -85,8 +82,43 @@ function Meetings() {
     );
 }
 
-const Main = ({ user, metrics, state }) => {
+async function loginToServerForMetrics() {
+    try {
+        await riffdataApp.authenticate({
+            strategy: 'local',
+            email: 'default-user-email',
+            password: 'default-user-password'
+        });
+    } catch (err) {
+        console.error('Error while loginToServerForSibilent', err);
+    }
+}
+
+const Main = ({ user, metrics }) => {
     const classes = useStyles();
+
+    useEffect(() => {
+        async function fetch() {
+            await loginToServerForMetrics();
+        }
+
+        fetch();
+    }, []);
+
+    const metricsConfig = {
+        serverConnections: { riffdataApp },
+        actionTypes: {
+            APP_USER_LOGOUT: actionTypes.LOGOUT,
+            APP_USER_LOGIN: actionTypes.LOGIN_SUCCESS
+        },
+        selectors: {
+            getCurrentUserId: () => user.uid,
+            getMetrics: () => metrics,
+            getIsRiffConnected: () => true
+        }
+    };
+
+    initRiffMetrics(metricsConfig);
 
     const loggedInRoutes = (
         <Switch>
@@ -176,8 +208,7 @@ const mapStateToProps = state => {
 
     return {
         user: state['features/riff-platform'].signIn.user,
-        metrics: state['features/riff-platform'].metrics,
-        state: state['features/riff-platform']
+        metrics: state['features/riff-platform'].metrics
     };
 };
 

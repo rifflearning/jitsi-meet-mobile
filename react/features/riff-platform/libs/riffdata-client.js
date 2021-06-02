@@ -1,19 +1,4 @@
-/* ******************************************************************************
- * riffdata-client.js                                                           *
- * *************************************************************************/ /**
- *
- * @fileoverview Connection to the riffdata server (currently feathers socket)
- *
- * [More detail about the file's contents]
- *
- * Created on        August 15, 2018
- * @author           Dan Calacci
- *
- * @copyright (c) 2018-present Riff Learning, Inc.,
- *            MIT License (see https://opensource.org/licenses/MIT)
- *
- * ******************************************************************************/
-
+/* eslint-disable no-undef */
 import auth from '@feathersjs/authentication-client';
 import feathers from '@feathersjs/feathers';
 import socketio from '@feathersjs/socketio-client';
@@ -37,7 +22,6 @@ const socket = io(process.env.RIFF_SERVER_URL, {
     ]
 });
 
-
 const app = feathers()
      .configure(socketio(socket), { timeout: 10000 })
      .configure(auth());
@@ -46,9 +30,6 @@ const app = feathers()
 // the above timeouts specified. So try setting that service's timeout directly
 app.service('participantEvents').timeout = 9000;
 
-/* **************************************************************************** *
-  * Module exports                                                               *
-  * **************************************************************************** */
 export {
     app,
     socket
