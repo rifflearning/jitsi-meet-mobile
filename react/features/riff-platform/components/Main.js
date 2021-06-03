@@ -205,7 +205,6 @@ Main.propTypes = {
 };
 
 const mapStateToProps = state => {
-console.log('state', state)
     return {
         user: state['features/riff-platform'].signIn.user,
         metrics: state['features/riff-platform'].metrics

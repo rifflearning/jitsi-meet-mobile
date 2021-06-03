@@ -30,20 +30,8 @@ const {
     getSelectedMeeting,
     getUserMeetings,
     getUserMeetingsError,
-    getUserMeetingsStatus,
-    getMetricDataset,
-    getDatasetStatus
+    getUserMeetingsStatus
 } = metricsRedux.selectors;
-
-const speakingTimeMapProps = state => {
-    return {
-        participantId: state['features/riff-platform'].signIn.user.uid,
-        meeting: getSelectedMeeting(state),
-        graphDataset: getMetricDataset(state, 'participant_info'),
-        datasetStatus: getDatasetStatus(state, 'participant_info')
-    };
-};
-
 
 const dashboardMapProps = {
     mapStateToProps: state => {
@@ -54,8 +42,7 @@ const dashboardMapProps = {
             selectedMeeting: getSelectedMeeting(state),
             fetchMeetingsStatus: getUserMeetingsStatus(state),
             fetchMeetingsMessage: getUserMeetingsError(state)?.message,
-            areAllChartsRendered: getAreAllChartsLoaded(state, Dashboard.graphTypes),
-            speakingTimeMapProps: speakingTimeMapProps(state)
+            areAllChartsRendered: getAreAllChartsLoaded(state, Dashboard.graphTypes)
         };
     },
 

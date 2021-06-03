@@ -1,4 +1,24 @@
+/* ******************************************************************************
+ * SpeakingTime.js                                                              *
+ * *************************************************************************/ /**
+ *
+ * @fileoverview React component to visualize the distribution of speaking
+ * time in a meeting.
+ *
+ * TODO: Tweak this component to be a generic pie chart to display any
+ * categorical data. Instead of expecting an array of participants with
+ * total utterance lengths, expect an array of the unexpected.
+ *
+ * Created on       October 28, 2019
+ * @author          Brec Hanson
+ *
+ * @copyright (c) 2019-present Riff Learning Inc.,
+ *            MIT License (see https://opensource.org/licenses/MIT)
+ *
+ * ******************************************************************************/
+
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -13,11 +33,13 @@ import {
     formatDuration,
     logger,
 } from '../../../../riff-dashboard-page/src/libs/utils';
-
+// move to riff
 import { GraphConfigs } from '../../../../riff-dashboard-page/src/libs/utils/constants';
 
 const { RequestStatus } = metricsRedux.constants;
-
+const { metricGraphLoaded } = metricsRedux.actions;
+const { getSelectedMeeting,  getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
+// remove it
 function getParticipantName(meeting, participantId) {
     const errPrefix = 'riffdata.getParticipantName: Attempted to get name for participant Id: ' +
         participantId;
@@ -328,43 +350,43 @@ class SpeakingTime extends React.PureComponent {
       */
      createSeries(chart) {
          const series = chart.series.push(new am4charts.PieSeries());
- 
+
          series.dataFields.value = 'lengthUtterances';
-        series.dataFields.category = 'participant';
-        series.padding = 0;
+         series.dataFields.category = 'participant';
+         series.padding = 0;
 
-        const slices = series.slices.template;
-        slices.propertyFields.fill = 'color';
-        slices.cornerRadius = 1;
-        slices.tooltipText = '{tooltipText}';
+         const slices = series.slices.template;
+         slices.propertyFields.fill = 'color';
+         slices.cornerRadius = 1;
+         slices.tooltipText = '{tooltipText}';
 
-        slices.strokeWidth = 0;
-        slices.strokeOpacity = 1;
-        slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
+         slices.strokeWidth = 0;
+         slices.strokeOpacity = 1;
+         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
-        const rgm = new am4core.LinearGradientModifier();
-        rgm.brightnesses.push(0, -0.07, -0.18);
-        slices.fillModifier = rgm;
+         const rgm = new am4core.LinearGradientModifier();
+         rgm.brightnesses.push(0, -0.07, -0.18);
+         slices.fillModifier = rgm;
 
-        series.labels.labelText = '{name}';
-        series.ticks.template.disabled = true;
-        series.labels.textAlign = "middle";
-        series.alignLabels = false;
+         series.labels.labelText = '{name}';
+         series.ticks.template.disabled = true;
+         series.labels.textAlign = "middle";
+         series.alignLabels = false;
 
-        const labels = series.labels.template;
-        labels.fill = am4core.color(Colors.white);
-        labels.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
-        labels.padding(0, 0, 0, 0);
-        labels.fontSize = 10;
-        labels.maxWidth = 55;
-        labels.truncate = true;
-        labels.radius = am4core.percent(-45);
+         const labels = series.labels.template;
+         labels.fill = am4core.color(Colors.white);
+         labels.text = "[font-weight: 600 text-transform: uppercase]{name}\n{value.percent.formatNumber('#.0')}%[/]";
+         labels.padding(0, 0, 0, 0);
+         labels.fontSize = 10;
+         labels.maxWidth = 55;
+         labels.truncate = true;
+         labels.radius = am4core.percent(-45);
 
-        labels.adapter.add("radius", function(radius, target) {
-            if (target.dataItem && target.dataItem.values.value.percent < 10) {
-              target.fill = am4core.color(Colors.mineShaft);
-              return 3;
-            }
+         labels.adapter.add("radius", function (radius, target) {
+             if (target.dataItem && target.dataItem.values.value.percent < 10) {
+                 target.fill = am4core.color(Colors.mineShaft);
+                 return 3;
+             }
             return radius;
           });
 
@@ -469,13 +491,20 @@ class SpeakingTime extends React.PureComponent {
          return { wasLoading, isLoaded, loadingNewData };
      }
  }
+
+ const mapStateToProps = state => {
+    return {
+        participantId: state['features/riff-platform'].signIn.user.uid,
+        meeting:       getSelectedMeeting(state),
+        graphDataset:  getMetricDataset(state, SpeakingTime.datasetType),
+        datasetStatus: getDatasetStatus(state, SpeakingTime.datasetType),
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        dashboardGraphLoaded: graphType => dispatch(metricGraphLoaded(graphType))
+    };
+};
  
- /* **************************************************************************** *
-  * Module exports                                                               *
-  * **************************************************************************** */
- export {
-     SpeakingTime
- };
- 
- 
- 
+export default connect(mapStateToProps, mapDispatchToProps)(SpeakingTime);

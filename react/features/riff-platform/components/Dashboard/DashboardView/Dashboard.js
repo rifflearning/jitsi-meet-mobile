@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-handler-names */
+/* eslint-disable valid-jsdoc */
 /* ******************************************************************************
  * dashboard.tsx                                                                *
  * *************************************************************************/ /**
@@ -13,7 +15,9 @@
 *            MIT License (see https://opensource.org/licenses/MIT)
 *
 * ******************************************************************************/
-
+import * as am4core from '@amcharts/amcharts4/core';
+// eslint-disable-next-line camelcase
+import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
     Affirmations,
     Influence,
@@ -28,49 +32,9 @@ import {
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
-import { SpeakingTime } from '../Metrics/SpeakingTime';
+import SpeakingTime from '../Metrics/SpeakingTime';
 import { Colors } from '../colorsHelpers';
 const { RequestStatus } = metricsRedux.constants;
-
-
-/** define the logContext (since the only thing in this module is the Dashboard class
-  *  we can specify that w/o a qualifier on the const name
-  */
-const logContext = 'RiffMetrics:Dashboard';
-
-/** Props used by the Dashboard component */
-//  interface DashboardProps {
-
-//      /** Optional additional renderable elements to be added before the dashboard */
-//      children?: React.ReactNode;
-
-//      /** The list of meeting objects to be presented */
-//      meetings: Meeting[];
-
-//      /** The meeting object that is currently selected or null if none is selected */
-//      selectedMeeting: Meeting | null;
-
-//      /** is the graphical rendering for all charts on the dashboard complete? */
-//      areAllChartsRendered: boolean;
-
-//      /** status of the meetings */
-//      fetchMeetingsStatus: RequestStatus;
-
-//      /** If the fetch status is failure, this is the message to display */
-//      fetchMeetingsMessage?: string;
-
-//      /** determines if a connection to the riffdata server has been established */
-//      isRiffConnected: boolean;
-
-//      /** function to load the meetings for the current user */
-//      loadRecentMeetings: () => void;
-
-//      /** function to invoke when a meeting is clicked on (expected to update selectedMeeting) */
-//      onSelectionChanged: (newSelectedMeeting: Meeting) => void;
-
-//      /** function to invoke when the selected meeting changes to update the datasets used by charts */
-//      loadMetricDatasets: () => void;
-//  }
 
 /* ******************************************************************************
   * Dashboard                                                               */ /**
@@ -109,6 +73,7 @@ class Dashboard extends React.Component {
     constructor(props) {
         super(props);
 
+        am4core.useTheme(am4themes_animated);
         this.onSelectionChanged = this.onSelectionChanged.bind(this);
     }
 
@@ -239,10 +204,7 @@ class Dashboard extends React.Component {
                                 className = 'metric-row'
                                 style = { metricRowStyle }>
                                 <div className = 'metric-container'>
-                                    <SpeakingTime
-                                        dashboardGraphLoaded = { this.props.dashboardGraphLoaded }
-                                        graphType = 'speaking_time'
-                                        { ...this.props.speakingTimeMapProps } />
+                                    <SpeakingTime />
                                 </div>
                                 <div className = 'metric-container'>
                                     <Influence />
@@ -258,11 +220,11 @@ class Dashboard extends React.Component {
                                     <Affirmations />
                                 </div>
                             </div>
-                            {/* <div
+                            <div
                                 className='metric-row'
                                 style={timelineRowStyle}>
                                 <Timeline />
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>
