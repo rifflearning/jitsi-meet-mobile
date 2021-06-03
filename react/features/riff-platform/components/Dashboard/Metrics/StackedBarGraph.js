@@ -25,7 +25,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
-import { ChartCard } from '../../../../riff-dashboard-page/src/components/Dashboard/Metrics/ChartCard';
+import ChartCard from '../ChartCard/index';
 import { Colors } from '../colorsHelpers';
 import { EventConfigs, GraphConfigs } from '../config';
 import { getParticipantName } from '../functions';

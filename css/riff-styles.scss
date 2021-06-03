@@ -11,7 +11,7 @@ html body {
             color: #ffffff;
         }
 
-        #riff-chart-card.chart-card-component {
+        .chart-card-container {
                 box-shadow: 0 1px 5px 0 rgba(#000000, 0.13);
                 background-color: #ffffff;
         
@@ -33,31 +33,6 @@ html body {
                 background: unset;
             }
         
-            .grouped_influences, .grouped_affirmations, .grouped_interruptions {
-                position: absolute;
-                background: unset;
-                display: flex;
-                align-items: flex-start;
-                bottom: 0;
-                margin-bottom: 30px;
-                flex-direction: column;
-           
-                .legend-item {
-                    max-width: 100%;
-                    padding-left: 0;
-                    cursor: inherit;
-                    .label {
-                        font-size: 10px;
-                        font-weight: 500;
-                    }
-                    .peer-color {
-                        margin-right: 3px;
-                        width: 10px;
-                        height: 10px;
-                    }
-                  
-                }
-            }
 
         }
     }

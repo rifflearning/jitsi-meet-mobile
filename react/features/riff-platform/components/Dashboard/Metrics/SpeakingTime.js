@@ -24,7 +24,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { ScaleLoader } from 'react-spinners';
 import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
-import { ChartCard } from '../../../../riff-dashboard-page/src/components/Dashboard/Metrics/ChartCard'
+import ChartCard from '../ChartCard/index';
 import { Colors, getColorMap } from '../colorsHelpers';
 import { formatDuration, getParticipantName } from '../functions';
 import { GraphConfigs } from '../config';
