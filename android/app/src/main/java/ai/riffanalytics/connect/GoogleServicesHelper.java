@@ -1,4 +1,4 @@
-package org.jitsi.meet;
+package ai.riffanalytics.connect;
 
 import android.net.Uri;
 import android.util.Log;

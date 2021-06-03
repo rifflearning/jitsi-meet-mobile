@@ -44,14 +44,18 @@ import {
     LOCK_STATE_CHANGED,
     P2P_STATUS_CHANGED,
     SEND_TONES,
+    SET_DESKTOP_SHARING_ENABLED,
     SET_FOLLOW_ME,
+    SET_MAX_RECEIVER_VIDEO_QUALITY,
     SET_PASSWORD,
     SET_PASSWORD_FAILED,
+    SET_PREFERRED_VIDEO_QUALITY,
     SET_ROOM,
     SET_PENDING_SUBJECT_CHANGE,
     SET_START_MUTED_POLICY
 } from './actionTypes';
 import {
+    AVATAR_ID_COMMAND,
     AVATAR_URL_COMMAND,
     EMAIL_COMMAND,
     JITSI_CONFERENCE_URL_KEY
@@ -119,12 +123,13 @@ function _addConferenceListeners(conference, dispatch, state) {
     conference.on(
         JitsiConferenceEvents.STARTED_MUTED,
         () => {
-            const audioMuted = Boolean(conference.isStartAudioMuted());
-            const videoMuted = Boolean(conference.isStartVideoMuted());
-            const localTracks = getLocalTracks(state['features/base/tracks']);
+            const audioMuted = Boolean(conference.startAudioMuted);
+            const videoMuted = Boolean(conference.startVideoMuted);
 
-            sendAnalytics(createStartMutedConfigurationEvent('remote', audioMuted, videoMuted));
-            logger.log(`Start muted: ${audioMuted ? 'audio, ' : ''}${videoMuted ? 'video' : ''}`);
+            sendAnalytics(createStartMutedConfigurationEvent(
+                'remote', audioMuted, videoMuted));
+            logger.log(`Start muted: ${audioMuted ? 'audio, ' : ''}${
+                videoMuted ? 'video' : ''}`);
 
             // XXX Jicofo tells lib-jitsi-meet to start with audio and/or video
             // muted i.e. Jicofo expresses an intent. Lib-jitsi-meet has turned
@@ -157,9 +162,9 @@ function _addConferenceListeners(conference, dispatch, state) {
 
     conference.on(
         JitsiConferenceEvents.TRACK_MUTE_CHANGED,
-        (track, participantThatMutedUs) => {
+        (_, participantThatMutedUs) => {
             if (participantThatMutedUs) {
-                dispatch(participantMutedUs(participantThatMutedUs, track));
+                dispatch(participantMutedUs(participantThatMutedUs));
             }
         });
 
@@ -205,6 +210,13 @@ function _addConferenceListeners(conference, dispatch, state) {
             botType
         })));
 
+    conference.addCommandListener(
+        AVATAR_ID_COMMAND,
+        (data, id) => dispatch(participantUpdated({
+            conference,
+            id,
+            avatarID: data.value
+        })));
     conference.addCommandListener(
         AVATAR_URL_COMMAND,
         (data, id) => dispatch(participantUpdated({
@@ -598,6 +610,22 @@ export function sendTones(tones: string, duration: number, pause: number) {
 }
 
 /**
+ * Sets the flag for indicating if desktop sharing is enabled.
+ *
+ * @param {boolean} desktopSharingEnabled - True if desktop sharing is enabled.
+ * @returns {{
+ *     type: SET_DESKTOP_SHARING_ENABLED,
+ *     desktopSharingEnabled: boolean
+ * }}
+ */
+export function setDesktopSharingEnabled(desktopSharingEnabled: boolean) {
+    return {
+        type: SET_DESKTOP_SHARING_ENABLED,
+        desktopSharingEnabled
+    };
+}
+
+/**
  * Enables or disables the Follow Me feature.
  *
  * @param {boolean} enabled - Whether or not Follow Me should be enabled.
@@ -610,6 +638,23 @@ export function setFollowMe(enabled: boolean) {
     return {
         type: SET_FOLLOW_ME,
         enabled
+    };
+}
+
+/**
+ * Sets the max frame height that should be received from remote videos.
+ *
+ * @param {number} maxReceiverVideoQuality - The max video frame height to
+ * receive.
+ * @returns {{
+ *     type: SET_MAX_RECEIVER_VIDEO_QUALITY,
+ *     maxReceiverVideoQuality: number
+ * }}
+ */
+export function setMaxReceiverVideoQuality(maxReceiverVideoQuality: number) {
+    return {
+        type: SET_MAX_RECEIVER_VIDEO_QUALITY,
+        maxReceiverVideoQuality
     };
 }
 
@@ -676,6 +721,24 @@ export function setPassword(
             return Promise.reject();
         }
         }
+    };
+}
+
+/**
+ * Sets the max frame height the user prefers to send and receive from the
+ * remote participants.
+ *
+ * @param {number} preferredVideoQuality - The max video resolution to send and
+ * receive.
+ * @returns {{
+ *     type: SET_PREFERRED_VIDEO_QUALITY,
+ *     preferredVideoQuality: number
+ * }}
+ */
+export function setPreferredVideoQuality(preferredVideoQuality: number) {
+    return {
+        type: SET_PREFERRED_VIDEO_QUALITY,
+        preferredVideoQuality
     };
 }
 

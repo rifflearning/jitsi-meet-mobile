@@ -12,7 +12,9 @@ import { ActionButton, InputField, PreMeetingScreen, ToggleButton } from '../../
 import { connect } from '../../base/redux';
 import { getDisplayName, updateSettings } from '../../base/settings';
 import { getLocalJitsiVideoTrack } from '../../base/tracks';
-import { isButtonEnabled } from '../../toolbox/functions.web';
+import { maybeExtractIdFromDisplayName } from '../../riff-dashboard-page/functions';
+import { updateName } from '../../riff-platform/actions/signIn';
+import { previousLocationRoomName } from '../../riff-platform/functions';
 import {
     joinConference as joinConferenceAction,
     joinConferenceWithoutAudio as joinConferenceWithoutAudioAction,
@@ -48,6 +50,11 @@ type Props = {
      * If join by phone button should be visible.
      */
     hasJoinByPhoneButton: boolean,
+
+    /**
+     * If join button is disabled or not.
+     */
+    joinButtonDisabled: boolean,
 
     /**
      * Joins the current meeting.
@@ -132,7 +139,12 @@ type Props = {
     /**
      * Array with the buttons which this Toolbox should display.
      */
-    visibleButtons: Array<string>
+    isAnon: Boolean,
+
+    /**
+     * Update name.
+     */
+    doUpdateName: Function
 };
 
 type State = {
@@ -246,7 +258,7 @@ class Prejoin extends Component<Props, State> {
         });
     }
 
-    _setName: () => void;
+    _setName: (string) => void;
 
     /**
      * Sets the guest participant name.
@@ -291,6 +303,7 @@ class Prejoin extends Component<Props, State> {
      */
     render() {
         const {
+            joinButtonDisabled,
             hasJoinByPhoneButton,
             joinConference,
             joinConferenceWithoutAudio,
@@ -302,11 +315,14 @@ class Prejoin extends Component<Props, State> {
             showJoinActions,
             t,
             videoTrack,
-            visibleButtons
+            isAnon,
+            doUpdateName
         } = this.props;
 
         const { _closeDialog, _onDropdownClose, _onJoinButtonClick, _onOptionsClick, _setName, _showDialog } = this;
         const { showJoinByPhoneButtons, showError } = this.state;
+
+        const { firebaseIdWithSeparator, displayName } = maybeExtractIdFromDisplayName(name);
 
         return (
             <PreMeetingScreen
@@ -323,10 +339,15 @@ class Prejoin extends Component<Props, State> {
                     <div className = 'prejoin-input-area-container'>
                         <div className = 'prejoin-input-area'>
                             <InputField
-                                autoFocus = { true }
-                                className = { showError ? 'error' : '' }
-                                hasError = { showError }
-                                onChange = { _setName }
+                                autofocus = { Boolean(isAnon) }
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onChange = { value => {
+                                    if (isAnon) {
+                                        doUpdateName(value);
+
+                                        return _setName(`${firebaseIdWithSeparator}${value}`);
+                                    }
+                                } }
                                 onSubmit = { joinConference }
                                 placeHolder = { t('dialog.enterDisplayName') }
                                 value = { name } />
@@ -362,15 +383,28 @@ class Prejoin extends Component<Props, State> {
                                     isOpen = { showJoinByPhoneButtons }
                                     onClose = { _onDropdownClose }>
                                     <ActionButton
-                                        OptionsIcon = { showJoinByPhoneButtons ? IconArrowUp : IconArrowDown }
+                                        disabled = { joinButtonDisabled || (isAnon && !displayName) }
                                         hasOptions = { true }
-                                        onClick = { _onJoinButtonClick }
+                                        onClick = { joinConference }
                                         onOptionsClick = { _onOptionsClick }
                                         testId = 'prejoin.joinMeeting'
                                         type = 'primary'>
-                                        { t('prejoin.joinMeeting') }
+                                        {isAnon ? 'Join as a guest' : `${t('prejoin.joinMeeting')}`}
                                     </ActionButton>
                                 </InlineDialog>
+                                {isAnon
+                                && <><br />or<br />
+                                    <ActionButton
+                                        className = 'prejoin-preview-login-anon-btn'
+                                        disabled = { joinButtonDisabled }
+                                        onClick = { () => {
+                                            previousLocationRoomName.set(window.location.pathname);
+                                            window.location.href = '/app/login'
+                                            ;
+                                        } }
+                                        type = 'primary'>
+                                    Login
+                                    </ActionButton></>}
                             </div>
                         </div>
                     </div>
@@ -399,11 +433,7 @@ class Prejoin extends Component<Props, State> {
      * @returns {React$Element}
      */
     _renderSkipPrejoinButton() {
-        const { buttonIsToggled, t, showSkipPrejoin } = this.props;
-
-        if (!showSkipPrejoin) {
-            return null;
-        }
+        const { buttonIsToggled, t } = this.props;
 
         return (
             <div className = 'prejoin-checkbox-container'>
@@ -424,11 +454,9 @@ class Prejoin extends Component<Props, State> {
  * @param {Object} ownProps - The props passed to the component.
  * @returns {Object}
  */
-function mapStateToProps(state, ownProps): Object {
+function mapStateToProps(state): Object {
     const name = getDisplayName(state);
-    const showErrorOnJoin = isDisplayNameRequired(state) && !name;
-    const { showJoinActions } = ownProps;
-    const isInviteButtonEnabled = isButtonEnabled('invite', state);
+    const joinButtonDisabled = isDisplayNameRequired(state) && !name;
 
     // Hide conference info when interfaceConfig is available and the invite button is disabled.
     // In all other cases we want to preserve the behaviour and control the the conference info
@@ -439,7 +467,9 @@ function mapStateToProps(state, ownProps): Object {
             : false;
 
     return {
+        isAnon: Boolean(state['features/riff-platform'].signIn.user?.isAnon),
         buttonIsToggled: isPrejoinSkipped(state),
+        joinButtonDisabled,
         name,
         deviceStatusVisible: isDeviceStatusVisible(state),
         roomName: getRoomName(state),
@@ -447,9 +477,7 @@ function mapStateToProps(state, ownProps): Object {
         showErrorOnJoin,
         hasJoinByPhoneButton: isJoinByPhoneButtonVisible(state),
         showCameraPreview: !isVideoMutedByUser(state),
-        showConferenceInfo,
-        videoTrack: getLocalJitsiVideoTrack(state),
-        visibleButtons: getToolbarButtons(state)
+        videoTrack: getLocalJitsiVideoTrack(state)
     };
 }
 
@@ -458,7 +486,8 @@ const mapDispatchToProps = {
     joinConference: joinConferenceAction,
     setJoinByPhoneDialogVisiblity: setJoinByPhoneDialogVisiblityAction,
     setSkipPrejoin: setSkipPrejoinAction,
-    updateSettings
+    updateSettings,
+    doUpdateName: updateName
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate(Prejoin));
