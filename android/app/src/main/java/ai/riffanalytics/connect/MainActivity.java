@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jitsi.meet;
+package ai.riffanalytics.connect;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -56,7 +56,7 @@ public class MainActivity extends JitsiMeetActivity {
         = (int) (Math.random() * Short.MAX_VALUE);
 
     /**
-     * ServerURL configuration key for restriction configuration using {@link android.content.RestrictionsManager}
+     * ServerURL configuration key for restriction configuration using {@link RestrictionsManager}
      */
     public static final String RESTRICTION_SERVER_URL = "SERVER_URL";
 
