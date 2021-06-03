@@ -38,7 +38,7 @@ import { GraphConfigs } from '../../../../riff-dashboard-page/src/libs/utils/con
 
 const { RequestStatus } = metricsRedux.constants;
 const { metricGraphLoaded } = metricsRedux.actions;
-const { getSelectedMeeting,  getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
+const { getSelectedMeeting, getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
 // remove it
 function getParticipantName(meeting, participantId) {
     const errPrefix = 'riffdata.getParticipantName: Attempted to get name for participant Id: ' +

@@ -20,7 +20,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
     Affirmations,
-    Influence,
+
+    // Influence,
     Interruptions,
     MeetingInfo,
 
@@ -32,6 +33,7 @@ import {
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
+import Influence from '../Metrics/Influence';
 import SpeakingTime from '../Metrics/SpeakingTime';
 import { Colors } from '../colorsHelpers';
 const { RequestStatus } = metricsRedux.constants;
@@ -173,10 +175,7 @@ class Dashboard extends React.Component {
 
         // Style for the metric rows used to constrain the height of the small charts
         const metricRowStyle = { height: '400px' };
-
         const timelineRowStyle = { height: '450px' };
-
-        console.log('...this.props.speakingTimeMapProps', this.props.speakingTimeMapProps);
 
         return (
             <div
@@ -221,8 +220,8 @@ class Dashboard extends React.Component {
                                 </div>
                             </div>
                             <div
-                                className='metric-row'
-                                style={timelineRowStyle}>
+                                className = 'metric-row'
+                                style = { timelineRowStyle }>
                                 <Timeline />
                             </div>
                         </div>
