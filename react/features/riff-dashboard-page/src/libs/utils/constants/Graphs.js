@@ -47,6 +47,19 @@ const GraphTypes = {
 };
 
 /**
+ * identifiers for event types that extract particular types of events from a
+ * graph dataset, such as the influences of a particular participant from the
+ * INFLUENCE dataset.
+ */
+const EventTypes = {
+    MY_INFLUENCE: 'my_influence',
+    THEIR_INFLUENCE: 'their_influence',
+    MY_INTERRUPTIONS: 'my_interruptions',
+    THEIR_INTERRUPTIONS: 'their_interruptions',
+    MY_AFFIRMATIONS: 'my_affirmations',
+    THEIR_AFFIRMATIONS: 'their_affirmations',
+}
+/**
  * Stores a configuration object for different graph types.
  *
  * The following properties are possible, but not present in all configs:

@@ -19,13 +19,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 // eslint-disable-next-line camelcase
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
-    Affirmations,
-
-    // Influence,
-    Interruptions,
     MeetingInfo,
-
-    //  SpeakingTime,
     MeetingList,
     Timeline,
     metricsRedux
@@ -33,13 +27,16 @@ import {
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
+import Affirmations from '../Metrics/Affirmations';
 import Influence from '../Metrics/Influence';
+import Interruptions from '../Metrics/Interruptions';
 import SpeakingTime from '../Metrics/SpeakingTime';
 import { Colors } from '../colorsHelpers';
+import { EventConfigs } from '../config';
 const { RequestStatus } = metricsRedux.constants;
 
 /* ******************************************************************************
-  * Dashboard                                                               */ /**
+* Dashboard                                                               */ /**
 *
 * React component to present the Riff Metrics for meetings the user attended
 *
@@ -64,9 +61,8 @@ class Dashboard extends React.Component {
         Influence.datasetType,
         Interruptions.datasetType,
         SpeakingTime.datasetType,
-        Timeline.datasetType
-
-        // ...Timeline.overlayEventTypes.map(et => EventConfigs[et].datasetType)
+        Timeline.datasetType,
+        ...Timeline.overlayEventTypes.map(et => EventConfigs[et].datasetType)
     ]);
 
     /* **************************************************************************

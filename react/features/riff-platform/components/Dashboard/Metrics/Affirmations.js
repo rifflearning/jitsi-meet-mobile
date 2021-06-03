@@ -1,9 +1,9 @@
 /* eslint-disable valid-jsdoc */
 /* ******************************************************************************
- * Influence.js                                                                *
+ * Affirmations.js                                                                *
  * *************************************************************************/ /**
  *
- * @fileoverview React component to visualize the influence of and to
+ * @fileoverview React component to visualize the affirmations of and to
  * a participant in a meeting.
  *
  * Created on       August 13, 2020
@@ -27,12 +27,12 @@ const { metricGraphLoaded } = metricsRedux.actions;
 const { getSelectedMeeting, getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
 
 /* ******************************************************************************
- * Influence                                                               */ /**
+ * Affirmations                                                               */ /**
  *
- * React component to visualize the influence of/to a participant in a meeting.
+ * React component to visualize the affirmations of/to a participant in a meeting.
  *
  ********************************************************************************/
-class Influence extends React.PureComponent {
+class Affirmations extends React.PureComponent {
     static propTypes = {
         /** meeting whose relevant data will be in graphDataset */
         dashboardGraphLoaded: PropTypes.func.isRequired,
@@ -56,10 +56,10 @@ class Influence extends React.PureComponent {
     };
 
     /** The GraphType of this component */
-    static graphType = GraphTypes.GROUPED_INFLUENCES;
+    static graphType = GraphTypes.GROUPED_AFFIRMATIONS;
 
     /** The GraphDatasetType of the graphDataset property */
-    static datasetType = GraphDatasetTypes.INFLUENCES;
+    static datasetType = GraphDatasetTypes.AFFIRMATIONS;
 
     /* **************************************************************************
      * render                                                              */ /**
@@ -71,10 +71,10 @@ class Influence extends React.PureComponent {
     render() {
         return (
             <StackedBarGraph
-                graphType = { Influence.graphType }
+                graphType = { Affirmations.graphType }
                 stackedEventTypes = { [
-                    EventTypes.MY_INFLUENCE,
-                    EventTypes.THEIR_INFLUENCE
+                    EventTypes.MY_INTERRUPTIONS,
+                    EventTypes.THEIR_AFFIRMATIONS
                 ] }
                 { ...this.props } />
         );
@@ -85,8 +85,8 @@ const mapStateToProps = state => {
     return {
         participantId: state['features/riff-platform'].signIn.user.uid,
         meeting: getSelectedMeeting(state),
-        graphDataset: getMetricDataset(state, Influence.datasetType),
-        datasetStatus: getDatasetStatus(state, Influence.datasetType)
+        graphDataset: getMetricDataset(state, Affirmations.datasetType),
+        datasetStatus: getDatasetStatus(state, Affirmations.datasetType)
     };
 };
 
@@ -96,4 +96,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Influence);
+export default connect(mapStateToProps, mapDispatchToProps)(Affirmations);
