@@ -14,17 +14,16 @@
  *
  * ******************************************************************************/
 
-import { metricsRedux, GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
+import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
 import { EventTypes } from '../config';
+import { metricGraphLoaded, getSelectedMeeting, getMetricDataset, getDatasetStatus } from '../utils';
 
 import { StackedBarGraph } from './StackedBarGraph';
 
-const { metricGraphLoaded } = metricsRedux.actions;
-const { getSelectedMeeting, getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
 
 /* ******************************************************************************
  * Affirmations                                                               */ /**
@@ -48,7 +47,7 @@ class Affirmations extends React.PureComponent {
         /** The request status of the graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
-            participants: PropTypes.instanceOf(Set).isRequired
+            participants: PropTypes.instanceOf(Map).isRequired
         }),
 
         /** sets a graphical rendering status for a graph type to loaded */

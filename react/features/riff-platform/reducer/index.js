@@ -13,8 +13,6 @@ import scheduler from './scheduler';
 import signIn from './signIn';
 import signUp from './signUp';
 
-console.log('metricsRedux', metricsRedux)
-
 ReducerRegistry.register('features/riff-platform',
   combineReducers({
       signIn,

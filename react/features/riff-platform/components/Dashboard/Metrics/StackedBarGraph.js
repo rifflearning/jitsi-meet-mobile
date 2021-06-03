@@ -19,59 +19,25 @@
  * ******************************************************************************/
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { metricsRedux, GraphTypes } from '@rifflearning/riff-metrics';
+import { GraphTypes } from '@rifflearning/riff-metrics';
 import * as d3 from 'd3-array';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
 import { ChartCard } from '../../../../riff-dashboard-page/src/components/Dashboard/Metrics/ChartCard';
-import { logger } from '../../../../riff-dashboard-page/src/libs/utils';
-import { GraphConfigs } from '../../../../riff-dashboard-page/src/libs/utils/constants';
 import { Colors } from '../colorsHelpers';
-import { EventConfigs } from '../config';
-
-const { RequestStatus } = metricsRedux.constants;
-
-function getParticipantName(meeting, participantId) {
-    const errPrefix = `riffdata.getParticipantName: Attempted to get name for participant Id: ${
-        participantId}`;
-
-    if (!meeting) {
-        logger.error(`${errPrefix} when there is no meeting.`);
-
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    const participants = meeting.participants;
-
-    if (!(participants instanceof Map)) {
-        logger.error(`${errPrefix} from meeting with incomplete participant data`);
-
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    if (!participants.has(participantId)) {
-        logger.error(`${errPrefix} which does not exist in the current meeting.`);
-
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    // NOTE: using typescript non-null assertion operator (!) on purpose because the
-    // above test has determined that the participantId does exist in the map.
-    return participants.get(participantId).name;
-}
+import { EventConfigs, GraphConfigs } from '../config';
+import { getParticipantName } from '../functions';
+import { RequestStatus, logger } from '../utils';
 
 /** define the logContext (since the only thing in this module is the StackedBarGraph class
  *  we can specify that w/o a qualifier on the const name
  */
-const logContext = 'RiffMetrics:StackedBarGraph';
+const logContext = 'StackedBarGraph';
 
 /* ******************************************************************************
  * StackedBarGraph                                                         */ /**
- *
- * React component to visualize binary relations calculated with the
- * computePairwiseRelation() function in libs/utils/index.js
  *
  ********************************************************************************/
 class StackedBarGraph extends React.PureComponent {
@@ -80,7 +46,7 @@ class StackedBarGraph extends React.PureComponent {
         dashboardGraphLoaded: PropTypes.func.isRequired,
 
         /** ID of the logged in user so their data can be distinguished */
-        datasetStatus: PropTypes.object,
+        datasetStatus: PropTypes.string,
 
         /** The request status of the graphDataset */
         graphDataset: PropTypes.object.isRequired,
@@ -93,7 +59,7 @@ class StackedBarGraph extends React.PureComponent {
         /** The event types we're stacking in this stacked bar graph */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
-            participants: PropTypes.instanceOf(Set).isRequired
+            participants: PropTypes.instanceOf(Map).isRequired
         }),
 
         /** meeting whose relevant data will be in graphDataset */
@@ -133,7 +99,7 @@ class StackedBarGraph extends React.PureComponent {
     componentWillUnmount() {
         this.disposeChart();
         this.chart = null;
-        logger.debug(`${this.logContext}.willUnmount: disposed of chart`);
+        logger.debug(`${logContext}.willUnmount: disposed of chart`);
     }
 
     /* **************************************************************************
@@ -145,7 +111,7 @@ class StackedBarGraph extends React.PureComponent {
         // If the dataset's current status is 'loaded', then draw graph
         // Also, don't re-draw graph if we only want to update the legend
         if (isLoaded && this.state.updatedLegendAt === prevState.updatedLegendAt) {
-            logger.debug(`${this.logContext}.didUpdate: drawing graph`, { props: this.props });
+            logger.debug(`${logContext}.didUpdate: drawing graph`, { props: this.props });
             this.drawGraph();
         }
     }
@@ -206,10 +172,10 @@ class StackedBarGraph extends React.PureComponent {
 
         return (
             <ChartCard
-                title = { config.title }
+                chartCardId = { chartCardId }
                 chartInfo = { config.info }
                 longDescription = { config.info.length > 250 }
-                chartCardId = { chartCardId }>
+                title = { config.title }>
                 {chartCardChildren}
             </ChartCard>
         );
@@ -260,7 +226,7 @@ class StackedBarGraph extends React.PureComponent {
             return [];
         }
 
-        logger.debug(`${this.logContext}.getGraphData: graphDataset`, this.props.graphDataset);
+        logger.debug(`${logContext}.getGraphData: graphDataset`, this.props.graphDataset);
 
         const chartData = new Map();
         const counts = this.props.graphDataset.relationCounts;
@@ -305,7 +271,7 @@ class StackedBarGraph extends React.PureComponent {
         // Force each series in the chart to refresh its data
         this.series.forEach(series => series.invalidateData());
 
-        logger.debug(`${this.logContext}.drawGraph`);
+        logger.debug(`${logContext}.drawGraph`);
         const chart = this.chart;
 
         const chartData = this.getGraphData();

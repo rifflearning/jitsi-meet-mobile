@@ -22,52 +22,25 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-
 import { ScaleLoader } from 'react-spinners';
-
-import { metricsRedux, GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
+import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
 import { ChartCard } from '../../../../riff-dashboard-page/src/components/Dashboard/Metrics/ChartCard'
 import { Colors, getColorMap } from '../colorsHelpers';
-
+import { formatDuration, getParticipantName } from '../functions';
+import { GraphConfigs } from '../config';
 import {
-    formatDuration,
-    logger,
-} from '../../../../riff-dashboard-page/src/libs/utils';
-// move to riff
-import { GraphConfigs } from '../../../../riff-dashboard-page/src/libs/utils/constants';
-
-const { RequestStatus } = metricsRedux.constants;
-const { metricGraphLoaded } = metricsRedux.actions;
-const { getSelectedMeeting, getMetricDataset, getDatasetStatus } = metricsRedux.selectors;
-// remove it
-function getParticipantName(meeting, participantId) {
-    const errPrefix = 'riffdata.getParticipantName: Attempted to get name for participant Id: ' +
-        participantId;
-    if (!meeting) {
-        logger.error(`${errPrefix} when there is no meeting.`);
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    const participants = meeting.participants;
-    if (!(participants instanceof Map)) {
-        logger.error(`${errPrefix} from meeting with incomplete participant data`);
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    if (!participants.has(participantId)) {
-        logger.error(`${errPrefix} which does not exist in the current meeting.`);
-        return participantId; // Use the participant Id because it's better than no name at all
-    }
-
-    // NOTE: using typescript non-null assertion operator (!) on purpose because the
-    // above test has determined that the participantId does exist in the map.
-    return participants.get(participantId).name;
-}
+    RequestStatus,
+    metricGraphLoaded,
+    getSelectedMeeting,
+    getMetricDataset,
+    getDatasetStatus,
+    logger
+} from '../utils';
 
 /** define the logContext (since the only thing in this module is the SpeakingTime class
  *  we can specify that w/o a qualifier on the const name
  */
- const logContext = 'RiffMetrics:SpeakingTime';
+ const logContext = 'SpeakingTime';
  
  /* ******************************************************************************
   * SpeakingTime                                                            */ /**
@@ -80,7 +53,7 @@ class SpeakingTime extends React.PureComponent {
         /** meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
-            participants: PropTypes.instanceOf(Set).isRequired,
+            participants: PropTypes.instanceOf(Map).isRequired,
         }),
         /** ID of the logged in user so their data can be distinguished */
         participantId: PropTypes.string.isRequired,

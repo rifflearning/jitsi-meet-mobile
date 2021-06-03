@@ -2,7 +2,7 @@
 // import { Dashboard } from '@rifflearning/riff-metrics';
 import React, { useEffect } from 'react';
 
-import { Dashboard } from './DashboardView';
+import Dashboard from './DashboardView';
 
 const DashboardPage = () => {
     useEffect(() => {
