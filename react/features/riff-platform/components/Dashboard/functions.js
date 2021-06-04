@@ -54,6 +54,27 @@ function formatDuration(durationInSeconds) {
     return formattedDuration;
 }
 
+/* ******************************************************************************
+ * getDurationInSeconds                                                    */ /**
+ *
+ * Returns the time difference in seconds between the given
+ * start and end times.
+ *
+ * @param {Date | string | number} startTime - An acceptable start time for the
+ *                                             javascript date constructor.
+ * @param {Date | string | number} endTime - An acceptable end time for the
+ *                                           javascript date constructor.
+ *
+ * @returns {number} The difference in seconds.
+ */
+function getDurationInSeconds(startTime, endTime) {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const durationSecs = (end.getTime() - start.getTime()) / 1000;
+
+    return durationSecs;
+}
+
 /**
  * Enable or disable the ability to scroll the html element.
  *
@@ -81,6 +102,7 @@ function setWindowScrolling(enableScrolling) {
 
 export {
     getParticipantName,
+    getDurationInSeconds,
     formatDuration,
     setWindowScrolling
 };

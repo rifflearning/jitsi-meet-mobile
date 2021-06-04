@@ -22,7 +22,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
     MeetingInfo,
     MeetingList,
-    Timeline
+   // Timeline
 } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -33,6 +33,7 @@ import Affirmations from '../Metrics/Affirmations';
 import Influence from '../Metrics/Influence';
 import Interruptions from '../Metrics/Interruptions';
 import SpeakingTime from '../Metrics/SpeakingTime';
+import Timeline from '../Metrics/TimelineChart';
 import { Colors } from '../colorsHelpers';
 import { EventConfigs } from '../config';
 import {

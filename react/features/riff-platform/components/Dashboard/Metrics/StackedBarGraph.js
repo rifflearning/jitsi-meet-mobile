@@ -276,8 +276,6 @@ class StackedBarGraph extends React.PureComponent {
 
         const chartData = this.getGraphData();
 
-        console.log('chartData', chartData);
-
         // Is this component trying to visualise an empty dataset?
         const emptyDataset = chartData.length === 0;
 

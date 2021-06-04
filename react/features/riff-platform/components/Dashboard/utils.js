@@ -15,7 +15,8 @@ const {
     getAreAllChartsLoaded,
     getUserMeetings,
     getUserMeetingsError,
-    getUserMeetingsStatus
+    getUserMeetingsStatus,
+    getMetricDatasets
 } = metricsRedux.selectors;
 
 export {
@@ -31,5 +32,6 @@ export {
     getAreAllChartsLoaded,
     getUserMeetings,
     getUserMeetingsError,
-    getUserMeetingsStatus
+    getUserMeetingsStatus,
+    getMetricDatasets
 };
