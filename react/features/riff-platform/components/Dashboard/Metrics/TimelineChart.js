@@ -232,12 +232,12 @@ class TimelineChart extends React.Component {
                 {emptyGraphText}
                 <div
                     className = 'amcharts-graph-container timeline-plot-div' />
-                {this.state.updatedLegendAt !== null
+                {/* {this.state.updatedLegendAt !== null
                     && <AmChartsLegend
                         getLegendItems = { this.getLegendItems }
                         graphType = { TimelineChart.graphType }
                         updatedLegendAt = { this.state.updatedLegendAt } />
-                }
+                } */}
             </ChartCard>
         );
     }
@@ -344,6 +344,8 @@ class TimelineChart extends React.Component {
 
         this.eventsSeries = eventsSeries;
 
+        this.createLegend(chart);
+
         this.chart = chart;
 
         return chart;
@@ -442,8 +444,15 @@ class TimelineChart extends React.Component {
 
             // Set noData and data properties for this event series
             eventSeries.noData = events.length === 0;
+
+            // For toggled off item legend style
+            events.length === 0 ? eventSeries.hide() : eventSeries.show();
+
+            // eventSeries.template.cursorOverStyle = am4core.MouseCursorStyle.default;
+
             eventSeries.data = events.map(event => {
                 return {
+                    noData: events.length === 0,
                     ...baseEventDatum,
                     dateTime: new Date(eventConfig.getEventTime(event)),
                     tooltip: eventConfig.getTimelineTooltip({
@@ -694,9 +703,12 @@ class TimelineChart extends React.Component {
 
         series.dataFields.categoryY = 'categoryY';
         series.dataFields.dateX = 'dateTime';
-        series.name = 'name';
+        series.name = EventConfigs[eventType].legendLabel;
         series.eventType = eventType;
         series.strokeWidth = 0;
+
+        // for legend color
+        series.fill = EventConfigs[eventType].color;
         series.bullets.push(this.renderCircleBullet());
         series.cursorTooltipEnabled = true;
 
@@ -778,7 +790,30 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * disposeChart                                                            */ /**
+     * createLegend                                                            */ /**
+     *
+     * Create the graph legend.
+     *
+     * For more info on amcharts createLegend, see:
+     * Https://www.amcharts.com/docs/v4/concepts/legend/.
+     *
+     * @param {Object} chart - The chart object for this StackedBarGraph.
+     *
+     */
+    createLegend(chart) {
+        chart.legend = new am4charts.Legend();
+        chart.legend.useDefaultMarker = true;
+        chart.legend.labels.template.fill = am4core.color(Colors.tundora);
+        chart.legend.labels.template.text = '[font-size: 10px]{name}';
+
+        const markerTemplate = chart.legend.markers.template;
+
+        markerTemplate.width = 10;
+        markerTemplate.height = 10;
+    }
+
+    /* ******************************************************************************
+    * disposeChart                                                            */ /**
     *
     * This is called when it is appropriate to dispose of the chart, for efficiency.
     *

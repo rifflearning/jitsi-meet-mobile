@@ -72,7 +72,7 @@ class Affirmations extends React.PureComponent {
             <StackedBarGraph
                 graphType = { Affirmations.graphType }
                 stackedEventTypes = { [
-                    EventTypes.MY_INTERRUPTIONS,
+                    EventTypes.MY_AFFIRMATIONS,
                     EventTypes.THEIR_AFFIRMATIONS
                 ] }
                 { ...this.props } />
