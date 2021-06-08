@@ -5,6 +5,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as d3 from 'd3-array';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React, { useRef, useEffect, useState } from 'react';
 
 import { Colors } from '../colorsHelpers';
@@ -350,13 +351,12 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime }) {
         eventsSeries.forEach((series, index) => {
             legendItems.push(
                 <div
-                    className = { 'legend-item timeline ' }
-                    key = { `timeline-legend-item-${index}` }
-                    style = {{ cursor: 'inherit' }}>
+                    className = 'emotion-legend-item'
+                    key = { `emotion-legend-item-${index}` }>
                     <span
                         className = 'peer-color'
                         style = {{ background: series.color }} />
-                    <span className = 'label'>
+                    <span className = 'legend-label'>
                         {series.title}
                     </span>
                 </div>
@@ -367,13 +367,26 @@ function EmotionsGraph({ data = [], participantId, startTime, endTime }) {
     };
 
     return (
-    <>
-        <div
-            id = 'emotion_chart'
-            className = 'amcharts-graph-container timeline-plot-div'
-            style = {{ width: '100%' }} />
-    </>
+        <>
+            <div
+                className = 'amcharts-graph-container timeline-plot-div'
+                id = 'emotion_chart'
+                style = {{ width: '100%' }} />
+            <div className = 'emotion-legend-wrapper'>
+                <div className = 'emotion-legend-container'>
+                    {getLegendItems()}
+                </div>
+            </div>
+        </>
     );
 }
+
+EmotionsGraph.propTypes = {
+    data: PropTypes.array.isRequired,
+    endTime: PropTypes.instanceOf(Date),
+    participantId: PropTypes.string.isRequired,
+    startTime: PropTypes.instanceOf(Date)
+
+};
 
 export default EmotionsGraph;
