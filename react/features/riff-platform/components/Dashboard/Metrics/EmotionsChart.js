@@ -26,7 +26,7 @@ import { ScaleLoader } from 'react-spinners';
 import api from '../../../api';
 import ChartCard from '../ChartCard';
 import { Colors } from '../colorsHelpers';
-import { RequestStatus, getSelectedMeeting, getMetricDataset } from '../utils';
+import { RequestStatus, getSelectedMeeting, getMetricDataset, getDatasetStatus } from '../utils';
 
 import EmotionsGraph from './EmotionsGraph';
 
@@ -38,6 +38,9 @@ import EmotionsGraph from './EmotionsGraph';
  ********************************************************************************/
 class EmotionsChart extends React.Component {
     static propTypes = {
+
+        /** The request status of the graphDataset */
+        datasetStatus: PropTypes.string.isRequired,
 
         /** The main dataset that is used for this graph */
         graphDataset: PropTypes.any.isRequired,
@@ -87,6 +90,26 @@ class EmotionsChart extends React.Component {
      }
 
      /* **************************************************************************
+     * shouldComponentUpdate                                               */ /**
+     *
+     */
+     shouldComponentUpdate(nextProps) {
+         const { allAreLoaded, allWereLoaded } = this.getDatasetStatus({
+             prevProps: this.props,
+             currentProps: nextProps
+         });
+
+         // Since this component is subscribed to multiple datasets in the
+         // Metrics index, it would re-render when each dataset loads.
+         // We only want to re-render if all of the datasets are loaded.
+         if (!allWereLoaded && !allAreLoaded) {
+             return false;
+         }
+
+         return true;
+     }
+
+     /* **************************************************************************
      * render                                                              */ /**
      *
      * Required method of a React component.
@@ -98,6 +121,10 @@ class EmotionsChart extends React.Component {
 
          const timelineData = this.props.graphDataset;
 
+         const { allAreLoaded } = this.getDatasetStatus({
+             currentProps: this.props
+         });
+
          // If there are no utts in the meeting, there are no events, and thus, no graph data
          if (this.state.emotionsData.length === 0) {
              emptyGraphText = <div className = 'empty-graph-text'>It doesn't look like emotions detection module was enabled.</div>;
@@ -105,7 +132,7 @@ class EmotionsChart extends React.Component {
 
          let loadingDisplay = null;
 
-         if (this.state.emotionsDataLoading) {
+         if (!allAreLoaded || this.state.emotionsDataLoading) {
              loadingDisplay = (
                  <div className = 'loading-overlay'>
                      {<ScaleLoader color = { Colors.lightRoyal } />}
@@ -122,9 +149,9 @@ class EmotionsChart extends React.Component {
                  {emptyGraphText}
                  <EmotionsGraph
                      data = { this.state.emotionsData }
-                     endTime = { timelineData?.endTime }
+                     endTime = { timelineData?.utterancesEnd }
                      participantId = { this.props.participantId }
-                     startTime = { timelineData?.startTime } />
+                     startTime = { timelineData?.utterancesStart } />
              </ChartCard>
          );
      }
@@ -157,8 +184,7 @@ class EmotionsChart extends React.Component {
      getDatasetStatus({ prevProps, currentProps }) {
 
          const getStatuses = props => [
-             props.datasetStatus,
-             ...Object.values(props.eventDatasetStatuses)
+             props.datasetStatus
          ];
 
          // This logic doesn't take the NOT_STARTED status into account because it was
@@ -181,7 +207,9 @@ const mapStateToProps = state => {
     return {
         participantId: state['features/riff-platform'].signIn.user.uid,
         meeting: getSelectedMeeting(state),
-        graphDataset: getMetricDataset(state, EmotionsChart.datasetType)
+        graphDataset: getMetricDataset(state, EmotionsChart.datasetType),
+        datasetStatus: getDatasetStatus(state, EmotionsChart.datasetType)
+
     };
 };
 
