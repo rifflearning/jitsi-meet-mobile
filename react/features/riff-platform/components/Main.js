@@ -16,6 +16,7 @@ import {
 } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
+import { loginToRiffDataServer } from '../actions/riffdataServer';
 import * as actionTypes from '../constants/actionTypes';
 import * as ROUTES from '../constants/routes';
 import { app as riffdataApp } from '../libs/riffdata-client';
@@ -81,27 +82,13 @@ function Meetings() {
     );
 }
 
-async function loginToServerForMetrics() {
-    try {
-        await riffdataApp.authenticate({
-            strategy: 'local',
-            email: 'default-user-email',
-            password: 'default-user-password'
-        });
-    } catch (err) {
-        console.error('Error while loginToServerForSibilent', err);
-    }
-}
-
-const Main = ({ user, metrics }) => {
+const Main = ({ user, metrics, isRiffServerConnected, authenticateToRiffDataServer }) => {
     const classes = useStyles();
 
     useEffect(() => {
-        async function fetch() {
-            await loginToServerForMetrics();
+        if (!isRiffServerConnected) {
+            authenticateToRiffDataServer();
         }
-
-        fetch();
     }, []);
 
     const metricsConfig = {
@@ -113,7 +100,7 @@ const Main = ({ user, metrics }) => {
         selectors: {
             getCurrentUserId: () => user.uid,
             getMetrics: () => metrics,
-            getIsRiffConnected: () => true
+            getIsRiffConnected: () => isRiffServerConnected
         }
     };
 
@@ -199,6 +186,8 @@ const Main = ({ user, metrics }) => {
 };
 
 Main.propTypes = {
+    authenticateToRiffDataServer: PropTypes.func,
+    isRiffServerConnected: PropTypes.bool,
     metrics: PropTypes.object,
     user: PropTypes.object
 };
@@ -206,8 +195,15 @@ Main.propTypes = {
 const mapStateToProps = state => {
     return {
         user: state['features/riff-platform'].signIn.user,
-        metrics: state['features/riff-platform'].metrics
+        metrics: state['features/riff-platform'].metrics,
+        isRiffServerConnected: Boolean(state['features/riff-platform'].riffDataServer.accessToken)
     };
 };
 
-export default connect(mapStateToProps)(Main);
+const mapDispatchToProps = dispatch => {
+    return {
+        authenticateToRiffDataServer: () => dispatch(loginToRiffDataServer())
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

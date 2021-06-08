@@ -9,6 +9,7 @@ import meetingMediator from './meetingMediator';
 import meetings from './meetings';
 import resetPassword from './resetPassword';
 import riff from './riff';
+import riffDataServer from './riffdataServer';
 import scheduler from './scheduler';
 import signIn from './signIn';
 import signUp from './signUp';
@@ -24,6 +25,7 @@ ReducerRegistry.register('features/riff-platform',
       resetPassword,
       meetingMediator,
       localRecording,
+      riffDataServer,
       metrics: metricsRedux.reducer
   })
 );

@@ -300,8 +300,10 @@ class Dashboard extends React.Component {
 }
 const mapStateToProps = state => {
     return {
-        // fix it
         isRiffConnected: true,
+
+        // isRiffConnected: Boolean(state['features/riff-platform'].riffDataServer.authToken),
+
         meetings: getUserMeetings(state),
         selectedMeeting: getSelectedMeeting(state),
         fetchMeetingsStatus: getUserMeetingsStatus(state),

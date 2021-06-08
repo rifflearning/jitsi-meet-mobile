@@ -1,6 +1,9 @@
 import { riffUtils, metricsRedux } from '@rifflearning/riff-metrics';
 
 const { logger } = riffUtils;
+
+logger.setLogLevel('info');
+
 const { RequestStatus } = metricsRedux.constants;
 const {
     loadMetricDatasets,
