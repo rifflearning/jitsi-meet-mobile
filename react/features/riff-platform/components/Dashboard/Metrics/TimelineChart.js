@@ -19,14 +19,13 @@
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { EStatus, GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
+import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
 import { createSelector } from 'reselect';
 
-import { AmChartsLegend } from '../../../../riff-dashboard-page/src/components/Dashboard/Metrics/AmChartsLegend';
 import { d3 } from '../../../../riff-dashboard-page/src/libs/d3';
 import ChartCard from '../ChartCard';
 import {
@@ -232,18 +231,12 @@ class TimelineChart extends React.Component {
                 {emptyGraphText}
                 <div
                     className = 'amcharts-graph-container timeline-plot-div' />
-                {/* {this.state.updatedLegendAt !== null
-                    && <AmChartsLegend
-                        getLegendItems = { this.getLegendItems }
-                        graphType = { TimelineChart.graphType }
-                        updatedLegendAt = { this.state.updatedLegendAt } />
-                } */}
             </ChartCard>
         );
     }
 
     /* ******************************************************************************
- * toggleSeries                                                            */ /**
+    * toggleSeries                                                            */ /**
     *
     * Toggle an event series in the timeline chart on or off.
     *
@@ -266,7 +259,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * getLegendItems                                                          */ /**
+    * getLegendItems                                                          */ /**
     *
     * Return the legend items for this graph.
     *
@@ -352,7 +345,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * drawGraph                                                               */ /**
+    * drawGraph                                                               */ /**
     *
     * Initialise the graph, add the axes, and populate with data.
     *
@@ -522,7 +515,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * createParticipantSeries                                                 */ /**
+    * createParticipantSeries                                                 */ /**
     *
     * Create the column series that will be used to represent the speaking timeline
     * for participants in a meeting.
@@ -617,7 +610,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * createYAxis                                                             */ /**
+    * createYAxis                                                             */ /**
     *
     * Create the y-axis for the graph.
     *
@@ -647,7 +640,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * createXAxis                                                             */ /**
+    * createXAxis                                                             */ /**
     *
     * Create the x-axis for the graph.
     *
@@ -719,7 +712,7 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
- * formatTime                                                          */ /**
+    * formatTime                                                          */ /**
     *
     * Format the date and time of an utterance or event.
     *
@@ -735,7 +728,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * renderCircleBullet                                                      */ /**
+    * renderCircleBullet                                                      */ /**
     *
     * Create a bullet for an occurrence of an event.
     *
@@ -756,7 +749,7 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
- * getDatasetStatus                                                        */ /**
+    * getDatasetStatus                                                        */ /**
     *
     * Check if all of the datasets passed in this.props.graphDatasets are loaded.
     *
@@ -802,6 +795,12 @@ class TimelineChart extends React.Component {
      */
     createLegend(chart) {
         chart.legend = new am4charts.Legend();
+
+        // disabling toggling items in legend
+        chart.legend.itemContainers.template.clickable = false;
+        chart.legend.itemContainers.template.focusable = false;
+        chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;
+
         chart.legend.useDefaultMarker = true;
         chart.legend.labels.template.fill = am4core.color(Colors.tundora);
         chart.legend.labels.template.text = '[font-size: 10px]{name}';
