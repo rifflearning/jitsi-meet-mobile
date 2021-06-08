@@ -494,7 +494,7 @@ class StackedBarGraph extends React.PureComponent {
     createLegend(chart) {
         chart.legend = new am4charts.Legend();
 
-        // disabling toggling of items in legend
+        // disabling toggling items in legend
         chart.legend.itemContainers.template.clickable = false;
         chart.legend.itemContainers.template.focusable = false;
         chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;

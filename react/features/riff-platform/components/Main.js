@@ -9,14 +9,13 @@ import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { initialize as initRiffMetrics } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
-import React, {useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
     Switch,
     Route, Redirect
 } from 'react-router-dom';
 
 import { connect } from '../../base/redux';
-import DashboardPage from '../../riff-dashboard-page/src/dashboard-page';
 import * as actionTypes from '../constants/actionTypes';
 import * as ROUTES from '../constants/routes';
 import { app as riffdataApp } from '../libs/riffdata-client';
