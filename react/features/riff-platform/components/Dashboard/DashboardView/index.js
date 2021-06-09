@@ -235,11 +235,6 @@ class Dashboard extends React.Component {
                     <div className = 'dashboard-content-container'>
                         <div className = 'dashboard-header-container'>
                             <h1 className = 'header'>{'Your Conversations'}</h1>
-                            <form action = 'mailto:feedback@riffanalytics.ai'>
-                                <button className = 'feedback-btn'>
-                                    {'Give us feedback'}
-                                </button>
-                            </form>
                         </div>
                         <MeetingInfo />
                         <div ref = { this.mainContent } />

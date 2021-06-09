@@ -5,8 +5,6 @@ html body {
         background-color: $defaultBackground;
         font-family: sans-serif;
 
-        @import '../react/features/riff-dashboard-page/src/sass/main.scss';
-
         h2 {
             color: #ffffff;
         }
@@ -74,7 +72,7 @@ html body {
         }
     }
 
-    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+   // @import '../react/features/riff-dashboard-page/src/sass/main.scss';
 }
 
 /* tooltip for meeting-mediator */

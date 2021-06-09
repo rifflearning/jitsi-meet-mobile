@@ -1,3 +1,38 @@
+#main-content-container {
+    color: #fff;
+
+    h1 {
+        color: #fff;
+    }
+    
+    .dashboard-view-component {
+        background-image: linear-gradient(-90deg,#282725 0,#282725 50%,#282725 100%);
+        color: #fff;
+      
+      .meeting-list-component {
+          border-top-right-radius: 4px;
+      }
+  
+      .meeting-info-component {
+        .meeting-title {
+           color: #fff;
+        }
+        .meeting-details {
+            color: #ffffff;
+      
+          h2 {
+              font-size: 16px;
+              margin-top: 0;
+            i {
+               color: rgba(255, 255, 255, 0.87);
+            }
+          }
+        }
+      }
+    }
+  }
+
+
 .chart-card-container {
     position: relative;
     width: 100%;
