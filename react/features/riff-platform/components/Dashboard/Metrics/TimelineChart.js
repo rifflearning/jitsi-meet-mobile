@@ -114,7 +114,7 @@ class TimelineChart extends React.Component {
         super(props);
 
         this.state = {
-            updatedLegendAt: null
+            updatedAt: null
         };
 
         this.chart = null;
@@ -124,13 +124,10 @@ class TimelineChart extends React.Component {
         this.participantSeries = {};
         this.eventsSeries = [];
         this.legend = {};
-
-        this.toggleSeries = this.toggleSeries.bind(this);
-        this.getLegendItems = this.getLegendItems.bind(this);
     }
 
     /* **************************************************************************
- * componentDidMount                                                   */ /**
+    * componentDidMount                                                   */ /**
     *
     */
     componentDidMount() {
@@ -138,7 +135,7 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
- * componentWillUnmount                                                */ /**
+    * componentWillUnmount                                                */ /**
     *
     */
     componentWillUnmount() {
@@ -148,7 +145,7 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
- * componentDidUpdate                                                  */ /**
+    * componentDidUpdate                                                  */ /**
     *
     */
     componentDidUpdate(prevProps, prevState) {
@@ -159,14 +156,13 @@ class TimelineChart extends React.Component {
 
         // If one of the dataset's previous status was 'loading',
         // and all of the dataset's current status is 'loaded', then draw graph
-        // Also, don't re-draw graph if we only want to update the legend
-        if (allAreLoaded && this.state.updatedLegendAt === prevState.updatedLegendAt) {
+        if (allAreLoaded && this.state.updatedAt === prevState.updatedAt) {
             this.drawGraph();
         }
     }
 
     /* **************************************************************************
- * shouldComponentUpdate                                               */ /**
+    * shouldComponentUpdate                                               */ /**
     *
     */
     shouldComponentUpdate(nextProps) {
@@ -186,7 +182,7 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
- * render                                                              */ /**
+    * render                                                              */ /**
     *
     * Required method of a React component.
                                                                               *
@@ -233,68 +229,6 @@ class TimelineChart extends React.Component {
                     className = 'amcharts-graph-container timeline-plot-div' />
             </ChartCard>
         );
-    }
-
-    /* ******************************************************************************
-    * toggleSeries                                                            */ /**
-    *
-    * Toggle an event series in the timeline chart on or off.
-    *
-    * @param {Object} series - The event series object that we want to toggle.
-    */
-    toggleSeries(series) {
-        // If the series has no data, don't do anything on toggle
-        if (series.noData) {
-            return;
-        }
-
-        if (series.isHidden || series.isHiding) {
-            series.show(); // show this data in chart
-        } else {
-            series.hide(); // hide this data in chart
-        }
-
-        // Update legend
-        this.setState({ updatedLegendAt: new Date() });
-    }
-
-    /* ******************************************************************************
-    * getLegendItems                                                          */ /**
-    *
-    * Return the legend items for this graph.
-    *
-    */
-    getLegendItems() {
-        const legendItems = this.eventsSeries.map(series => {
-            const eventConfig = EventConfigs[series.eventType];
-
-            // Apply hidden styles to the legend item if it's been toggled,
-            // or if it's empty series
-            const hidden = series.isHidden || series.isHiding || series.noData;
-            const hiddenClass = hidden ? 'hidden' : '';
-
-            // Apply extra styles if series has no data
-            const emptyDatasetClass = series.noData ? 'empty-dataset' : '';
-
-            // Legend item color - If no data in series, grey, else color from config
-            const legendItemColor = series.noData ? '#999999' : eventConfig.color;
-
-            return (
-                <div
-                    className = { `legend-item timeline ${hiddenClass} ${emptyDatasetClass}` }
-                    key = { `timeline-legend-item-${series.eventType}` }
-                    onClick = { () => this.toggleSeries(series) }>
-                    <span
-                        className = 'peer-color'
-                        style = {{ background: legendItemColor }} />
-                    <span className = 'label'>
-                        {eventConfig.legendLabel}
-                    </span>
-                </div>
-            );
-        });
-
-        return legendItems;
     }
 
     /* ******************************************************************************
@@ -551,8 +485,8 @@ class TimelineChart extends React.Component {
         participantSeries.events.on('validated', () => {
             this.props.dashboardGraphLoaded(TimelineChart.graphType);
 
-            // Update legend
-            this.setState({ updatedLegendAt: new Date() });
+            // Update
+            this.setState({ updatedAt: new Date() });
         });
 
         return participantSeries;
