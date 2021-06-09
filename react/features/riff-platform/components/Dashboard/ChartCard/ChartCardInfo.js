@@ -17,7 +17,7 @@ const ChartCardInfo = ({ chartInfo, id, longDescription, onClose }) => {
                 </div>
             </div>
 
-            <div className = { `chart-card-info ${descClassName}` }>
+            <div className = { `chart-card-info-box ${descClassName}` }>
                 {chartInfo}
             </div>
         </div>

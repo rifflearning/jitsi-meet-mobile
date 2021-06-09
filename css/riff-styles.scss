@@ -36,6 +36,14 @@ html body {
     }
 }
 
+.has-text-centered {
+    text-align: center !important;
+}
+
+.is-size-7 {
+    font-size: .75rem!important;
+}
+
 #meeting-mediator-wrapper {
     position: fixed;
     z-index: 1000;
@@ -43,6 +51,11 @@ html body {
     top: 0;
     cursor: move;
     pointer-events: all;
+
+    .chart-card-info-small {
+        box-sizing: border-box;
+    }
+    
 
     &.closed {
        display: none;
@@ -72,7 +85,7 @@ html body {
         }
     }
 
-   // @import '../react/features/riff-dashboard-page/src/sass/main.scss';
+    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
 }
 
 /* tooltip for meeting-mediator */
