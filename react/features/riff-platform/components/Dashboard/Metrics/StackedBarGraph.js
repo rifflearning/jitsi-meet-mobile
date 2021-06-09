@@ -76,14 +76,12 @@ class StackedBarGraph extends React.PureComponent {
         super(props);
 
         this.state = {
-            updatedLegendAt: null
+            updatedAt: null
         };
 
         this.chart = null;
         this.series = [];
         this.avrAxisRange = 0;
-
-        this.toggleSeries = this.toggleSeries.bind(this);
     }
 
     /* **************************************************************************
@@ -109,8 +107,7 @@ class StackedBarGraph extends React.PureComponent {
         const { isLoaded } = this.getDatasetStatus(prevProps);
 
         // If the dataset's current status is 'loaded', then draw graph
-        // Also, don't re-draw graph if we only want to update the legend
-        if (isLoaded && this.state.updatedLegendAt === prevState.updatedLegendAt) {
+        if (isLoaded && this.state.updatedAt === prevState.updatedAt) {
             logger.debug(`${logContext}.didUpdate: drawing graph`, { props: this.props });
             this.drawGraph();
         }
@@ -181,31 +178,6 @@ class StackedBarGraph extends React.PureComponent {
         );
     }
 
-
-    /* ******************************************************************************
-     * toggleSeries                                                            */ /**
-     *
-     * Toggle an event series in the bar graph chart on or off.
-     *
-     * @param {Object} series - The event series object that we want to toggle.
-     */
-    toggleSeries(series) {
-        // If the series has no data, don't do anything on toggle
-        if (series.noData) {
-            return;
-        }
-
-        if (series.isHidden || series.isHiding) {
-            series.show(); // show this data in chart
-        } else {
-            series.hide(); // hide this data in chart
-        }
-
-        // Update legend
-        this.setState({ updatedLegendAt: new Date() });
-    }
-
-
     /* ******************************************************************************
     * getGraphData                                                            */ /**
     *
@@ -240,7 +212,6 @@ class StackedBarGraph extends React.PureComponent {
                 const pid = eventCount.participantId;
 
                 if (!chartData.has(pid)) {
-                    // fix it
                     const participant = getParticipantName(this.props.meeting, pid);
                     const participantName = participant.split(' ')[0];
 
@@ -417,12 +388,29 @@ class StackedBarGraph extends React.PureComponent {
 
         label.adapter.add('textOutput', text => `[font-weight: 600 text-transform: uppercase]${text}`);
 
-        categoryAxis.events.on('sizechanged', ev => {
-            const axis = ev.target;
+        const defineMaxWidth = axis => {
             const cellWidth = axis.pixelWidth / (axis.endIndex - axis.startIndex);
 
-            axis.renderer.labels.template.maxWidth = cellWidth;
+            return cellWidth;
+        };
+
+        categoryAxis.events.on('sizechanged', ev => {
+            const axis = ev.target;
+
+            axis.renderer.labels.template.maxWidth = defineMaxWidth(axis);
         });
+
+        // fix label truncate
+        label.adapter.add('maxWidth', (width, target) => {
+            const axis = target.axis;
+
+            if (axis) {
+                return defineMaxWidth(axis);
+            }
+
+            return width;
+        });
+
 
         return categoryAxis;
     }
@@ -453,8 +441,7 @@ class StackedBarGraph extends React.PureComponent {
         chart.events.on('datavalidated', () => {
             this.props.dashboardGraphLoaded(this.props.graphType);
 
-            // Update legend
-            this.setState({ updatedLegendAt: new Date() });
+            this.setState({ updatedAt: new Date() });
         });
 
         // Create categoryAxis axis
