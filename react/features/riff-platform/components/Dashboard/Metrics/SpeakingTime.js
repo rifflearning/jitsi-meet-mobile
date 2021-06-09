@@ -28,7 +28,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
 
-import ChartCard from '../ChartCard/index';
+import ChartCard from '../ChartCard/ChartCard';
 import { Colors, getColorMap } from '../colorsHelpers';
 import { GraphConfigs } from '../config';
 import { formatDuration, getParticipantName } from '../functions';
@@ -268,7 +268,7 @@ class SpeakingTime extends React.PureComponent {
         slices.tooltipText = '{tooltipText}';
 
         slices.strokeWidth = 0;
-        slices.strokeOpacity = 1;
+        slices.strokeOpacity = 0;
         slices.states.getKey('active').properties.shiftRadius = 0; // remove this default animation
 
         const rgm = new am4core.LinearGradientModifier();
@@ -295,7 +295,7 @@ class SpeakingTime extends React.PureComponent {
             if (target.dataItem && target.dataItem.values.value.percent < 10) {
                 target.fill = am4core.color(Colors.mineShaft);
 
-                return 3;
+                return 4;
             }
 
             return radius;

@@ -25,7 +25,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
-import ChartCard from '../ChartCard/index';
+import ChartCard from '../ChartCard/ChartCard';
 import { Colors } from '../colorsHelpers';
 import { EventConfigs, GraphConfigs } from '../config';
 import { getParticipantName } from '../functions';

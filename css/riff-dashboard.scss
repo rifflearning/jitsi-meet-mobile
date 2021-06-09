@@ -121,6 +121,17 @@
         justify-content: center;
         white-space: pre-line;
         font-size: 1rem;
+        overflow: auto;
+        padding: 0;
+        max-height: 95%;
+
+        @media screen and (max-width: 960px) {
+            margin: 0;
+        }
+
+        &::-webkit-scrollbar {
+            width: 2px;
+        }
         
         &.info-small {
             padding: 2em .5em;

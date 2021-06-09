@@ -24,7 +24,7 @@ import { connect } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
 
 import api from '../../../api';
-import ChartCard from '../ChartCard';
+import ChartCard from '../ChartCard/ChartCard';
 import { Colors } from '../colorsHelpers';
 import { RequestStatus, getSelectedMeeting, getMetricDataset, getDatasetStatus } from '../utils';
 
@@ -65,7 +65,6 @@ class EmotionsChart extends React.Component {
          super(props);
 
          this.state = {
-             updatedLegendAt: null,
              emotionsData: [],
              emotionsDataLoading: false
          };

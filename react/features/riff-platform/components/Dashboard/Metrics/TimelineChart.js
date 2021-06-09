@@ -27,7 +27,7 @@ import { connect } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
 import { createSelector } from 'reselect';
 
-import ChartCard from '../ChartCard';
+import ChartCard from '../ChartCard/ChartCard';
 import {
     Colors,
     getColorMap
