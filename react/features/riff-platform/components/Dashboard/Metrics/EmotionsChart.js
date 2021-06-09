@@ -158,7 +158,7 @@ class EmotionsChart extends React.Component {
 
      getEmotionsData() {
          if (!this.props.meeting?._id) {
-             return console.error('no meeting id for getEmotionsData');
+             return;
          }
          this.setState({ emotionsDataLoading: true });
          api.fetchEmotions(this.props.meeting._id)
