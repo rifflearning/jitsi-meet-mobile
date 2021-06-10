@@ -33,8 +33,8 @@ const ChartCard = ({ chartCardId, chartInfo, children, longDescription, title })
             && <ChartCardInfo
                 chartInfo = { chartInfo }
                 id = { chartCardId }
-                longDescription = { longDescription } 
-                onClose = { () => setIsInfoOpen(false) }/>
+                longDescription = { longDescription }
+                onClose = { () => setIsInfoOpen(false) } />
             }
         </div>
     );

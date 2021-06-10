@@ -31,7 +31,7 @@ import ChartCard from '../ChartCard/ChartCard';
 import {
     Colors,
     getColorMap
-} from '../colorsHelpers';
+} from '../colorHelper';
 import {
     GraphConfigs, EventTypes, EventConfigs
 } from '../config';
@@ -50,21 +50,19 @@ import {
 
 import SpeakingTime from './SpeakingTime';
 
-
 const logContext = 'Timeline';
-
 
 /* ******************************************************************************
  * TimelineChart                                                           */ /**
-*
-* React component to visualize the speaking timeline for each participant in a
-* meeting. It also shows when critical events in the meeting involving you and
-* other participants took place.
-*
-********************************************************************************/
+ *
+ * React component to visualize the speaking timeline for each participant in a
+ * meeting. It also shows when critical events in the meeting involving you and
+ * other participants took place.
+ *
+ ********************************************************************************/
 class TimelineChart extends React.Component {
     static propTypes = {
-        /** meeting whose relevant data will be in graphDataset */
+        /** Sets a graphical rendering status for a graph type to loaded */
         dashboardGraphLoaded: PropTypes.func.isRequired,
 
         /** The request status of the graphDataset */
@@ -79,16 +77,16 @@ class TimelineChart extends React.Component {
         /** The main dataset that is used for this graph */
         graphDataset: PropTypes.object.isRequired,
 
-        /** A unique graph type used to fetch configurations for this graph */
+        /** Meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
             participants: PropTypes.instanceOf(Map).isRequired
         }),
 
-        /** sets a graphical rendering status for a graph type to loaded */
+        /** ID of the logged in user so their data can be distinguished */
         participantId: PropTypes.string.isRequired,
 
-        /** The participant speaking time dataset that is used for correct chart colors */
+        /** The participant info dataset that is used for correct chart colors */
         participantsStatsData: PropTypes.object.isRequired
     };
 
@@ -108,8 +106,8 @@ class TimelineChart extends React.Component {
     ];
 
     /* **************************************************************************
-    * constructor                                                         */ /**
-    */
+     * constructor                                                         */ /**
+     */
     constructor(props) {
         super(props);
 
@@ -127,17 +125,17 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
-    * componentDidMount                                                   */ /**
-    *
-    */
+     * componentDidMount                                                   */ /**
+     *
+     */
     componentDidMount() {
         this.initGraph();
     }
 
     /* **************************************************************************
-    * componentWillUnmount                                                */ /**
-    *
-    */
+     * componentWillUnmount                                                */ /**
+     *
+     */
     componentWillUnmount() {
         this.disposeChart();
         this.chart = null;
@@ -145,9 +143,9 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
-    * componentDidUpdate                                                  */ /**
-    *
-    */
+     * componentDidUpdate                                                  */ /**
+     *
+     */
     componentDidUpdate(prevProps, prevState) {
         const { allAreLoaded } = this.getDatasetStatus({
             prevProps,
@@ -162,9 +160,9 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
-    * shouldComponentUpdate                                               */ /**
-    *
-    */
+     * shouldComponentUpdate                                               */ /**
+     *
+     */
     shouldComponentUpdate(nextProps) {
         const { allAreLoaded, allWereLoaded } = this.getDatasetStatus({
             prevProps: this.props,
@@ -182,12 +180,12 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
-    * render                                                              */ /**
-    *
-    * Required method of a React component.
-                                                                              *
-    * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-    */
+     * render                                                              */ /**
+     *
+     * Required method of a React component.                                                                           *
+
+     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+     */
     render() {
         logger.debug('TimelinePlot: render');
 
@@ -232,16 +230,16 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * initGraph                                                               */ /**
-    *
-    * Initialise the chart and bind to the appropriate html element.
-    *
-    * For more info on amcharts XYChart, see:
-    * Https://www.amcharts.com/docs/v4/reference/XYChart/
-    * https://www.amcharts.com/docs/v4/chart-types/xy-chart/.
-    *
-    * @returns {Object} Containing a reference to the chart.
-    */
+     * initGraph                                                               */ /**
+     *
+     * Initialise the chart and bind to the appropriate html element.
+     *
+     * For more info on amcharts XYChart, see:
+     * Https://www.amcharts.com/docs/v4/reference/XYChart/
+     * https://www.amcharts.com/docs/v4/chart-types/xy-chart/.
+     *
+     * @returns {Object} Containing a reference to the chart.
+     */
     initGraph() {
         // Hide am-charts logo (paid version)
         am4core.options.commercialLicense = true;
@@ -279,11 +277,11 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * drawGraph                                                               */ /**
-    *
-    * Initialise the graph, add the axes, and populate with data.
-    *
-    */
+     * drawGraph                                                               */ /**
+     *
+     * Initialise the graph, add the axes, and populate with data.
+     *
+     */
     drawGraph() {
         // Force each series in the chart to refresh its data
         // this.eventsSeries.forEach(series => series.invalidateData());
@@ -347,13 +345,13 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * addEventsData                                                           */ /**
-    *
-    * Map over the event types and add the data to the respective graph series.
-    *
-    * @param participantNames - the names of each participant in the meeting
-    * @returns {Object} Containing the event data for each GraphType.
-    */
+     * addEventsData                                                           */ /**
+     *
+     * Map over the event types and add the data to the respective graph series.
+     *
+     * @param participantNames - the names of each participant in the meeting
+     * @returns {Object} Containing the event data for each GraphType.
+     */
     addEventsData(participantNames) {
         for (const eventSeries of this.eventsSeries) {
             const eventType = eventSeries.eventType;
@@ -393,14 +391,14 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * createAllEventSeries                                                    */ /**
-    *
-    * Map over the event types and create an amcharts graph series for each.
-    *
-    * @param {Object} chart - The chart object for the TimelinePlot.
-    *
-    * @returns {array} Containing the graph series for each GraphType.
-    */
+     * createAllEventSeries                                                    */ /**
+     *
+     * Map over the event types and create an amcharts graph series for each.
+     *
+     * @param {Object} chart - The chart object for the TimelinePlot.
+     *
+     * @returns {array} Containing the graph series for each GraphType.
+     */
     createAllEventSeries(chart) {
         const eventsSeries = TimelineChart.overlayEventTypes
             .map(eventType => this.createEventSeries(eventType));
@@ -412,16 +410,16 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * addParticipantData                                                      */ /**
-    *
-    * Map over all utterances and populate participant speaking time columns.
-    *
-    * For more info on amcharts ColumnSeries, see:
-    * Https://www.amcharts.com/docs/v4/reference/columnseries/.
-    *
-    * @param {Map} participantNames - The names of each participant in the meeting.
-    * @param {Object} timelineData - The timeline data for a meeting.
-    */
+     * addParticipantData                                                      */ /**
+     *
+     * Map over all utterances and populate participant speaking time columns.
+     *
+     * For more info on amcharts ColumnSeries, see:
+     * Https://www.amcharts.com/docs/v4/reference/columnseries/.
+     *
+     * @param {Map} participantNames - The names of each participant in the meeting.
+     * @param {Object} timelineData - The timeline data for a meeting.
+     */
     addParticipantData(participantNames, timelineData) {
         // sorted participants ids are required for generating correct participants colors
         const sortedParticipants = new Map([ ...this.props.participantsStatsData.participantStats.entries() ]
@@ -449,18 +447,18 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * createParticipantSeries                                                 */ /**
-    *
-    * Create the column series that will be used to represent the speaking timeline
-    * for participants in a meeting.
-    *
-    * For more info on amcharts ColumnSeries, see:
-    * Https://www.amcharts.com/docs/v4/reference/columnseries/.
-    *
-    * @param {Object} chart - The chart object for the TimelinePlot.
-    *
-    * @returns {Object} Containing the graph series config for each GraphType.
-    */
+     * createParticipantSeries                                                 */ /**
+     *
+     * Create the column series that will be used to represent the speaking timeline
+     * for participants in a meeting.
+     *
+     * For more info on amcharts ColumnSeries, see:
+     * Https://www.amcharts.com/docs/v4/reference/columnseries/.
+     *
+     * @param {Object} chart - The chart object for the TimelinePlot.
+     *
+     * @returns {Object} Containing the graph series config for each GraphType.
+     */
     createParticipantSeries(chart) {
         const participantSeries = chart.series.push(new am4charts.ColumnSeries());
 
@@ -493,9 +491,9 @@ class TimelineChart extends React.Component {
     }
 
     /* *****************************************************************************
-    * getUttTooltip                                                          */ /**
-    *
-    * Get the html tooltip for an utterance.
+     * getUttTooltip                                                          */ /**
+     *
+     * Get the html tooltip for an utterance.
      *
      * @param fromDate - start of utterance
      * @param toDate - end of utterance
@@ -512,16 +510,16 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * generateYAxisCategories                                                 */ /**
-    *
-    * Generate the y-axis categories for the graph. The y-axis categories will be
-    * the names of the participants and the categories for all event types.
-    *
-    * @param {Object} participantNames - The names of each participant in the meeting.
-    * @param {Object} eventTypes - Contains the y-axis categories for each event type.
-    *
-    * @returns {Object} Containing the y-axis categories for the graph.
-    */
+     * generateYAxisCategories                                                 */ /**
+     *
+     * Generate the y-axis categories for the graph. The y-axis categories will be
+     * the names of the participants and the categories for all event types.
+     *
+     * @param {Object} participantNames - The names of each participant in the meeting.
+     * @param {Object} eventTypes - Contains the y-axis categories for each event type.
+     *
+     * @returns {Object} Containing the y-axis categories for the graph.
+     */
     generateYAxisCategories(participantNames, eventTypes) {
         const yAxisCategories = Object.values(participantNames).filter(name => name !== 'You');
 
@@ -544,18 +542,18 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * createYAxis                                                             */ /**
-    *
-    * Create the y-axis for the graph.
-    *
-    * For info on amcharts CategoryAxis, view:
-    * Https://www.amcharts.com/docs/v4/reference/categoryaxis/
-    * https://www.amcharts.com/docs/v4/concepts/axes/category-axis/.
-    *
-    * @param {Object} chart - The chart object for the TimelinePlot.
-    *
-    * @returns {Object} Containing the y-axis for the graph.
-    */
+     * createYAxis                                                             */ /**
+     *
+     * Create the y-axis for the graph.
+     *
+     * For info on amcharts CategoryAxis, view:
+     * Https://www.amcharts.com/docs/v4/reference/categoryaxis/
+     * https://www.amcharts.com/docs/v4/concepts/axes/category-axis/.
+     *
+     * @param {Object} chart - The chart object for the TimelinePlot.
+     *
+     * @returns {Object} Containing the y-axis for the graph.
+     */
     createYAxis(chart) {
         const categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
 
@@ -574,18 +572,18 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * createXAxis                                                             */ /**
-    *
-    * Create the x-axis for the graph.
-    *
-    * For info on amcharts date-axis, view:
-    * Https://www.amcharts.com/docs/v4/concepts/axes/date-axis
-    * https://www.amcharts.com/docs/v4/reference/dateaxis/.
-    *
-    * @param {Object} chart - The chart object for the TimelinePlot.
-    *
-    * @returns {Object} Containing the x-axis for the graph.
-    */
+     * createXAxis                                                             */ /**
+     *
+     * Create the x-axis for the graph.
+     *
+     * For info on amcharts date-axis, view:
+     * Https://www.amcharts.com/docs/v4/concepts/axes/date-axis
+     * https://www.amcharts.com/docs/v4/reference/dateaxis/.
+     *
+     * @param {Object} chart - The chart object for the TimelinePlot.
+     *
+     * @returns {Object} Containing the x-axis for the graph.
+     */
     createXAxis(chart) {
         const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
 
@@ -613,18 +611,18 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * createEventSeries                                                       */ /**
-    *
-    * Create the graph series for an event type (ex. My Influences)
-    * These are technically line charts with bullets (without the line 'strokeWidth = 0').
-    *
-    * For more info on amcharts LineSeries, see:
-    * https://www.amcharts.com/docs/v4/reference/LineSeries/
-    *
-    * @param {Object} eventType - the eventType that is associated with the events
-    *
-    * @returns {Object} containing the graph series for an event type
-    */
+     * createEventSeries                                                       */ /**
+     *
+     * Create the graph series for an event type (ex. My Influences)
+     * These are technically line charts with bullets (without the line 'strokeWidth = 0').
+     *
+     * For more info on amcharts LineSeries, see:
+     * https://www.amcharts.com/docs/v4/reference/LineSeries/
+     *
+     * @param {Object} eventType - the eventType that is associated with the events
+     *
+     * @returns {Object} containing the graph series for an event type
+     */
     createEventSeries(eventType) {
         const series = new am4charts.LineSeries();
 
@@ -646,14 +644,14 @@ class TimelineChart extends React.Component {
     }
 
     /* **************************************************************************
-    * formatTime                                                          */ /**
-    *
-    * Format the date and time of an utterance or event.
-    *
-    * @param {Date | string | number} dt - Anything acceptable to the Date constructor.
-    *
-    * @returns {string} A formatted representation of the given date/time.
-    */
+     * formatTime                                                          */ /**
+     *
+     * Format the date and time of an utterance or event.
+     *
+     * @param {Date | string | number} dt - Anything acceptable to the Date constructor.
+     *
+     * @returns {string} A formatted representation of the given date/time.
+     */
     formatTime(dt) {
         /** Use d3 to create a datetime formatter */
         const d3Format = d3.timeFormat('%I:%M:%S %p');
@@ -662,12 +660,12 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * renderCircleBullet                                                      */ /**
-    *
-    * Create a bullet for an occurrence of an event.
-    *
-    * @returns {Object} Containing the bullet.
-    */
+     * renderCircleBullet                                                      */ /**
+     *
+     * Create a bullet for an occurrence of an event.
+     *
+     * @returns {Object} Containing the bullet.
+     */
     renderCircleBullet() {
         const bullet = new am4charts.CircleBullet();
 
@@ -683,18 +681,18 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * getDatasetStatus                                                        */ /**
-    *
-    * Check if all of the datasets passed in this.props.graphDatasets are loaded.
-    *
-    * @param {object} prevProps - Optional, containing the previous props.
-    * @param {object} currentProps - Containing the current or next props.
-    *
-    * @returns {object} containing three booleans:
-    *                   1. oneWasLoading  - Was one of the datasets previously loading?
-    *                   2. allAreLoaded   - Are all the datasets loaded?
-    *                   3. loadingNewData - Is new data being fetched?
-    */
+     * getDatasetStatus                                                        */ /**
+     *
+     * Check if all of the datasets passed in this.props.graphDatasets are loaded.
+     *
+     * @param {object} prevProps - Optional, containing the previous props.
+     * @param {object} currentProps - Containing the current or next props.
+     *
+     * @returns {object} containing three booleans:
+     *                   1. oneWasLoading  - Was one of the datasets previously loading?
+     *                   2. allAreLoaded   - Are all the datasets loaded?
+     *                   3. loadingNewData - Is new data being fetched?
+     */
     getDatasetStatus({ prevProps, currentProps }) {
 
         const getStatuses = props => [
@@ -746,11 +744,11 @@ class TimelineChart extends React.Component {
     }
 
     /* ******************************************************************************
-    * disposeChart                                                            */ /**
-    *
-    * This is called when it is appropriate to dispose of the chart, for efficiency.
-    *
-    */
+     * disposeChart                                                            */ /**
+     *
+     * This is called when it is appropriate to dispose of the chart, for efficiency.
+     *
+     */
     disposeChart() {
         if (this.chart) {
             this.chart.dispose();
@@ -762,20 +760,20 @@ class TimelineChart extends React.Component {
 
 /* ******************************************************************************
  * getUniqueParticipantNameMap                                             */ /**
-*
-* Map the participant ids to unique names that consist of the participant name
-* with a suffix if needed to make it unique.
-*
-* TODO: If this is used for multiple charts, it should ensure that the same
-*       new (de-duped) name is used consistently for the same participant id.
-*       Check how that is done for participant colors.
-*
-* @param {Array<{id: string, name: string}>} participants
-* @param {string} currentUserId
-*
-* @returns {Object<ParticiantId, string>} Map of participant id to a unique
-*      name for that participant.
-*/
+ *
+ * Map the participant ids to unique names that consist of the participant name
+ * with a suffix if needed to make it unique.
+ *
+ * TODO: If this is used for multiple charts, it should ensure that the same
+ *       new (de-duped) name is used consistently for the same participant id.
+ *       Check how that is done for participant colors.
+ *
+ * @param {Array<{id: string, name: string}>} participants
+ * @param {string} currentUserId
+ *
+ * @returns {Object<ParticiantId, string>} Map of participant id to a unique
+ *      name for that participant.
+ */
 function getUniqueParticipantNameMap(participants, currentUserId) {
     // Get participant names, renaming duplicates
     const name2Ids = {};
@@ -867,8 +865,6 @@ const mapStateToProps = state => {
         datasetStatus: getDatasetStatus(state, TimelineChart.datasetType),
         eventDatasets: getTimelineEventDatasets(state),
         eventDatasetStatuses: getTimelineEventDatasetStatuses(state),
-
-        // refactor it
         participantsStatsData: getMetricDataset(state, SpeakingTime.datasetType)
     };
 };

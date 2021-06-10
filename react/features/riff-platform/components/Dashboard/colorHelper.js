@@ -78,7 +78,7 @@ function getColorForOther(n, currentColor, currentTextColor) {
     let textColor = currentTextColor;
 
     if (k === 0) {
-        const i = (n / 5) % (PeerColors.length - 2) + 2;
+        const i = ((n / 5) % (PeerColors.length - 2)) + 2;
 
         color = PeerColors[i];
         textColor = Colors.white;

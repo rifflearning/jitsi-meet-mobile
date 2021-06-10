@@ -2,8 +2,8 @@
 /* eslint-disable react/jsx-handler-names */
 /* eslint-disable valid-jsdoc */
 /* ******************************************************************************
- * Dashboard.js                                                                *
- * *************************************************************************/ /**
+* index.js                                                                *
+* *************************************************************************/ /**
 *
 * @fileoverview React component container for meeting metrics (the dashboard)
 *
@@ -34,7 +34,7 @@ import Influence from '../Metrics/Influence';
 import Interruptions from '../Metrics/Interruptions';
 import SpeakingTime from '../Metrics/SpeakingTime';
 import Timeline from '../Metrics/TimelineChart';
-import { Colors } from '../colorsHelpers';
+import { Colors } from '../colorHelper';
 import { EventConfigs } from '../config';
 import {
     RequestStatus,
@@ -53,12 +53,12 @@ import {
 const logContext = 'Dashboard';
 
 /* ******************************************************************************
-* Dashboard                                                               */ /**
+* DashboardView                                                              */ /**
 *
 * React component to present the metrics for meetings the user attended
 *
 ********************************************************************************/
-class Dashboard extends React.Component {
+class DashboardView extends React.Component {
 
     static propTypes = {
         /** is the graphical rendering for all charts on the dashboard complete? */
@@ -116,7 +116,7 @@ class Dashboard extends React.Component {
 
     /* **************************************************************************
      * constructor                                                         */ /**
-    */
+     */
     constructor(props) {
         super(props);
 
@@ -126,17 +126,17 @@ class Dashboard extends React.Component {
 
     /* **************************************************************************
      * componentDidMount                                                   */ /**
-    *
-    * Lifecycle method of a React component.
-    * This is invoked immediately after a component is mounted (inserted into the
-    * tree). Initialization that requires DOM nodes should go here.
-    *
-    * Load the user's list of meetings. As this may be a time consuming operation
-    * we wait until this page is mounted and we know that the list is actually
-    * needed.
-    *
-    * @see {@link https://reactjs.org/docs/react-component.html#componentdidmount|React.Component.componentDidMount}
-    */
+     *
+     * Lifecycle method of a React component.
+     * This is invoked immediately after a component is mounted (inserted into the
+     * tree). Initialization that requires DOM nodes should go here.
+     *
+     * Load the user's list of meetings. As this may be a time consuming operation
+     * we wait until this page is mounted and we know that the list is actually
+     * needed.
+     *
+     * @see {@link https://reactjs.org/docs/react-component.html#componentdidmount|React.Component.componentDidMount}
+     */
     componentDidMount() {
         if (this.props.isRiffConnected) {
             logger.debug(`${logContext}.componentDidMount: loading recent meetings now`);
@@ -152,13 +152,13 @@ class Dashboard extends React.Component {
 
     /* **************************************************************************
      * componentDidUpdate                                                  */ /**
-    *
-    * ComponentDidUpdate() is invoked immediately after updating occurs. This
-    * method is not called for the initial render.
-    *
-    * Use this as an opportunity to operate on the DOM when the component has
-    * been updated.
-    */
+     *
+     * ComponentDidUpdate() is invoked immediately after updating occurs. This
+     * method is not called for the initial render.
+     *
+     * Use this as an opportunity to operate on the DOM when the component has
+     * been updated.
+     */
     componentDidUpdate(prevProps) {
         const isNewSelectedMeeting = prevProps.selectedMeeting !== this.props.selectedMeeting;
 
@@ -183,11 +183,11 @@ class Dashboard extends React.Component {
 
     /* **************************************************************************
      * render                                                              */ /**
-    *
-    * Required method of a React component.
-                                                                              *
-    * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-    */
+     *
+     * Required method of a React component.
+                                                                               *
+     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+     */
     render() {
         //  logger.debug(`${logContext}.render: entered`, { props: this.props });
 
@@ -278,11 +278,11 @@ class Dashboard extends React.Component {
 
     /* **************************************************************************
      * onSelectionChanged                                                  */ /**
-    *
-    * Handler for the MeetingList onSelectionChanged callback.
-    * Adds special handling when the selection is "changed" to the current
-    * selection to reload all metric datasets.
-    */
+     *
+     * Handler for the MeetingList onSelectionChanged callback.
+     * Adds special handling when the selection is "changed" to the current
+     * selection to reload all metric datasets.
+     */
     onSelectionChanged(meeting) {
         const currentSelectedMeeting = this.props.selectedMeeting;
 
@@ -303,7 +303,7 @@ const mapStateToProps = state => {
         selectedMeeting: getSelectedMeeting(state),
         fetchMeetingsStatus: getUserMeetingsStatus(state),
         fetchMeetingsMessage: getUserMeetingsError(state)?.message,
-        areAllChartsRendered: getAreAllChartsLoaded(state, Dashboard.graphTypes)
+        areAllChartsRendered: getAreAllChartsLoaded(state, DashboardView.graphTypes)
     };
 };
 
@@ -318,10 +318,10 @@ const mapDispatchToProps = dispatch => {
         },
 
         loadMetricDatasets: () => {
-            dispatch(loadMetricDatasets(Dashboard.datasetTypes));
+            dispatch(loadMetricDatasets(DashboardView.datasetTypes));
         },
         dashboardGraphLoaded: graphType => dispatch(metricGraphLoaded(graphType))
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardView);

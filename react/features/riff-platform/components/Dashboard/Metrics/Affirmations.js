@@ -33,24 +33,22 @@ import { StackedBarGraph } from './StackedBarGraph';
  ********************************************************************************/
 class Affirmations extends React.PureComponent {
     static propTypes = {
-        /** meeting whose relevant data will be in graphDataset */
+        /** Sets a graphical rendering status for a graph type to loaded */
         dashboardGraphLoaded: PropTypes.func.isRequired,
 
-        /** ID of the logged in user so their data can be distinguished */
+        /** The request status of the graphDataset */
         datasetStatus: PropTypes.string.isRequired,
 
-        /** The dataset needed for this pie chart
-         *  - the potential datasets are defined in constants/Graphs (GraphDatasets)
-         */
+        /** The main dataset that is used for this graph */
         graphDataset: PropTypes.object.isRequired,
 
-        /** The request status of the graphDataset */
+        /** Meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
             participants: PropTypes.instanceOf(Map).isRequired
         }),
 
-        /** sets a graphical rendering status for a graph type to loaded */
+        /** ID of the logged in user so their data can be distinguished */
         participantId: PropTypes.string.isRequired
     };
 

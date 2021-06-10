@@ -8,7 +8,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { useRef, useEffect, useState } from 'react';
 
-import { Colors } from '../colorsHelpers';
+import { Colors } from '../colorHelper';
 
 const formatTime = dt => new Date(dt).getTime();
 

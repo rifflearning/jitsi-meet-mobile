@@ -26,7 +26,7 @@ import React from 'react';
 import { ScaleLoader } from 'react-spinners';
 
 import ChartCard from '../ChartCard/ChartCard';
-import { Colors } from '../colorsHelpers';
+import { Colors } from '../colorHelper';
 import { EventConfigs, GraphConfigs } from '../config';
 import { getParticipantName } from '../functions';
 import { RequestStatus, logger } from '../utils';
@@ -42,30 +42,28 @@ const logContext = 'StackedBarGraph';
  ********************************************************************************/
 class StackedBarGraph extends React.PureComponent {
     static propTypes = {
-        /** sets a graphical rendering status for a graph type to loaded */
+        /** Sets a graphical rendering status for a graph type to loaded */
         dashboardGraphLoaded: PropTypes.func.isRequired,
 
-        /** ID of the logged in user so their data can be distinguished */
+        /** The request status of the graphDataset */
         datasetStatus: PropTypes.string,
 
-        /** The request status of the graphDataset */
+        /** The main dataset that is used for this graph */
         graphDataset: PropTypes.object.isRequired,
 
-        /** The graph types we're embedding in this stacked bar graph
-         *  - the keys of this object are defined in constants/Graphs (GraphTypes)
-         */
+        /** The graph types we're embedding in this stacked bar graph */
         graphType: PropTypes.oneOf(Object.values(GraphTypes)).isRequired,
 
-        /** The event types we're stacking in this stacked bar graph */
+        /** Meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
             participants: PropTypes.instanceOf(Map).isRequired
         }),
 
-        /** meeting whose relevant data will be in graphDataset */
+        /** ID of the logged in user so their data can be distinguished */
         participantId: PropTypes.string.isRequired,
 
-        /** sets a graphical rendering status for a graph type to loaded */
+        /** The event types we're stacking in this stacked bar graph */
         stackedEventTypes: PropTypes.array
     };
 
@@ -179,20 +177,20 @@ class StackedBarGraph extends React.PureComponent {
     }
 
     /* ******************************************************************************
-    * getGraphData                                                            */ /**
-    *
-    * For each embedded graph type passed in props, parse through the data and
-    * organise it under participant names.
-    *
-    * @returns {Array<{
-    *              participant: string,                - participant name
-    *              totalRelations: number,
-    *              [eventType.legendLabel...]: number, - One of these for each of
-    *                                                    the event types
-    *                                                    e.g. 'Your Affirmations' and
-    *                                                    'Their Affirmations'
-    *          }>} containing the prepared data for the graph.
-    */
+     * getGraphData                                                            */ /**
+     *
+     * For each embedded graph type passed in props, parse through the data and
+     * organise it under participant names.
+     *
+     * @returns {Array<{
+     *              participant: string,                - participant name
+     *              totalRelations: number,
+     *              [eventType.legendLabel...]: number, - One of these for each of
+     *                                                    the event types
+     *                                                    e.g. 'Your Affirmations' and
+     *                                                    'Their Affirmations'
+     *          }>} containing the prepared data for the graph.
+     */
     getGraphData() {
         if (this.props.graphDataset.relationCounts.size === 0) {
             return [];

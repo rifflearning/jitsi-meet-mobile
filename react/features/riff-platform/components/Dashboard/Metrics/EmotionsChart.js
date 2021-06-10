@@ -25,7 +25,7 @@ import { ScaleLoader } from 'react-spinners';
 
 import api from '../../../api';
 import ChartCard from '../ChartCard/ChartCard';
-import { Colors } from '../colorsHelpers';
+import { Colors } from '../colorHelper';
 import { RequestStatus, getSelectedMeeting, getMetricDataset, getDatasetStatus } from '../utils';
 
 import EmotionsGraph from './EmotionsGraph';
@@ -38,14 +38,13 @@ import EmotionsGraph from './EmotionsGraph';
  ********************************************************************************/
 class EmotionsChart extends React.Component {
     static propTypes = {
-
         /** The request status of the graphDataset */
         datasetStatus: PropTypes.string.isRequired,
 
         /** The main dataset that is used for this graph */
-        graphDataset: PropTypes.any.isRequired,
+        graphDataset: PropTypes.object.isRequired,
 
-        /** meeting whose relevant data will be in graphDataset */
+        /** Meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
             participants: PropTypes.instanceOf(Map).isRequired
@@ -59,8 +58,8 @@ class EmotionsChart extends React.Component {
      static datasetType = GraphDatasetTypes.UTTERANCE_TIMELINE;
 
      /* **************************************************************************
-     * constructor                                                         */ /**
-     */
+      * constructor                                                         */ /**
+      */
      constructor(props) {
          super(props);
 
@@ -71,17 +70,17 @@ class EmotionsChart extends React.Component {
      }
 
      /* **************************************************************************
-     * componentDidMount                                                   */ /**
-     *
-     */
+      * componentDidMount                                                   */ /**
+      *
+      */
      componentDidMount() {
          setTimeout(() => this.getEmotionsData(), 0); // no meetingId if call synchronously
      }
 
      /* **************************************************************************
-     * componentDidUpdate                                                  */ /**
-     *
-     */
+      * componentDidUpdate                                                  */ /**
+      *
+      */
      componentDidUpdate(prevProps) {
          if (prevProps.meeting?._id !== this.props.meeting?._id) {
              this.getEmotionsData();
@@ -89,9 +88,9 @@ class EmotionsChart extends React.Component {
      }
 
      /* **************************************************************************
-     * shouldComponentUpdate                                               */ /**
-     *
-     */
+      * shouldComponentUpdate                                               */ /**
+      *
+      */
      shouldComponentUpdate(nextProps) {
          const { allAreLoaded, allWereLoaded } = this.getDatasetStatus({
              prevProps: this.props,
@@ -109,12 +108,12 @@ class EmotionsChart extends React.Component {
      }
 
      /* **************************************************************************
-     * render                                                              */ /**
-     *
-     * Required method of a React component.
-                                                                               *
-     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-     */
+      * render                                                              */ /**
+      *
+      * Required method of a React component.
+                                                                                *
+      * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+      */
      render() {
          let emptyGraphText;
 
@@ -168,18 +167,18 @@ class EmotionsChart extends React.Component {
      }
 
      /* ******************************************************************************
-    * getDatasetStatus                                                        */ /**
-    *
-    * Check if all of the datasets passed in this.props.graphDatasets are loaded.
-    *
-    * @param {object} prevProps - Optional, containing the previous props.
-    * @param {object} currentProps - Containing the current or next props.
-    *
-    * @returns {object} containing three booleans:
-    *                   1. oneWasLoading  - Was one of the datasets previously loading?
-    *                   2. allAreLoaded   - Are all the datasets loaded?
-    *                   3. loadingNewData - Is new data being fetched?
-    */
+     * getDatasetStatus                                                        */ /**
+     *
+     * Check if all of the datasets passed in this.props.graphDatasets are loaded.
+     *
+     * @param {object} prevProps - Optional, containing the previous props.
+     * @param {object} currentProps - Containing the current or next props.
+     *
+     * @returns {object} containing three booleans:
+     *                   1. oneWasLoading  - Was one of the datasets previously loading?
+     *                   2. allAreLoaded   - Are all the datasets loaded?
+     *                   3. loadingNewData - Is new data being fetched?
+     */
      getDatasetStatus({ prevProps, currentProps }) {
 
          const getStatuses = props => [
@@ -199,7 +198,6 @@ class EmotionsChart extends React.Component {
              allAreLoaded,
              allWereLoaded };
      }
-
 }
 
 const mapStateToProps = state => {

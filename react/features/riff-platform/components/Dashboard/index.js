@@ -1,5 +1,4 @@
 /* eslint-disable react/no-multi-comp */
-// import { Dashboard } from '@rifflearning/riff-metrics';
 import React, { useEffect } from 'react';
 
 import Dashboard from './DashboardView';

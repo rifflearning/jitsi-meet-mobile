@@ -1,6 +1,6 @@
 /* eslint-disable valid-jsdoc */
 /* ******************************************************************************
- * graphs.ts                                                                    *
+ * config.ts                                                                    *
  * *************************************************************************/ /**
  *
  * @fileoverview constants relating to the metric graphs
@@ -17,7 +17,7 @@
 import {
     Colors,
     getColorForSelf
-} from './colorsHelpers';
+} from './colorHelper';
 
 /**
  * identifiers for datasets that are used on the dashboard

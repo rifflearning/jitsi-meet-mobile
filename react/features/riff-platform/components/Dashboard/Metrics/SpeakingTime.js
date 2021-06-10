@@ -29,7 +29,7 @@ import { connect } from 'react-redux';
 import { ScaleLoader } from 'react-spinners';
 
 import ChartCard from '../ChartCard/ChartCard';
-import { Colors, getColorMap } from '../colorsHelpers';
+import { Colors, getColorMap } from '../colorHelper';
 import { GraphConfigs } from '../config';
 import { formatDuration, getParticipantName } from '../functions';
 import {
@@ -41,9 +41,6 @@ import {
     logger
 } from '../utils';
 
-/** define the logContext (since the only thing in this module is the SpeakingTime class
- *  we can specify that w/o a qualifier on the const name
- */
 const logContext = 'SpeakingTime';
 
 /* ******************************************************************************
@@ -54,24 +51,22 @@ const logContext = 'SpeakingTime';
   ********************************************************************************/
 class SpeakingTime extends React.PureComponent {
     static propTypes = {
-        /** meeting whose relevant data will be in graphDataset */
+        /** Sets a graphical rendering status for a graph type to loaded */
         dashboardGraphLoaded: PropTypes.func.isRequired,
 
-        /** ID of the logged in user so their data can be distinguished */
+        /** The request status of the graphDataset */
         datasetStatus: PropTypes.string.isRequired,
 
-        /** The dataset needed for this pie chart
-         *  - the potential datasets are defined in constants/Graphs (GraphDatasets)
-         */
+        /** The main dataset that is used for this graph */
         graphDataset: PropTypes.object.isRequired,
 
-        /** The request status of the graphDataset */
+        /** Meeting whose relevant data will be in graphDataset */
         meeting: PropTypes.shape({
             _id: PropTypes.string.isRequired,
             participants: PropTypes.instanceOf(Map).isRequired
         }),
 
-        /** sets a graphical rendering status for a graph type to loaded */
+        /** ID of the logged in user so their data can be distinguished */
         participantId: PropTypes.string.isRequired
     };
 
@@ -83,7 +78,7 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * constructor                                                         */ /**
-    */
+     */
     constructor(props) {
         super(props);
 
@@ -97,21 +92,21 @@ class SpeakingTime extends React.PureComponent {
 
     /* **************************************************************************
      * componentDidMount                                                   */ /**
-    */
+     */
     componentDidMount() {
         this.initGraph();
     }
 
     /* **************************************************************************
      * componentWillUnmount                                                */ /**
-    */
+     */
     componentWillUnmount() {
         this.disposeChart();
     }
 
     /* **************************************************************************
      * componentDidUpdate                                                  */ /**
-    */
+     */
     componentDidUpdate(prevProps, prevState) {
         const { isLoaded } = this.getDatasetStatus(prevProps);
 
@@ -122,12 +117,12 @@ class SpeakingTime extends React.PureComponent {
     }
 
     /* **************************************************************************
-    * render                                                              */ /**
-    *
-    * Required method of a React component.
-                                                                              *
-    * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
-    */
+     * render                                                              */ /**
+     *
+     * Required method of a React component.
+                                                                               *
+     * @see {@link https://reactjs.org/docs/react-component.html#render|React.Component.render}
+     */
     render() {
         logger.debug(`${logContext}.render: entered`, { props: this.props });
 
@@ -169,12 +164,12 @@ class SpeakingTime extends React.PureComponent {
     }
 
     /* ******************************************************************************
-    * getGraphData                                                            */ /**
-    *
-    * For each participant in a meeting, create config objects for the pie chart.
-    *
-    * @returns Data items containing the prepared data for the graph.
-    */
+     * getGraphData                                                            */ /**
+     *
+     * For each participant in a meeting, create config objects for the pie chart.
+     *
+     * @returns Data items containing the prepared data for the graph.
+     */
     getGraphData() {
         // sort participants by totalSecsUtterances
         const sortedParticipants = new Map([ ...this.props.graphDataset.participantStats.entries() ]
@@ -216,11 +211,11 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * drawGraph                                                               */ /**
-    *
-    * Initialise the graph, add the categories, and populate with data.
-    * - if an empty dataset is passed, return.
-    *
-    */
+     *
+     * Initialise the graph, add the categories, and populate with data.
+     * - if an empty dataset is passed, return.
+     *
+     */
     drawGraph() {
         logger.debug(`${logContext}.drawGraph<${SpeakingTime.graphType}>: entered`);
         const chart = this.chart;
@@ -244,16 +239,16 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * createSeries                                                            */ /**
-    *
-    * Create the graph series.
-    *
-    * For more info on amcharts PieSeries, see:
-    * Https://www.amcharts.com/docs/v4/reference/pieseries/.
-    *
-    * @param chart - The chart object for this SpeakingTime.
-    *
-    * @returns The graph series for this graph type.
-    */
+     *
+     * Create the graph series.
+     *
+     * For more info on amcharts PieSeries, see:
+     * Https://www.amcharts.com/docs/v4/reference/pieseries/.
+     *
+     * @param chart - The chart object for this SpeakingTime.
+     *
+     * @returns The graph series for this graph type.
+     */
     createSeries(chart) {
         const series = chart.series.push(new am4charts.PieSeries());
 
@@ -323,15 +318,15 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * initGraph                                                               */ /**
-    *
-    * Initialise the chart and bind to the appropriate html element.
-    *
-    * For more info on amcharts PieChart, see:
-    * Https://www.amcharts.com/docs/v4/reference/PieChart/
-    * https://www.amcharts.com/docs/v4/chart-types/pie-chart/.
-    *
-    * @returns {Object} Containing a reference to the chart.
-    */
+     *
+     * Initialise the chart and bind to the appropriate html element.
+     *
+     * For more info on amcharts PieChart, see:
+     * Https://www.amcharts.com/docs/v4/reference/PieChart/
+     * https://www.amcharts.com/docs/v4/chart-types/pie-chart/.
+     *
+     * @returns {Object} Containing a reference to the chart.
+     */
     initGraph() {
         logger.debug(`${logContext}.initGraph<${SpeakingTime.graphType}>: entered`);
 
@@ -366,9 +361,9 @@ class SpeakingTime extends React.PureComponent {
 
     /* ******************************************************************************
      * disposeChart                                                            */ /**
-    *
-    * This is called when it is appropriate to dispose of the chart, for efficiency.
-    */
+     *
+     * This is called when it is appropriate to dispose of the chart, for efficiency.
+     */
     disposeChart() {
         if (this.chart) {
             this.chart.dispose();
@@ -378,17 +373,17 @@ class SpeakingTime extends React.PureComponent {
     }
 
     /* ******************************************************************************
-    * getDatasetStatus                                                        */ /**
-    *
-    * Check if the dataset passed in this.props.graphDataset is loaded.
-    *
-    * @param {object} prevProps Optional, containing the previous props.
-    *
-    * @returns {object} containing three booleans:
-    *      1. wasLoading  - Was the dataset previously loading?
-    *      2. isLoaded   - Is the dataset loaded?
-    *      3. loadingNewData - Is new data being fetched?
-    */
+     * getDatasetStatus                                                        */ /**
+     *
+     * Check if the dataset passed in this.props.graphDataset is loaded.
+     *
+     * @param {object} prevProps Optional, containing the previous props.
+     *
+     * @returns {object} containing three booleans:
+     *      1. wasLoading  - Was the dataset previously loading?
+     *      2. isLoaded   - Is the dataset loaded?
+     *      3. loadingNewData - Is new data being fetched?
+     */
     getDatasetStatus(prevProps) {
         const isLoaded = this.props.datasetStatus === RequestStatus.SUCCESS;
 
