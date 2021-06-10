@@ -343,9 +343,6 @@ class SpeakingTime extends React.PureComponent {
         // Fired when graph's data gets updated
         chart.events.on('datavalidated', () => {
             this.props.dashboardGraphLoaded(SpeakingTime.graphType);
-
-            // Update
-            this.setState({ updatedAt: new Date() });
         });
 
         // Create pie graph series

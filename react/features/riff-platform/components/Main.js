@@ -9,7 +9,7 @@ import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { initialize as initRiffMetrics } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
     Switch,
     Route, Redirect

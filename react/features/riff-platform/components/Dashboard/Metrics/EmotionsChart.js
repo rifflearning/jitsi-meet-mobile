@@ -70,14 +70,6 @@ class EmotionsChart extends React.Component {
      }
 
      /* **************************************************************************
-      * componentDidMount                                                   */ /**
-      *
-      */
-     componentDidMount() {
-         setTimeout(() => this.getEmotionsData(), 0); // no meetingId if call synchronously
-     }
-
-     /* **************************************************************************
       * componentDidUpdate                                                  */ /**
       *
       */
@@ -156,7 +148,7 @@ class EmotionsChart extends React.Component {
 
      getEmotionsData() {
          if (!this.props.meeting?._id) {
-             return;
+             return console.error('no meeting id for getEmotionsData');
          }
          this.setState({ emotionsDataLoading: true });
          api.fetchEmotions(this.props.meeting._id)
@@ -206,7 +198,6 @@ const mapStateToProps = state => {
         meeting: getSelectedMeeting(state),
         graphDataset: getMetricDataset(state, EmotionsChart.datasetType),
         datasetStatus: getDatasetStatus(state, EmotionsChart.datasetType)
-
     };
 };
 

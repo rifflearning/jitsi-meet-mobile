@@ -36,6 +36,7 @@ import SpeakingTime from '../Metrics/SpeakingTime';
 import Timeline from '../Metrics/TimelineChart';
 import { Colors } from '../colorHelper';
 import { EventConfigs } from '../config';
+import { setWindowScrolling } from '../functions';
 import {
     RequestStatus,
     loadMetricDatasets,
@@ -147,7 +148,7 @@ class DashboardView extends React.Component {
         }
 
         // make sure window scrolling is enabled
-        // setWindowScrolling(true);
+        setWindowScrolling(true);
     }
 
     /* **************************************************************************
@@ -296,9 +297,6 @@ class DashboardView extends React.Component {
 const mapStateToProps = state => {
     return {
         isRiffConnected: true,
-
-        // isRiffConnected: Boolean(state['features/riff-platform'].riffDataServer.authToken),
-
         meetings: getUserMeetings(state),
         selectedMeeting: getSelectedMeeting(state),
         fetchMeetingsStatus: getUserMeetingsStatus(state),
