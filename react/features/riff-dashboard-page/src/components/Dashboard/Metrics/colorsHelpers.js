@@ -97,9 +97,9 @@
   */
  function getColorMap(setIds, selfId) {
  
-     const gradientColorsIds = setIds.filter((id, index) => index !== 0 && id !== selfId);
-     const mainColorsIds = setIds.filter((id, index) => index === 0 || id === selfId);
- 
+     const gradientColorsIds = setIds.filter((id, index) => (selfId == setIds[0] ? index !== 1 : index !== 0 ) && id !== selfId);
+     const mainColorsIds = setIds.filter((id, index) => (selfId == setIds[0] ? index === 1 : index === 0 ) || id === selfId);
+
      const colorMap = new Map();
  
      for (const id of mainColorsIds) {

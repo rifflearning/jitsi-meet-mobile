@@ -5,13 +5,11 @@ html body {
         background-color: $defaultBackground;
         font-family: sans-serif;
 
-        @import '../react/features/riff-dashboard-page/src/sass/main.scss';
-
         h2 {
             color: #ffffff;
         }
 
-        #riff-chart-card.chart-card-component {
+        .chart-card-container {
                 box-shadow: 0 1px 5px 0 rgba(#000000, 0.13);
                 background-color: #ffffff;
         
@@ -33,34 +31,17 @@ html body {
                 background: unset;
             }
         
-            .grouped_influences, .grouped_affirmations, .grouped_interruptions {
-                position: absolute;
-                background: #ffffff;
-                display: flex;
-                align-items: flex-start;
-                bottom: 0;
-                margin-bottom: 30px;
-                flex-direction: column;
-           
-                .legend-item {
-                    max-width: 100%;
-                    padding-left: 0;
-                    cursor: inherit;
-                    .label {
-                        font-size: 10px;
-                        font-weight: 500;
-                    }
-                    .peer-color {
-                        margin-right: 3px;
-                        width: 10px;
-                        height: 10px;
-                    }
-                  
-                }
-            }
 
         }
     }
+}
+
+.has-text-centered {
+    text-align: center !important;
+}
+
+.is-size-7 {
+    font-size: .75rem!important;
 }
 
 #meeting-mediator-wrapper {
@@ -70,6 +51,11 @@ html body {
     top: 0;
     cursor: move;
     pointer-events: all;
+
+    .chart-card-info-small {
+        box-sizing: border-box;
+    }
+    
 
     &.closed {
        display: none;
@@ -98,8 +84,6 @@ html body {
             fill: #4a4a4a;
         }
     }
-
-    @import '../react/features/riff-dashboard-page/src/sass/main.scss';
 }
 
 /* tooltip for meeting-mediator */

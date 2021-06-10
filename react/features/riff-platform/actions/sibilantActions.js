@@ -4,8 +4,8 @@
 import Sibilant from '@rifflearning/sibilant';
 
 import UIEvents from '../../../../service/UI/UIEvents';
-import { app, socket } from '../../riff-dashboard-page/src/libs/riffdata-client';
 import * as actionTypes from '../constants/actionTypes';
+import { app, socket } from '../libs/riffdata-client';
 
 function setRoomIdFromRiffDataServer(roomId) {
     return {
