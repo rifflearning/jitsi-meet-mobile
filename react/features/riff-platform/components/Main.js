@@ -196,7 +196,7 @@ const mapStateToProps = state => {
     return {
         user: state['features/riff-platform'].signIn.user,
         metrics: state['features/riff-platform'].metrics,
-        isRiffServerConnected: Boolean(state['features/riff-platform'].riffDataServer.accessToken)
+        isRiffServerConnected: Boolean(state['features/riff-platform'].riffDataServer.authToken)
     };
 };
 
