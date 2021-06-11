@@ -7,12 +7,16 @@ import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
 import { connect, disconnect } from '../../../base/connection';
 import { translate } from '../../../base/i18n';
 import { connect as reactReduxConnect } from '../../../base/redux';
+import { setColorAlpha } from '../../../base/util';
 import { Chat } from '../../../chat';
 import { Filmstrip } from '../../../filmstrip';
 import { CalleeInfoContainer } from '../../../invite';
 import { LargeVideo } from '../../../large-video';
 import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
+import { ParticipantsPane } from '../../../participants-pane/components';
+import { getParticipantsPaneOpen } from '../../../participants-pane/functions';
 import { Prejoin, isPrejoinPageVisible } from '../../../prejoin';
+<<<<<<< HEAD
 // eslint-disable-next-line max-len
 import DraggableMeetingMediator from '../../../riff-platform/components/DraggableMeetingMediator';
 import {
@@ -21,6 +25,10 @@ import {
     setToolboxAlwaysVisible,
     showToolbox
 } from '../../../toolbox';
+=======
+import { fullScreenChanged, showToolbox } from '../../../toolbox/actions.web';
+import { Toolbox } from '../../../toolbox/components/web';
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 import { LAYOUTS, getCurrentLayout } from '../../../video-layout';
 import { maybeShowSuboptimalExperienceNotification } from '../../functions';
 import {
@@ -29,13 +37,10 @@ import {
 } from '../AbstractConference';
 import type { AbstractProps } from '../AbstractConference';
 
-import InviteMore from './InviteMore';
-import Labels from './Labels';
+import ConferenceInfo from './ConferenceInfo';
 import { default as Notice } from './Notice';
-import { default as Subject } from './Subject';
 
 declare var APP: Object;
-declare var config: Object;
 declare var interfaceConfig: Object;
 
 /**
@@ -70,14 +75,19 @@ const LAYOUT_CLASSNAMES = {
 type Props = AbstractProps & {
 
     /**
-     * Whether the local participant is recording the conference.
+     * The alpha(opacity) of the background
      */
-    _iAmRecorder: boolean,
+    _backgroundAlpha: number,
 
     /**
      * Returns true if the 'lobby screen' is visible.
      */
     _isLobbyScreenVisible: boolean,
+
+    /**
+     * If participants pane is visible or not.
+     */
+    _isParticipantsPaneVisible: boolean,
 
     /**
      * The CSS class to apply to the root of {@link Conference} to modify the
@@ -106,7 +116,11 @@ class Conference extends AbstractConference<Props, *> {
     _onFullScreenChange: Function;
     _onShowToolbar: Function;
     _originalOnShowToolbar: Function;
+<<<<<<< HEAD
     firebaseUnsubscribe: Function;
+=======
+    _setBackground: Function;
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
     /**
      * Initializes a new Conference instance.
@@ -130,6 +144,7 @@ class Conference extends AbstractConference<Props, *> {
 
         // Bind event handler so it is only bound once for every instance.
         this._onFullScreenChange = this._onFullScreenChange.bind(this);
+        this._setBackground = this._setBackground.bind(this);
     }
 
     /**
@@ -184,19 +199,14 @@ class Conference extends AbstractConference<Props, *> {
      */
     render() {
         const {
-            // XXX The character casing of the name filmStripOnly utilized by
-            // interfaceConfig is obsolete but legacy support is required.
-            filmStripOnly: filmstripOnly
-        } = interfaceConfig;
-        const {
-            _iAmRecorder,
             _isLobbyScreenVisible,
+            _isParticipantsPaneVisible,
             _layoutClassName,
             _showPrejoin
         } = this.props;
-        const hideLabels = filmstripOnly || _iAmRecorder;
 
         return (
+<<<<<<< HEAD
             <div
                 className = { _layoutClassName }
                 id = 'videoconference_page'
@@ -213,17 +223,65 @@ class Conference extends AbstractConference<Props, *> {
                     <Filmstrip filmstripOnly = { filmstripOnly } />
                     { hideLabels || <Labels /> }
                 </div>
+=======
+            <div id = 'layout_wrapper'>
+                <div
+                    className = { _layoutClassName }
+                    id = 'videoconference_page'
+                    onMouseMove = { this._onShowToolbar }
+                    ref = { this._setBackground }>
+                    <ConferenceInfo />
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
-                { filmstripOnly || _showPrejoin || _isLobbyScreenVisible || <Toolbox /> }
-                { filmstripOnly || <Chat /> }
+                    <Notice />
+                    <div id = 'videospace'>
+                        <LargeVideo />
+                        {!_isParticipantsPaneVisible && <KnockingParticipantList />}
+                        <Filmstrip />
+                    </div>
 
-                { this.renderNotificationsContainer() }
+                    { _showPrejoin || _isLobbyScreenVisible || <Toolbox /> }
+                    <Chat />
 
-                <CalleeInfoContainer />
+                    { this.renderNotificationsContainer() }
 
-                { !filmstripOnly && _showPrejoin && <Prejoin />}
+                    <CalleeInfoContainer />
+
+                    { _showPrejoin && <Prejoin />}
+
+                </div>
+                <ParticipantsPane />
             </div>
         );
+    }
+
+    /**
+     * Sets custom background opacity based on config. It also applies the
+     * opacity on parent element, as the parent element is not accessible directly,
+     * only though it's child.
+     *
+     * @param {Object} element - The DOM element for which to apply opacity.
+     *
+     * @private
+     * @returns {void}
+     */
+    _setBackground(element) {
+        if (!element) {
+            return;
+        }
+
+        if (this.props._backgroundAlpha !== undefined) {
+            const elemColor = element.style.background;
+            const alphaElemColor = setColorAlpha(elemColor, this.props._backgroundAlpha);
+
+            element.style.background = alphaElemColor;
+            if (element.parentElement) {
+                const parentColor = element.parentElement.style.background;
+                const alphaParentColor = setColorAlpha(parentColor, this.props._backgroundAlpha);
+
+                element.parentElement.style.background = alphaParentColor;
+            }
+        }
     }
 
     /**
@@ -268,9 +326,6 @@ class Conference extends AbstractConference<Props, *> {
         dispatch(connect());
 
         maybeShowSuboptimalExperienceNotification(dispatch, t);
-
-        interfaceConfig.filmStripOnly
-            && dispatch(setToolboxAlwaysVisible(true));
     }
 }
 
@@ -285,8 +340,9 @@ class Conference extends AbstractConference<Props, *> {
 function _mapStateToProps(state) {
     return {
         ...abstractMapStateToProps(state),
-        _iAmRecorder: state['features/base/config'].iAmRecorder,
+        _backgroundAlpha: state['features/base/config'].backgroundAlpha,
         _isLobbyScreenVisible: state['features/base/dialog']?.component === LobbyScreen,
+        _isParticipantsPaneVisible: getParticipantsPaneOpen(state),
         _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state)],
         _roomName: state['features/riff-platform']?.meeting?.meeting?.name,
         _showPrejoin: isPrejoinPageVisible(state)

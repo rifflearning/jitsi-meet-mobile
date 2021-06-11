@@ -1,6 +1,6 @@
 // @flow
 
-import Button from '@atlaskit/button';
+import Button from '@atlaskit/button/standard-button';
 import { FieldTextStateless } from '@atlaskit/field-text';
 import React from 'react';
 
@@ -12,7 +12,11 @@ import {
 import { AbstractDialogTab } from '../../../base/dialog';
 import type { Props as AbstractDialogTabProps } from '../../../base/dialog';
 import { translate } from '../../../base/i18n';
+<<<<<<< HEAD
 import { maybeExtractIdFromDisplayName } from '../../../riff-dashboard-page/functions';
+=======
+import { openLogoutDialog } from '../../actions';
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
 declare var APP: Object;
 
@@ -143,23 +147,14 @@ class ProfileTab extends AbstractDialogTab<Props> {
         if (this.props.authLogin) {
             sendAnalytics(createProfilePanelButtonEvent('logout.button'));
 
-            APP.UI.messageHandler.openTwoButtonDialog({
-                leftButtonKey: 'dialog.Yes',
-                msgKey: 'dialog.logoutQuestion',
-                submitFunction(evt, yes) {
-                    if (yes) {
-                        APP.UI.emitEvent(UIEvents.LOGOUT);
-                    }
-                },
-                titleKey: 'dialog.logoutTitle'
-            });
+            APP.store.dispatch(openLogoutDialog(
+                () => APP.UI.emitEvent(UIEvents.LOGOUT)
+            ));
         } else {
             sendAnalytics(createProfilePanelButtonEvent('login.button'));
 
             APP.UI.emitEvent(UIEvents.AUTH_CLICKED);
         }
-
-        this.props.closeDialog();
     }
 
     /**

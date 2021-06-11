@@ -7,26 +7,29 @@ import { Icon, IconInviteMore } from '../../../base/icons';
 import { getParticipantCount } from '../../../base/participants';
 import { connect } from '../../../base/redux';
 import { beginAddPeople } from '../../../invite';
+<<<<<<< HEAD
 import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MultipleRoomsMeetingNameDropdown';
 import {
     isButtonEnabled,
     isToolboxVisible
 } from '../../../toolbox';
+=======
+import { isButtonEnabled, isToolboxVisible } from '../../../toolbox/functions.web';
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
 declare var interfaceConfig: Object;
 
 type Props = {
 
     /**
-     * Whether tile view is enabled.
+     * Whether to show the option to invite more people.
      */
-    _tileViewEnabled: Boolean,
+    _shouldShow: boolean,
 
     /**
-     * Whether to show the option to invite more people
-     * instead of the subject.
+     * Whether the toolbox is visible.
      */
-    _visible: boolean,
+    _toolboxVisible: boolean,
 
     /**
      * Handler to open the invite dialog.
@@ -52,14 +55,20 @@ type Props = {
  * @returns {React$Element<any>}
  */
 function InviteMore({
+<<<<<<< HEAD
     _tileViewEnabled,
     _visible,
     _isMultipleRoomsQuantity,
+=======
+    _shouldShow,
+    _toolboxVisible,
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
     onClick,
     t
 }: Props) {
 
     return (
+<<<<<<< HEAD
         _visible
             ? <div className = { `invite-more-container${_tileViewEnabled ? ' elevated' : ''}` }>
                 <div className = 'invite-more-header'>
@@ -72,6 +81,21 @@ function InviteMore({
                     <Icon src = { IconInviteMore } />
                     <div className = 'invite-more-button-text'>
                         {t('addPeople.inviteMorePrompt')}
+=======
+        _shouldShow
+            ? <div className = { `invite-more-container${_toolboxVisible ? '' : ' elevated'}` }>
+                <div className = 'invite-more-content'>
+                    <div className = 'invite-more-header'>
+                        {t('addPeople.inviteMoreHeader')}
+                    </div>
+                    <div
+                        className = 'invite-more-button'
+                        onClick = { onClick }>
+                        <Icon src = { IconInviteMore } />
+                        <div className = 'invite-more-button-text'>
+                            {t('addPeople.inviteMorePrompt')}
+                        </div>
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
                     </div>
                 </div>
             </div> : null
@@ -92,10 +116,15 @@ function mapStateToProps(state) {
     const hide = interfaceConfig.HIDE_INVITE_MORE_HEADER;
 
     return {
+<<<<<<< HEAD
         _tileViewEnabled: state['features/video-layout'].tileViewEnabled,
         _visible: isToolboxVisible(state) && isButtonEnabled('invite') && isAlone && !hide,
         _isMultipleRoomsQuantity: Boolean(state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity)
 
+=======
+        _shouldShow: isButtonEnabled('invite', state) && isAlone && !hide,
+        _toolboxVisible: isToolboxVisible(state)
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
     };
 }
 

@@ -1,4 +1,4 @@
-/* global APP, $, interfaceConfig */
+/* global APP, $ */
 
 import Logger from 'jitsi-meet-logger';
 
@@ -9,6 +9,7 @@ import {
     sendAnalytics
 } from '../../react/features/analytics';
 import { toggleDialog } from '../../react/features/base/dialog';
+import { clickOnVideo } from '../../react/features/filmstrip/actions';
 import { KeyboardShortcutsDialog }
     from '../../react/features/keyboard-shortcuts';
 import { SpeakerStats } from '../../react/features/speaker-stats';
@@ -54,8 +55,12 @@ const KeyboardShortcut = {
                 if (_shortcuts.has(key)) {
                     _shortcuts.get(key).function(e);
                 } else if (!isNaN(num) && num >= 0 && num <= 9) {
+<<<<<<< HEAD
                     // disable 0-9 shortcuts
                     // APP.UI.clickOnVideo(num);
+=======
+                    APP.store.dispatch(clickOnVideo(num));
+>>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
                 }
 
             }
@@ -204,14 +209,12 @@ const KeyboardShortcut = {
         });
         this._addShortcutToHelp('SPACE', 'keyboardShortcuts.pushToTalk');
 
-        if (!interfaceConfig.filmStripOnly) {
-            this.registerShortcut('T', null, () => {
-                sendAnalytics(createShortcutEvent('speaker.stats'));
-                APP.store.dispatch(toggleDialog(SpeakerStats, {
-                    conference: APP.conference
-                }));
-            }, 'keyboardShortcuts.showSpeakerStats');
-        }
+        this.registerShortcut('T', null, () => {
+            sendAnalytics(createShortcutEvent('speaker.stats'));
+            APP.store.dispatch(toggleDialog(SpeakerStats, {
+                conference: APP.conference
+            }));
+        }, 'keyboardShortcuts.showSpeakerStats');
 
         /**
          * FIXME: Currently focus keys are directly implemented below in
