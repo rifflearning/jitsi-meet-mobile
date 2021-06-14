@@ -2,13 +2,13 @@
 
 import React from 'react';
 
-import { getConferenceName } from '../../../base/conference/functions';
 import { JitsiRecordingConstants } from '../../../base/lib-jitsi-meet';
 import { getParticipantCount } from '../../../base/participants/functions';
 import { connect } from '../../../base/redux';
 import { E2EELabel } from '../../../e2ee';
 import { LocalRecordingLabel } from '../../../local-recording';
 import { RecordingLabel } from '../../../recording';
+import MultipleRoomsNameDropdown from '../../../riff-platform/components/Meeting/MultipleRoomsMeetingNameDropdown';
 import { isToolboxVisible } from '../../../toolbox/functions.web';
 import { TranscribingLabel } from '../../../transcribing';
 import { VideoQualityLabel } from '../../../video-quality';
@@ -52,7 +52,12 @@ type Props = {
     /**
      * Indicates whether the component should be visible or not.
      */
-    _visible: boolean
+    _visible: boolean,
+
+    /**
+     * Whether to show name with multiple rooms quantity instead of name.
+     */
+     _isMultipleRoomsQuantity: boolean
 };
 
 /**
@@ -68,7 +73,8 @@ function ConferenceInfo(props: Props) {
         _showParticipantCount,
         _subject,
         _fullWidth,
-        _visible
+        _visible,
+        _isMultipleRoomsQuantity
     } = props;
 
     return (
@@ -77,7 +83,9 @@ function ConferenceInfo(props: Props) {
                 {
                     !_hideConferenceNameAndTimer
                         && <div className = 'subject-info'>
-                            { _subject && <span className = 'subject-text'>{ _subject }</span>}
+                            {_isMultipleRoomsQuantity
+                                ? <MultipleRoomsNameDropdown />
+                                : _subject && <span className = 'subject-text'>{ _subject }</span>}
                             { !_hideConferenceTimer && <ConferenceTimer /> }
                         </div>
                 }
@@ -117,8 +125,9 @@ function _mapStateToProps(state) {
         _hideConferenceTimer: Boolean(hideConferenceTimer),
         _fullWidth: state['features/video-layout'].tileViewEnabled,
         _showParticipantCount: participantCount > 2 && !hideParticipantsStats,
-        _subject: hideConferenceSubject ? '' : getConferenceName(state),
-        _visible: isToolboxVisible(state)
+        _subject: hideConferenceSubject ? '' : state['features/riff-platform']?.meeting?.meeting?.name,
+        _visible: isToolboxVisible(state),
+        _isMultipleRoomsQuantity: Boolean(state['features/riff-platform']?.meeting?.meeting?.multipleRoomsQuantity)
     };
 }
 
