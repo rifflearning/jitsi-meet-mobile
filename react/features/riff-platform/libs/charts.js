@@ -25,7 +25,7 @@
 
 import { MeetingMediator as MM } from '@rifflearning/riff-metrics';
 
-import { logger } from '../components/Dashboard/utils;';
+import { logger } from '../components/Dashboard/utils';
 
 class Mediator {
     // COPIED FROM ORIGINAL RHYTHM-RTC PROJECT
