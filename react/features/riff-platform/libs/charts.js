@@ -21,11 +21,11 @@
 /* eslint
     camelcase: off,
  */
+// COPIED FROM RIFF-RTC PROJECT (June 14, 2021)
 
-import { MeetingMediator as MM, riffUtils } from '@rifflearning/riff-metrics';
-const { logger } = riffUtils;
+import { MeetingMediator as MM } from '@rifflearning/riff-metrics';
 
-logger.setLogLevel('info');
+import { logger } from '../components/Dashboard/utils;';
 
 class Mediator {
     // COPIED FROM ORIGINAL RHYTHM-RTC PROJECT
