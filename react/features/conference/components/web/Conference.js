@@ -234,7 +234,7 @@ class Conference extends AbstractConference<Props, *> {
                     ref = { this._setBackground }>
                     <ConferenceInfo />
 
-
+                    {!_showPrejoin && <DraggableMeetingMediator />}
                     <Notice />
                     <div id = 'videospace'>
                         <LargeVideo />

@@ -53,7 +53,6 @@ import {
     RecordButton
 } from '../../../recording';
 import MeetingMediatorButton from '../../../riff-platform/components/DraggableMeetingMediator/MeetingMediatorButton';
-//import { SecurityDialogButton } from '../../../security';
 import { isScreenAudioShared, isScreenAudioSupported } from '../../../screen-share/';
 import SecurityDialogButton from '../../../security/components/security-dialog/SecurityDialogButton';
 import {
@@ -1277,6 +1276,14 @@ class Toolbox extends Component<Props> {
                         showLabel = { true } />);
         }
 
+        if (this.props._shouldShowButton('meetingmediator')) {
+            buttons.has('meetingmediator')
+                ? mainMenuAdditionalButtons.push(<MeetingMediatorButton />)
+                : overflowMenuAdditionalButtons.push(<MeetingMediatorButton
+                    closeOverflowMenuIfOpen = { this._closeOverflowMenuIfOpen }
+                    isOverflowMenu = { true } />);
+        }
+
         return {
             mainMenuAdditionalButtons,
             overflowMenuAdditionalButtons
@@ -1322,62 +1329,6 @@ class Toolbox extends Component<Props> {
             t
         } = this.props;
 
-        // if (this._shouldShowButton('desktop')
-        //         && this._isDesktopSharingButtonVisible()) {
-        //     buttonsLeft.push('desktop');
-        // }
-        // if (this._shouldShowButton('raisehand')) {
-        //     buttonsLeft.push('raisehand');
-        // }
-        // if (this._shouldShowButton('chat')) {
-        //     buttonsLeft.push('chat');
-        // }
-        // if (this._shouldShowButton('closedcaptions')) {
-        //     buttonsLeft.push('closedcaptions');
-        // }
-        // if (this._shouldShowButton('meetingmediator')) {
-        //     buttonsLeft.push('meetingmediator');
-        // }
-        // if (overflowHasItems) {
-        //     buttonsRight.push('overflowmenu');
-        // }
-        // if (this._shouldShowButton('invite')) {
-        //     buttonsRight.push('invite');
-        // }
-        // if (this._shouldShowButton('security') || this._shouldShowButton('info')) {
-        //     buttonsRight.push('security');
-        // }
-
-        // if (this._shouldShowButton('tileview')) {
-        //     buttonsRight.push('tileview');
-        // }
-        // if (this._shouldShowButton('localrecording') && !isMobileBrowser()) {
-        //     buttonsRight.push('localrecording');
-        // }
-
-        // const movedButtons = [];
-
-        // if (buttonsLeft.length > maxNumberOfButtonsPerGroup) {
-        //     movedButtons.push(...buttonsLeft.splice(
-        //         maxNumberOfButtonsPerGroup,
-        //         buttonsLeft.length - maxNumberOfButtonsPerGroup));
-        //     if (buttonsRight.indexOf('overflowmenu') === -1) {
-        //         buttonsRight.unshift('overflowmenu');
-        //     }
-        // }
-
-        // if (buttonsRight.length > maxNumberOfButtonsPerGroup) {
-        //     if (buttonsRight.indexOf('overflowmenu') === -1) {
-        //         buttonsRight.unshift('overflowmenu');
-        //     }
-
-        //     let numberOfButtons = maxNumberOfButtonsPerGroup;
-
-        //     // make sure the more button will be displayed when we move buttons.
-        //     if (numberOfButtons === 0) {
-        //         numberOfButtons++;
-        //     }
-
         const buttonSet = getToolbarAdditionalButtons(_clientWidth, _isMobile);
         const toolbarAccLabel = 'toolbar.accessibilityLabel.moreActionsMenu';
         const showOverflowMenuButton = buttonSet.has('overflow');
@@ -1390,61 +1341,6 @@ class Toolbox extends Component<Props> {
         }
 
         return (
-
-            // <div className = 'toolbox-content'>
-            //     <div className = 'button-group-left'>
-            //         { buttonsLeft.indexOf('desktop') !== -1
-            //             && this._renderDesktopSharingButton() }
-            //         { buttonsLeft.indexOf('raisehand') !== -1
-            //             && <ToolbarButton
-            //                 accessibilityLabel = { t('toolbar.accessibilityLabel.raiseHand') }
-            //                 icon = { IconRaisedHand }
-            //                 onClick = { this._onToolbarToggleRaiseHand }
-            //                 toggled = { _raisedHand }
-            //                 tooltip = { t('toolbar.raiseHand') } /> }
-            //         { buttonsLeft.indexOf('chat') !== -1
-            //             && <div className = 'toolbar-button-with-badge'>
-            //                 <ToolbarButton
-            //                     accessibilityLabel = { t('toolbar.accessibilityLabel.chat') }
-            //                     icon = { IconChat }
-            //                     onClick = { this._onToolbarToggleChat }
-            //                     toggled = { _chatOpen }
-            //                     tooltip = { t('toolbar.chat') } />
-            //                 <ChatCounter />
-            //             </div> }
-            //         { buttonsLeft.indexOf('meetingmediator') !== -1
-            //             && <MeetingMediatorButton />}
-            //         {
-            //             buttonsLeft.indexOf('closedcaptions') !== -1
-            //                 && <ClosedCaptionButton />
-            //         }
-            //     </div>
-            //     <div className = 'button-group-center'>
-            //         { this._renderAudioButton() }
-            //         <HangupButton
-            //             visible = { this._shouldShowButton('hangup') } />
-            //         { this._renderVideoButton() }
-            //     </div>
-            //     <div className = 'button-group-right'>
-            //         { buttonsRight.indexOf('localrecording') !== -1
-            //             && <LocalRecordingButton
-            //                 onClick = {
-            //                     this._onToolbarOpenLocalRecordingInfoDialog
-            //                 } />
-            //         }
-            //         { buttonsRight.indexOf('tileview') !== -1
-            //             && <TileViewButton /> }
-            //         { buttonsRight.indexOf('invite') !== -1
-            //             && <ToolbarButton
-            //                 accessibilityLabel =
-            //                     { t('toolbar.accessibilityLabel.invite') }
-            //                 icon = { IconInviteMore }
-            //                 onClick = { this._onToolbarOpenInvite }
-            //                 tooltip = { t('toolbar.invite') } /> }
-            //         { buttonsRight.indexOf('security') !== -1
-            //             && <SecurityDialogButton customClass = 'security-toolbar-button' /> }
-            //         { buttonsRight.indexOf('overflowmenu') !== -1
-            //             && <OverflowMenuButton
             <div className = { containerClassName }>
                 <div
                     className = 'toolbox-content-wrapper'
