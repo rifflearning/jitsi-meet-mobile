@@ -2,11 +2,8 @@
 
 import React, { PureComponent } from 'react';
 
-<<<<<<< HEAD
 import { maybeExtractIdFromDisplayName } from '../../../riff-dashboard-page/functions';
-import { IconShareDesktop } from '../../icons';
-=======
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
+import { IconShareDesktop } from '../../icons'; 6;
 import { getParticipantById } from '../../participants';
 import { connect } from '../../redux';
 import { getAvatarColor, getInitials } from '../functions';
@@ -213,18 +210,18 @@ class Avatar<P: Props> extends PureComponent<P, State> {
 export function _mapStateToProps(state: Object, ownProps: Props) {
     const { colorBase, displayName, participantId } = ownProps;
     const _participant: ?Object = participantId && getParticipantById(state, participantId);
-<<<<<<< HEAD
+
     const _initialsBase = maybeExtractIdFromDisplayName(_participant?.name).displayName ?? displayName;
-    const screenShares = state['features/video-layout'].screenShares || [];
 
-    let _loadableAvatarUrl = _participant?.loadableAvatarUrl;
+    // const screenShares = state['features/video-layout'].screenShares || [];
 
-    if (participantId && screenShares.includes(participantId)) {
-        _loadableAvatarUrl = IconShareDesktop;
-    }
-=======
-    const _initialsBase = _participant?.name ?? displayName;
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
+    // let _loadableAvatarUrl = _participant?.loadableAvatarUrl;
+
+    // if (participantId && screenShares.includes(participantId)) {
+    //     _loadableAvatarUrl = IconShareDesktop;
+    // }
+
+    // const _initialsBase = _participant?.name ?? displayName;
 
     return {
         _initialsBase,

@@ -13,13 +13,10 @@ import { ActionButton, InputField, PreMeetingScreen, ToggleButton } from '../../
 import { connect } from '../../base/redux';
 import { getDisplayName, updateSettings } from '../../base/settings';
 import { getLocalJitsiVideoTrack } from '../../base/tracks';
-<<<<<<< HEAD
 import { maybeExtractIdFromDisplayName } from '../../riff-dashboard-page/functions';
 import { updateName } from '../../riff-platform/actions/signIn';
 import { previousLocationRoomName } from '../../riff-platform/functions';
-=======
 import { isButtonEnabled } from '../../toolbox/functions.web';
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 import {
     joinConference as joinConferenceAction,
     joinConferenceWithoutAudio as joinConferenceWithoutAudioAction,
@@ -137,7 +134,6 @@ type Props = {
     videoTrack: ?Object,
 
     /**
-<<<<<<< HEAD
      * If the user is anonymous.
      */
     isAnon: Boolean,
@@ -145,12 +141,11 @@ type Props = {
     /**
      * Update name.
      */
-    doUpdateName: Function
-=======
-     * Array with the buttons which this Toolbox should display.
+    doUpdateName: Function,
+
+     /* Array with the buttons which this Toolbox should display.
      */
     visibleButtons: Array<string>
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 };
 
 type State = {
@@ -320,12 +315,9 @@ class Prejoin extends Component<Props, State> {
             showJoinActions,
             t,
             videoTrack,
-<<<<<<< HEAD
             isAnon,
-            doUpdateName
-=======
-            visibleButtons
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
+            doUpdateName,
+            visibleButton
         } = this.props;
 
         const { _closeDialog, _onDropdownClose, _onJoinButtonClick, _onOptionsClick, _setName, _showDialog } = this;
@@ -348,7 +340,6 @@ class Prejoin extends Component<Props, State> {
                     <div className = 'prejoin-input-area-container'>
                         <div className = 'prejoin-input-area'>
                             <InputField
-<<<<<<< HEAD
                                 autofocus = { Boolean(isAnon) }
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onChange = { value => {
@@ -358,12 +349,9 @@ class Prejoin extends Component<Props, State> {
                                         return _setName(`${firebaseIdWithSeparator}${value}`);
                                     }
                                 } }
-=======
                                 autoFocus = { true }
                                 className = { showError ? 'error' : '' }
                                 hasError = { showError }
-                                onChange = { _setName }
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
                                 onSubmit = { joinConference }
                                 placeHolder = { t('dialog.enterDisplayName') }
                                 value = { displayName } />
@@ -399,11 +387,8 @@ class Prejoin extends Component<Props, State> {
                                     isOpen = { showJoinByPhoneButtons }
                                     onClose = { _onDropdownClose }>
                                     <ActionButton
-<<<<<<< HEAD
                                         disabled = { joinButtonDisabled || (isAnon && !displayName) }
-=======
                                         OptionsIcon = { showJoinByPhoneButtons ? IconArrowUp : IconArrowDown }
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
                                         hasOptions = { true }
                                         onClick = { _onJoinButtonClick }
                                         onOptionsClick = { _onOptionsClick }

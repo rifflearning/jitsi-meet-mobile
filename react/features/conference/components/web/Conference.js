@@ -16,19 +16,21 @@ import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
 import { ParticipantsPane } from '../../../participants-pane/components';
 import { getParticipantsPaneOpen } from '../../../participants-pane/functions';
 import { Prejoin, isPrejoinPageVisible } from '../../../prejoin';
-<<<<<<< HEAD
+
 // eslint-disable-next-line max-len
 import DraggableMeetingMediator from '../../../riff-platform/components/DraggableMeetingMediator';
-import {
-    Toolbox,
-    fullScreenChanged,
-    setToolboxAlwaysVisible,
-    showToolbox
-} from '../../../toolbox';
-=======
+
+// HEAD
+//import {
+
+    // Toolbox,
+    // fullScreenChanged,
+    //setToolboxAlwaysVisible
+
+    // showToolbox
+//} from '../../../toolbox';
 import { fullScreenChanged, showToolbox } from '../../../toolbox/actions.web';
 import { Toolbox } from '../../../toolbox/components/web';
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 import { LAYOUTS, getCurrentLayout } from '../../../video-layout';
 import { maybeShowSuboptimalExperienceNotification } from '../../functions';
 import {
@@ -116,11 +118,10 @@ class Conference extends AbstractConference<Props, *> {
     _onFullScreenChange: Function;
     _onShowToolbar: Function;
     _originalOnShowToolbar: Function;
-<<<<<<< HEAD
+
+    // maybe remove ?
     firebaseUnsubscribe: Function;
-=======
     _setBackground: Function;
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
     /**
      * Initializes a new Conference instance.
@@ -206,24 +207,25 @@ class Conference extends AbstractConference<Props, *> {
         } = this.props;
 
         return (
-<<<<<<< HEAD
-            <div
-                className = { _layoutClassName }
-                id = 'videoconference_page'
-                onMouseMove = { this._onShowToolbar }>
 
-                {!_showPrejoin && <DraggableMeetingMediator />}
+        // HEAD
+        // <div
+        //     className = { _layoutClassName }
+        //     id = 'videoconference_page'
+        //     onMouseMove = { this._onShowToolbar }>
 
-                <Notice />
-                <Subject />
-                <InviteMore />
-                <div id = 'videospace'>
-                    <LargeVideo />
-                    <KnockingParticipantList />
-                    <Filmstrip filmstripOnly = { filmstripOnly } />
-                    { hideLabels || <Labels /> }
-                </div>
-=======
+        //     {!_showPrejoin && <DraggableMeetingMediator />}
+
+        //     <Notice />
+        //     <Subject />
+        //     <InviteMore />
+        //     <div id = 'videospace'>
+        //         <LargeVideo />
+        //         <KnockingParticipantList />
+        //         <Filmstrip filmstripOnly = { filmstripOnly } />
+        //         { hideLabels || <Labels /> }
+        //     </div>
+
             <div id = 'layout_wrapper'>
                 <div
                     className = { _layoutClassName }
@@ -231,7 +233,7 @@ class Conference extends AbstractConference<Props, *> {
                     onMouseMove = { this._onShowToolbar }
                     ref = { this._setBackground }>
                     <ConferenceInfo />
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
+
 
                     <Notice />
                     <div id = 'videospace'>

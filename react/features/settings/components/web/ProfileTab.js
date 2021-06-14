@@ -12,11 +12,8 @@ import {
 import { AbstractDialogTab } from '../../../base/dialog';
 import type { Props as AbstractDialogTabProps } from '../../../base/dialog';
 import { translate } from '../../../base/i18n';
-<<<<<<< HEAD
 import { maybeExtractIdFromDisplayName } from '../../../riff-dashboard-page/functions';
-=======
 import { openLogoutDialog } from '../../actions';
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 
 declare var APP: Object;
 

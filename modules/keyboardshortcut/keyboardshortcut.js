@@ -55,12 +55,9 @@ const KeyboardShortcut = {
                 if (_shortcuts.has(key)) {
                     _shortcuts.get(key).function(e);
                 } else if (!isNaN(num) && num >= 0 && num <= 9) {
-<<<<<<< HEAD
                     // disable 0-9 shortcuts
                     // APP.UI.clickOnVideo(num);
-=======
-                    APP.store.dispatch(clickOnVideo(num));
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
+                    // APP.store.dispatch(clickOnVideo(num));
                 }
 
             }

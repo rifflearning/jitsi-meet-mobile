@@ -5,11 +5,8 @@ import React, { Component } from 'react';
 import { MEDIA_TYPE } from '../../../base/media';
 import { getLocalParticipant, getParticipantById, PARTICIPANT_ROLE } from '../../../base/participants';
 import { connect } from '../../../base/redux';
-<<<<<<< HEAD
 import DisplayParticipantNameIndicator from '../../../riff-platform/components/DisplayParticipantNameIndicator';
-=======
 import { getTrackByMediaTypeAndParticipant, isLocalTrackMuted, isRemoteTrackMuted } from '../../../base/tracks';
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
 import { getCurrentLayout, LAYOUTS } from '../../../video-layout';
 
 import AudioMutedIndicator from './AudioMutedIndicator';
@@ -90,19 +87,14 @@ class StatusIndicators extends Component<Props> {
 
         return (
             <div>
-<<<<<<< HEAD
-                { showAudioMutedIndicator ? <AudioMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
-                { showVideoMutedIndicator ? <VideoMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
+                { _showAudioMutedIndicator ? <AudioMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
+                { _showScreenShareIndicator ? <ScreenShareIndicator tooltipPosition = { tooltipPosition } /> : null }
+                { _showVideoMutedIndicator ? <VideoMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
+                { _showModeratorIndicator ? <ModeratorIndicator tooltipPosition = { tooltipPosition } /> : null }
                 <DisplayParticipantNameIndicator
                     participantId = { this.props.participantID }
                     tileView = { _currentLayout }
                     tooltipPosition = { tooltipPosition } />
-=======
-                { _showAudioMutedIndicator ? <AudioMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
-                { _showScreenShareIndicator ? <ScreenShareIndicator tooltipPosition = { tooltipPosition } /> : null }
-                { _showVideoMutedIndicator ? <VideoMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
-                { _showModeratorIndicator ? <ModeratorIndicator tooltipPosition = { tooltipPosition } /> : null }
             </div>
         );
     }

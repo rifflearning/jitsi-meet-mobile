@@ -32,22 +32,6 @@ export function selectEndpoints(participantIds: Array<string>) {
  *
  * @param {string} participantIds - The remote participants which currently have active
  * screen share streams.
-<<<<<<< HEAD
- * @returns {Function}
- */
-export function setParticipantsWithScreenShare(participantIds: Array<string>) {
-    return (dispatch: Dispatch<any>) => {
-
-        // back to tile view after opponent stop screen sharing
-        if (participantIds.length === 0) {
-            dispatch(setTileView(true));
-        }
-
-        return dispatch({
-            type: SCREEN_SHARE_PARTICIPANTS_UPDATED,
-            participantIds
-        });
-=======
  * @returns {{
  *     type: SCREEN_SHARE_REMOTE_PARTICIPANTS_UPDATED,
  *     participantId: string
@@ -57,7 +41,6 @@ export function setRemoteParticipantsWithScreenShare(participantIds: Array<strin
     return {
         type: SCREEN_SHARE_REMOTE_PARTICIPANTS_UPDATED,
         participantIds
->>>>>>> 6b115d773c312ee641fec72a6aa4ba56f69c9696
     };
 }
 
