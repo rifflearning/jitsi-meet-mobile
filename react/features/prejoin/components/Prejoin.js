@@ -317,13 +317,15 @@ class Prejoin extends Component<Props, State> {
             videoTrack,
             isAnon,
             doUpdateName,
-            visibleButton
+            visibleButtons
         } = this.props;
 
         const { _closeDialog, _onDropdownClose, _onJoinButtonClick, _onOptionsClick, _setName, _showDialog } = this;
         const { showJoinByPhoneButtons, showError } = this.state;
 
         const { firebaseIdWithSeparator, displayName } = maybeExtractIdFromDisplayName(name);
+
+        const joinButtonDisabled = this.props.showErrorOnJoin;
 
         return (
             <PreMeetingScreen
@@ -341,6 +343,8 @@ class Prejoin extends Component<Props, State> {
                         <div className = 'prejoin-input-area'>
                             <InputField
                                 autofocus = { Boolean(isAnon) }
+                                className = { showError ? 'error' : '' }
+                                hasError = { showError }
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onChange = { value => {
                                     if (isAnon) {
@@ -349,9 +353,6 @@ class Prejoin extends Component<Props, State> {
                                         return _setName(`${firebaseIdWithSeparator}${value}`);
                                     }
                                 } }
-                                autoFocus = { true }
-                                className = { showError ? 'error' : '' }
-                                hasError = { showError }
                                 onSubmit = { joinConference }
                                 placeHolder = { t('dialog.enterDisplayName') }
                                 value = { displayName } />
@@ -387,8 +388,8 @@ class Prejoin extends Component<Props, State> {
                                     isOpen = { showJoinByPhoneButtons }
                                     onClose = { _onDropdownClose }>
                                     <ActionButton
-                                        disabled = { joinButtonDisabled || (isAnon && !displayName) }
                                         OptionsIcon = { showJoinByPhoneButtons ? IconArrowUp : IconArrowDown }
+                                        disabled = { joinButtonDisabled || (isAnon && !displayName) }
                                         hasOptions = { true }
                                         onClick = { _onJoinButtonClick }
                                         onOptionsClick = { _onOptionsClick }
