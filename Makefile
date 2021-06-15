@@ -106,7 +106,7 @@ deploy-aws: all
 
 .NOTPARALLEL:
 
-dev: deploy-init deploy-css deploy-rnnoise-binary deploy-lib-jitsi-meet deploy-libflac
+dev: deploy-init deploy-css deploy-rnnoise-binary deploy-lib-jitsi-meet deploy-libflac deploy-olm
 	$(WEBPACK_DEV_SERVER) --host 0.0.0.0
 
 # dev: deploy-init deploy-css deploy-rnnoise-binary deploy-tflite deploy-meet-models deploy-lib-jitsi-meet deploy-libflac deploy-olm
