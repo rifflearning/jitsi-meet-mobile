@@ -1,3 +1,5 @@
+$violetColor: #775e80;
+
 html body {
   background-color: $defaultBackground;
 
@@ -178,5 +180,22 @@ body > .tooltip {
 }
 
 .premeeting-screen .content input.field.focused {
-    box-shadow: 0 0 4px 3px #775e80;
+    box-shadow: 0 0 4px 3px $violetColor;
 }
+
+.watermark {
+    width: 186px;
+    height: 74px;
+}
+
+.participants_pane-content button {
+    background: $primaryButtonBackground;
+
+        &:hover {
+            background: $primaryButtonHoverBackground;
+        }
+}
+
+.invite-more-dialog .copy-button {
+    background: $primaryButtonBackground;
+} 
