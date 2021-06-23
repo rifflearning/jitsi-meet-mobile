@@ -74,7 +74,7 @@
 	<string>Participate in meetings with voice.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
-		<string>org.jitsi.JitsiMeet.ios.conference</string>
+		<string>ai.riffanalytics.connect.ios.conference</string>
 	</array>
 	<key>RTCAppGroupIdentifier</key>
 	<string>group.ai.riffanalytics.connect.appgroup</string>
