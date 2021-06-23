@@ -8,6 +8,11 @@ Can't find the 'node' binary to build the React Native bundle.  If you have a no
 
 This error is most likely due to installing Node via brew;  which is good and ok.  the above command creates a symlink to node where the react-native scroptes can find it.
 
+
+#when running the ./build-ios.release.sh you will get a bitcode error until you run the script below
+jitsi-meet-mobile/node_modules/react-native-webrtc/tools/downloadBitcode.sh
+
+
 # Jitsi Meet SDK for iOS
 
 This document has been moved to [The Handbook](https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ios-sdk).
