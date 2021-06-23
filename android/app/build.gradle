@@ -16,12 +16,16 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    lintOptions {
+        abortOnError false
+    }
+
     packagingOptions {
         exclude 'lib/*/libhermes*.so'
     }
 
     defaultConfig {
-        applicationId 'org.jitsi.meet'
+        applicationId 'ai.riffanalytics.connect'
         versionCode vcode
         versionName project.appVersion
 
