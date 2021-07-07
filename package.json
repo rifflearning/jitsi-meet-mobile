@@ -15,7 +15,6 @@
   "author": "",
   "readmeFilename": "README.md",
   "dependencies": {
-    "@amcharts/amcharts4": "^4.10.16",
     "@atlaskit/button": "15.1.4",
     "@atlaskit/checkbox": "12.0.0",
     "@atlaskit/dropdown-menu": "10.1.2",
@@ -134,6 +133,7 @@
     "util": "0.12.1",
     "uuid": "3.1.0",
     "wasm-check": "2.0.1",
+    "webpack": "^4.28.4",
     "windows-iana": "^3.1.0",
     "xmldom": "0.5.0",
     "zxcvbn": "4.4.2"
@@ -173,7 +173,6 @@
     "string-replace-loader": "2.1.1",
     "style-loader": "0.19.0",
     "unorm": "1.6.0",
-    "webpack": "4.43.0",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.11",
     "webpack-dev-server": "3.11.0"
