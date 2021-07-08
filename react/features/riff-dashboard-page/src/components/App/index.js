@@ -16,21 +16,21 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { replace } from 'connected-react-router';
 
-import { startFirebaseLoginListener } from 'Redux/listeners/firebase';
+import { startFirebaseLoginListener } from 'redux/listeners/firebase';
 import {
     changeDisplayName,
     changeRoomId,
     changeRoomName,
     setInviteId
-} from 'Redux/actions/chat';
-import { ltiLoginSuccess, qparamLoginSuccess } from 'Redux/actions/user';
+} from 'redux/actions/chat';
+import { ltiLoginSuccess, qparamLoginSuccess } from 'redux/actions/user';
 import {
     attemptRiffAuthenticate,
     riffGetIsHostInRoom,
     riffGetRoomFromId,
     updateIsMeetingStarted,
-} from 'Redux/actions/riff';
-import { getIsRiffConnected } from 'Redux/selectors/riff';
+} from 'redux/actions/riff';
+import { getIsRiffConnected } from 'redux/selectors/riff';
 import { logger } from 'libs/utils';
 
 import { App } from './App';

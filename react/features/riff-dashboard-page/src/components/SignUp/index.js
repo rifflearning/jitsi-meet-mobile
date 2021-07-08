@@ -17,15 +17,15 @@
 import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
 
-import { firebaseLoginSuccess } from 'Redux/actions/user';
+import { firebaseLoginSuccess } from 'redux/actions/user';
 import {
     changeDisplayName,
     changeRoomId,
     changeRoomName,
-} from 'Redux/actions/chat';
-import { getInviteId } from 'Redux/selectors/chat';
-import { getIsPersonalMode } from 'Redux/selectors/config';
-import { Routes } from 'Redux/constants';
+} from 'redux/actions/chat';
+import { getInviteId } from 'redux/selectors/chat';
+import { getIsPersonalMode } from 'redux/selectors/config';
+import { Routes } from 'redux/constants';
 
 import { SignUpView } from './SignUpView';
 

@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 //import * as am4charts from '@amcharts/amcharts4/charts';
 import * as d3 from 'd3-array';
 
-import { ScaleLoader } from 'react-spinners';
+//this is not compat with react-native
+//import { ScaleLoader } from 'react-spinners';
 import { logger } from 'libs/utils';
 import { Colors } from './colorsHelpers';
 

@@ -21,8 +21,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 //import * as am4core from '@amcharts/amcharts4/core';
 //import * as am4charts from '@amcharts/amcharts4/charts';
-
-import { ScaleLoader } from 'react-spinners';
+//this is not compatible with react-native
+//import { ScaleLoader } from 'react-spinners';
 
 import { logger } from 'libs/utils';
 import {

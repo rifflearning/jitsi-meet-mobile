@@ -27,7 +27,7 @@ import firebase from 'firebase/app';
 // (in our case only the single auth service)
 import 'firebase/auth';
 
-import { getFirebaseConfig } from 'Redux/selectors/config';
+import { getFirebaseConfig } from '../../redux/selectors/config';
 
 import { logger } from './logger';
 import { validateEmail } from './user_utils';

@@ -17,14 +17,14 @@
 import { connect } from 'react-redux';
 
 import { app as riffServer } from 'libs/riffdata-client';
-import { userUpdateInfo } from 'Redux/actions/user';
-import { changeDisplayName } from 'Redux/actions/chat';
+import { userUpdateInfo } from 'redux/actions/user';
+import { changeDisplayName } from 'redux/actions/chat';
 import {
     getUserEmail,
     getUserId,
     getUserName,
     getUserRoomName,
-} from 'Redux/selectors/user';
+} from 'redux/selectors/user';
 
 import { ProfileView } from './ProfileView';
 

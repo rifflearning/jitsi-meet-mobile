@@ -16,6 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+//this is not compat with react-native
 import { ScaleLoader } from 'react-spinners';
 import { Helmet } from 'react-helmet';
 //not compatible with react-native

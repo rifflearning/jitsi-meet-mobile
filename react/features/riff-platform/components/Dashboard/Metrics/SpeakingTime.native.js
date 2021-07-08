@@ -22,11 +22,12 @@
 
 //import * as am4charts from '@amcharts/amcharts4/charts';
 //import * as am4core from '@amcharts/amcharts4/core';
-import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
+//import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { ScaleLoader } from 'react-spinners';
+//not compat with react-native
+//import { ScaleLoader } from 'react-spinners';
 
 import ChartCard from '../ChartCard/ChartCard';
 import { Colors, getColorMap } from '../colorHelper';

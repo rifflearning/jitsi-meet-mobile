@@ -12,7 +12,7 @@
  *
  * ******************************************************************************/
 
-import { getSurveySettings } from 'Redux/selectors/config';
+import { getSurveySettings } from '../../redux/selectors/config';
 
 /* ******************************************************************************
  * initSurveyUrls                                                          */ /**

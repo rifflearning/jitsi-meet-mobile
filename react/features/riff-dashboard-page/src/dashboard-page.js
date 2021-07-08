@@ -28,8 +28,8 @@ import { ConnectedRouter } from 'connected-react-router';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { persistor, store } from 'Redux/store';
-import { getRtcServerVer } from 'Redux/selectors/config';
+import { persistor, store } from 'redux/store';
+import { getRtcServerVer } from 'redux/selectors/config';
 import { logger } from 'libs/utils';
 
 import { browserHistory } from './history';

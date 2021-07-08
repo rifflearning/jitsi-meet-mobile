@@ -21,7 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { getUserId } from 'Redux/selectors/user';
+import { getUserId } from 'redux/selectors/user';
 
 import Mediator from 'libs/charts';
 import { app } from '../../../../../../riff-platform/libs/riffdata-client';

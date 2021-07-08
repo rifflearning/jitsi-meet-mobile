@@ -20,14 +20,16 @@
 // eslint-disable-next-line camelcase
 //import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import {
-    MeetingInfo,
-    MeetingList
-} from '@rifflearning/riff-metrics';
+//not compatible with react-native due to amchart depend
+//import {
+//    MeetingInfo,
+//    MeetingList
+//} from '@rifflearning/riff-metrics';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { ScaleLoader } from 'react-spinners';
+//JERRY react-spinner not react-native compat
+//import { ScaleLoader } from 'react-spinners';
 
 import Affirmations from '../Metrics/Affirmations';
 import EmotionsChart from '../Metrics/EmotionsChart';

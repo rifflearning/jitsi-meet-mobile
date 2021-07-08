@@ -19,12 +19,15 @@
 
 //import * as am4charts from '@amcharts/amcharts4/charts';
 //import * as am4core from '@amcharts/amcharts4/core';
-import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
+//not compat with react-native due to depend on amchart
+//import { GraphDatasetTypes, GraphTypes } from '@rifflearning/riff-metrics';
 import * as d3 from 'd3-time-format';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { ScaleLoader } from 'react-spinners';
+
+//this is not compat with react-native
+//import { ScaleLoader } from 'react-spinners';
 import { createSelector } from 'reselect';
 
 import ChartCard from '../ChartCard/ChartCard';

@@ -21,18 +21,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Router } from 'react-router';
 import { Helmet } from 'react-helmet';
-import { ScaleLoader } from 'react-spinners';
+//this is not compat with react-native
+//import { ScaleLoader } from 'react-spinners';
 import { v4 as uuidv4 } from 'uuid';
 
-import { store } from 'Redux/store';
-import { getDummyEmailDomain, getIsPersonalMode, getUseSurveyLogin } from 'Redux/selectors/config';
+import { store } from 'redux/store';
+import { getDummyEmailDomain, getIsPersonalMode, getUseSurveyLogin } from 'redux/selectors/config';
 import {
     getCanUserBeInvited,
     getIsUserLoggedIn,
     getUserId,
     getUserRoomId,
-} from 'Redux/selectors/user';
-import { Routes } from 'Redux/constants';
+} from 'redux/selectors/user';
+import { Routes } from 'redux/constants';
 import { Colors, isCSSAnimationsSupported, logger, surveys } from 'libs/utils';
 
 import { Chat } from 'components/Chat';

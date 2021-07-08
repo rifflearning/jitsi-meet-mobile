@@ -18,7 +18,7 @@ import { logger } from 'libs/utils';
 import {
     TEXT_CHAT_MSG_UPDATE,
     TEXT_CHAT_SET_BADGE,
-} from 'Redux/constants/ActionTypes';
+} from 'redux/constants/ActionTypes';
 
 const updateTextChat = (message, meeting, participant, time) => {
     const messageObj = { message, meeting, participant, time };
