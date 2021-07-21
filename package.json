@@ -184,7 +184,7 @@
   "scripts": {
     "lint": "eslint . && flow",
     "lint-fix": "eslint --fix .",
-    "postinstall": "patch-package && jetify",
+    "postinstall": "patch-package && jetify && cp ./d3-array.js.patch node_modules/d3-array/dist/d3-array.js",
     "validate": "npm ls",
     "start": "make dev",
     "ios": "react-native run-ios",
