@@ -1,6 +1,6 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.jitsi.meet"
+    package="ai.riffanalytics.connect"
     android:installLocation="auto">
   <application
       android:allowBackup="true"
@@ -28,15 +28,15 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
-        <data android:host="alpha.jitsi.net" android:scheme="https" />
-        <data android:host="beta.meet.jit.si" android:scheme="https" />
-        <data android:host="meet.jit.si" android:scheme="https" />
+        <data android:host="riffai.riffremote.com" android:scheme="https" />
+        <data android:host="ai.riffremote.com" android:scheme="https" />
+        <data android:host="dev-jitsi.riffplatform.com" android:scheme="https" />
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
-        <data android:scheme="org.jitsi.meet" />
+        <data android:scheme="ai.riffanalytics.connect" />
       </intent-filter>
     </activity>
   </application>

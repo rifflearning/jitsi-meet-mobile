@@ -3,11 +3,11 @@
         "apps": [],
         "details": [
             {
-                "appID": "BQNXB4G3KQ.org.jitsi.JitsiMeet.ios",
+                "appID": "BQNXB4G3KQ.ai.riffanalytics.connect.ios",
                 "paths": [ "*" ]
             },
             {
-                "appID": "UPXU4CQZ5P.com.atlassian.JitsiMeet.ios",
+                "appID": "UPXU4CQZ5P.ai.riffanalytics.connect.ios",
                 "paths": [ "*" ]
             }
         ]

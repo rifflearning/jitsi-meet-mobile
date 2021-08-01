@@ -30,14 +30,14 @@
     JitsiMeet *jitsiMeet = [JitsiMeet sharedInstance];
 
     jitsiMeet.conferenceActivityType = JitsiMeetConferenceActivityType;
-    jitsiMeet.customUrlScheme = @"org.jitsi.meet";
-    jitsiMeet.universalLinkDomains = @[@"meet.jit.si", @"alpha.jitsi.net", @"beta.meet.jit.si"];
+    jitsiMeet.customUrlScheme = @"ai.riffanalytics.connect";
+    jitsiMeet.universalLinkDomains = @[@"dev-jitsi.riffplatform.com", @"riffai.riffremote.com", @"ai.riffremote.com"];
 
     jitsiMeet.defaultConferenceOptions = [JitsiMeetConferenceOptions fromBuilder:^(JitsiMeetConferenceOptionsBuilder *builder) {
         [builder setFeatureFlag:@"resolution" withValue:@(360)];
         [builder setFeatureFlag:@"ios.screensharing.enabled" withBoolean:YES];
-        builder.serverURL = [NSURL URLWithString:@"https://meet.jit.si"];
-        builder.welcomePageEnabled = YES;
+        builder.serverURL = [NSURL URLWithString:@"https://dev-jitsi.riffplatform.com"];
+        builder.welcomePageEnabled = YES; //Jerry riff: was yes, let's see if this fixes splash screen issue
 
         // Apple rejected our app because they claim requiring a
         // Dropbox account for recording is not acceptable.
