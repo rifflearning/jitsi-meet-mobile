@@ -45,7 +45,7 @@
     },
     "calendarSync": {
         "addMeetingURL": "Ajouter un lien de conférence",
-        "confirmAddLink": "Voulez-vous ajouter un lien Jitsi à cet événement ?",
+        "confirmAddLink": "Voulez-vous ajouter un lien Riff Connect à cet événement ?",
         "error": {
             "appConfiguration": "L'intégration du calendrier n'est pas correctement configurée.",
             "generic": "Une erreur s'est produite. Veuillez vérifier les paramètres de votre calendrier ou tenter de l'actualiser.",
@@ -360,7 +360,7 @@
         "answer": "Répondre",
         "audioCallTitle": "Appel entrant",
         "decline": "Rejeter",
-        "productLabel": "via Jitsi Meet",
+        "productLabel": "via Riff Connect",
         "videoCallTitle": "Appel vidéo entrant"
     },
     "info": {
@@ -526,7 +526,7 @@
         "newDeviceAudioTitle": "Nouveau périphérique audio détecté",
         "newDeviceAction": "Utiliser",
         "OldElectronAPPTitle": "Vulnérabilité de sécurité !",
-        "oldElectronClientDescription1": "Vous semblez utiliser une ancienne version du client Jitsi Meet qui présente des vulnérabilités de sécurité connues. Veuillez vous assurer de mettre à jour vers notre ",
+        "oldElectronClientDescription1": "Vous semblez utiliser une ancienne version du client Riff Connect qui présente des vulnérabilités de sécurité connues. Veuillez vous assurer de mettre à jour vers notre ",
         "oldElectronClientDescription2": "dernière build",
         "oldElectronClientDescription3": " rapidement !"
     },
@@ -919,11 +919,11 @@
         "getHelp": "Obtenir de l'aide",
         "go": "Créer",
         "goSmall": "Créer",
-        "headerTitle": "Jitsi Meet",
+        "headerTitle": "Riff Connect",
         "headerSubtitle": "Conférences sécurisées et de haute qualité",
         "info": "Infos",
         "join": "CRÉER / REJOINDRE",
-        "jitsiOnMobile": "Jitsi sur mobile – télécharger notre application et démarrez des conférences de n'import où",
+        "RiffConnectOnMobile": "Riff Connect sur mobile – télécharger notre application et démarrez des conférences de n'import où",
         "moderatedMessage": "Ou <a href=\"{{url}}\" rel=\"noopener noreferrer\" target=\"_blank\">réserver une URL de réunion</a> à l'avance et où vous êtes le seul modérateur.",
         "privacy": "Confidentialité",
         "recentList": "Récent",
